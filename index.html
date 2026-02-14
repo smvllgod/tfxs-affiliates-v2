@@ -291,6 +291,7 @@
     <div id="broker-select-options" class="max-h-48 overflow-y-auto py-1"></div>
 </div>
 <div id="timeframe-dropdown-portal" class="hidden fixed w-52 rounded-xl border border-white/10 bg-[#111] shadow-2xl overflow-hidden" style="z-index: 99999;"></div>
+<div id="broker-filter-portal" class="hidden fixed w-52 rounded-xl border border-white/10 bg-[#111] shadow-2xl overflow-hidden" style="z-index: 99999;"></div>
 
     <div class="halo-bg"></div>
 
@@ -519,9 +520,13 @@
             <!-- Broker Filter -->
             <div class="glass-panel px-4 py-2 rounded-lg flex items-center gap-2 border-white/10">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-brand-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
-                <select id="broker-filter" class="bg-transparent text-sm font-medium text-white border-none focus:ring-0 outline-none cursor-pointer appearance-none pr-6" style="background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 fill=%22%236b7280%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M19 9l-7 7-7-7%22 stroke=%22%236b7280%22 stroke-width=%222%22 fill=%22none%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 0 center;">
-                    <option value="">All Brokers</option>
-                </select>
+                <div class="custom-select relative" id="broker-filter-wrapper">
+                    <button type="button" id="broker-filter-btn" class="bg-transparent text-sm font-medium text-white flex items-center gap-2 cursor-pointer outline-none">
+                        <span id="broker-filter-label">All Brokers</span>
+                        <svg class="w-3.5 h-3.5 text-gray-500 shrink-0 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <input type="hidden" id="broker-filter" value="">
+                </div>
             </div>
 
             
@@ -1405,10 +1410,10 @@
                 const maxReg = Math.max(...regData, 0);
                 const regTick = _smartRegTick(maxReg);
                 revenueChart.xAxis[0].setCategories(labels, false);
-                revenueChart.series[0].setData(commData, false);
-                revenueChart.series[1].setData(regData, false);
+                revenueChart.series[0].setData(commData, true);
+                revenueChart.series[1].setData(regData, true);
                 revenueChart.yAxis[1].update({ tickInterval: regTick.interval, max: regTick.max }, false);
-                revenueChart.redraw(false);
+                revenueChart.redraw(true);
                 _lastUpdateTs = Date.now();
             };
 
@@ -1441,7 +1446,7 @@
                     height: null,
                     backgroundColor: 'transparent',
                     spacing: window.innerWidth < 640 ? [8, 4, 6, 4] : [4, 8, 0, 8],
-                    animation: { duration: 200 },
+                    animation: { duration: 600, easing: 'easeOutCubic' },
                     reflow: true,
                     zooming: { type: 'x' },
                     resetZoomButton: {
@@ -1555,7 +1560,7 @@
                         threshold: null
                     },
                     series: {
-                        animation: { duration: 200 },
+                        animation: { duration: 600 },
                         turboThreshold: 5000
                     }
                 },

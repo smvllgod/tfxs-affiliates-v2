@@ -359,6 +359,9 @@ async function deleteBrokerPrefixAPI(id) {
   return res.json();
 }
 
+/** Normalize broker names in existing conversions */
+async function normalizeBrokersAPI() { return apiSend("POST", "/admin/normalize-brokers", {}); }
+
 // ── Make available globally (no ES modules in static pages) ──
 window.TFXS_API = {
   API_BASE,
@@ -374,6 +377,7 @@ window.TFXS_API = {
   fetchBrokerPrefixes,
   addBrokerPrefixAPI,
   deleteBrokerPrefixAPI,
+  normalizeBrokersAPI,
   fetchSummary,
   fetchEvents,
   fetchDeals,

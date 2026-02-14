@@ -1153,6 +1153,14 @@ function selectConvUser(userId, country, deposit) {
 }
 
 function openConvModal(data) {
+  // Populate broker dropdown from allBrokers
+  const brokerSel = $("conv-broker");
+  if (brokerSel && brokerSel.tagName === "SELECT") {
+    const currentVal = data ? ((data.broker || "").trim() || (data.admin_note || "").replace(/^broker:/, "").trim()) : "";
+    brokerSel.innerHTML = '<option value="">Select a broker...</option>' +
+      allBrokers.map(b => `<option value="${esc(b.name)}"${b.name === currentVal ? ' selected' : ''}>${esc(b.name)}</option>`).join('');
+  }
+
   if (data && data.id) {
     $("conv-modal-title").textContent = "Edit Conversion";
     $("conv-edit-id").value = data.id;
@@ -1165,7 +1173,7 @@ function openConvModal(data) {
     $("conv-country").value = data.country || "";
     $("conv-deposit").value = data.deposit_amount || "";
     $("conv-commission").value = data.commission_amount || "";
-    $("conv-broker").value = (data.admin_note || "").replace(/^broker:/, "") || "";
+    // broker already set above via dropdown population
     // Set date
     if (data.occurred_at && $("conv-date")) {
       const d = new Date(data.occurred_at);
@@ -1183,7 +1191,7 @@ function openConvModal(data) {
     $("conv-country").value = "";
     $("conv-deposit").value = "";
     $("conv-commission").value = "";
-    if ($("conv-broker")) $("conv-broker").value = "";
+    if (brokerSel) brokerSel.value = "";
     // Default date to now
     if ($("conv-date")) $("conv-date").value = new Date().toISOString().slice(0, 16);
   }
@@ -1943,13 +1951,24 @@ async function addBrokerPrefix() {
 }
 
 async function deleteBrokerPrefix(id) {
-  if (!confirm("Delete this prefix mapping?")) return;
+  if (!await tfxsConfirm("This prefix mapping will be removed.", { title: "Delete Prefix Mapping", okText: "Delete", variant: "danger" })) return;
   try {
     const { deleteBrokerPrefixAPI } = window.TFXS_API;
     await deleteBrokerPrefixAPI(id);
     toast("Prefix rule deleted");
     await loadBrokerPrefixes();
   } catch (e) { toast("Failed to delete prefix: " + e.message, "error"); }
+}
+
+async function normalizeBrokerNames() {
+  const btn = $("normalize-brokers-btn");
+  if (btn) { btn.disabled = true; btn.textContent = "Normalizing..."; }
+  try {
+    const { normalizeBrokersAPI } = window.TFXS_API;
+    const res = await normalizeBrokersAPI();
+    toast(`Broker names normalized — ${res.updated || 0} conversion(s) updated`);
+  } catch (e) { toast("Normalization failed: " + e.message, "error"); }
+  if (btn) { btn.disabled = false; btn.textContent = "Normalize"; }
 }
 
 // ══════════════════════════════════════════════════════

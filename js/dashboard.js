@@ -38,27 +38,75 @@
     attemptConnection();
   });
 
-  // ── Broker filter dropdown ──────────────────────────────
+  // ── Broker filter dropdown (custom portal — matches timeframe style) ──
+  let _brokerFilterItems = [{ value: '', label: 'All Brokers' }];
+
   async function populateBrokerFilter() {
-    const select = document.getElementById('broker-filter');
-    if (!select) return;
+    const hidden = document.getElementById('broker-filter');
+    const btn    = document.getElementById('broker-filter-btn');
+    const label  = document.getElementById('broker-filter-label');
+    const portal = document.getElementById('broker-filter-portal');
+    if (!hidden || !btn || !portal) return;
+
     try {
       const res = await fetchBrokers();
       if (res?.ok && res.data?.length) {
-        res.data.forEach(b => {
-          const opt = document.createElement('option');
-          opt.value = b.name;
-          opt.textContent = b.name;
-          select.appendChild(opt);
-        });
+        _brokerFilterItems = [{ value: '', label: 'All Brokers' }];
+        res.data.forEach(b => _brokerFilterItems.push({ value: b.name, label: b.name }));
       }
     } catch (e) {
       console.warn('[TFXS] Could not load brokers for filter:', e.message);
     }
+
+    function renderFilterOpts() {
+      portal.innerHTML = '<div class="max-h-72 overflow-y-auto py-1">' +
+        _brokerFilterItems.map(o => `<div class="custom-select-opt px-3 py-2.5 text-sm cursor-pointer hover:bg-white/10 transition text-white${o.value === hidden.value ? ' bg-white/5 text-brand-500 font-medium' : ''}" data-value="${o.value}">${o.label}</div>`).join('') +
+      '</div>';
+      portal.querySelectorAll('.custom-select-opt').forEach(opt => {
+        opt.addEventListener('click', () => {
+          hidden.value = opt.dataset.value;
+          label.textContent = opt.textContent;
+          portal.classList.add('hidden');
+          btn.querySelector('svg').classList.remove('rotate-180');
+          hidden.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+      });
+    }
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = !portal.classList.contains('hidden');
+      document.querySelectorAll('.custom-select-dd-open').forEach(d => { d.classList.add('hidden'); d.classList.remove('custom-select-dd-open'); });
+      if (!open) {
+        const rect = btn.getBoundingClientRect();
+        portal.style.top = (rect.bottom + 4) + 'px';
+        portal.style.left = rect.left + 'px';
+        portal.classList.remove('hidden');
+        portal.classList.add('custom-select-dd-open');
+        btn.querySelector('svg').classList.add('rotate-180');
+        renderFilterOpts();
+      } else {
+        btn.querySelector('svg').classList.remove('rotate-180');
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#broker-filter-wrapper') && !e.target.closest('#broker-filter-portal')) {
+        portal.classList.add('hidden');
+        btn.querySelector('svg').classList.remove('rotate-180');
+      }
+    });
+
+    window.addEventListener('scroll', () => {
+      if (!portal.classList.contains('hidden')) {
+        portal.classList.add('hidden');
+        btn.querySelector('svg').classList.remove('rotate-180');
+      }
+    }, true);
+
     // Re-load dashboard when broker filter changes
-    select.addEventListener('change', () => {
+    hidden.addEventListener('change', () => {
       if (typeof loadLiveData === 'function') loadLiveData().catch(() => {});
-      // Also trigger the Update button logic if updateDashboardData exists
       if (typeof window.updateDashboardData === 'function') window.updateDashboardData();
     });
   }
