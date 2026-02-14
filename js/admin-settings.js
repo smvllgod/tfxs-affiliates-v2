@@ -1174,10 +1174,14 @@ function openConvModal(data) {
     $("conv-deposit").value = data.deposit_amount || "";
     $("conv-commission").value = data.commission_amount || "";
     // broker already set above via dropdown population
-    // Set date
+    // Set date via Flatpickr
     if (data.occurred_at && $("conv-date")) {
       const d = new Date(data.occurred_at);
-      $("conv-date").value = d.toISOString().slice(0, 16);
+      if ($("conv-date")._flatpickr) {
+        $("conv-date")._flatpickr.setDate(d, true);
+      } else {
+        $("conv-date").value = d.toISOString().slice(0, 16);
+      }
     }
   } else {
     $("conv-modal-title").textContent = "Add Conversion";
@@ -1192,8 +1196,14 @@ function openConvModal(data) {
     $("conv-deposit").value = "";
     $("conv-commission").value = "";
     if (brokerSel) brokerSel.value = "";
-    // Default date to now
-    if ($("conv-date")) $("conv-date").value = new Date().toISOString().slice(0, 16);
+    // Default date to now via Flatpickr
+    if ($("conv-date")) {
+      if ($("conv-date")._flatpickr) {
+        $("conv-date")._flatpickr.setDate(new Date(), true);
+      } else {
+        $("conv-date").value = new Date().toISOString().slice(0, 16);
+      }
+    }
   }
   onConvTypeChange();
   if ($("conv-uid-info")) $("conv-uid-info").classList.add("hidden");
@@ -1215,9 +1225,14 @@ async function submitConversion() {
     deposit_amount: Number($("conv-deposit").value) || 0,
     commission_amount: Number($("conv-commission").value) || 0,
   };
-  // Add custom date
-  if ($("conv-date") && $("conv-date").value) {
-    body.occurred_at = new Date($("conv-date").value).toISOString();
+  // Add custom date (from Flatpickr or raw value)
+  if ($("conv-date")) {
+    const fp = $("conv-date")._flatpickr;
+    if (fp && fp.selectedDates.length) {
+      body.occurred_at = fp.selectedDates[0].toISOString();
+    } else if ($("conv-date").value) {
+      body.occurred_at = new Date($("conv-date").value).toISOString();
+    }
   }
   // Add broker
   if ($("conv-broker") && $("conv-broker").value.trim()) {
@@ -2070,6 +2085,22 @@ const fpOpts = { dateFormat: "Y-m-d", theme: "dark", disableMobile: true, monthS
   const el = $(id);
   if (el) flatpickr(el, fpOpts);
 });
+
+// Init flatpickr on conversion date (datetime picker)
+const convDateEl = $("conv-date");
+if (convDateEl && !convDateEl._flatpickr) {
+  flatpickr(convDateEl, {
+    enableTime: true,
+    time_24hr: true,
+    dateFormat: "Y-m-d H:i",
+    theme: "dark",
+    disableMobile: true,
+    monthSelectorType: "static",
+    allowInput: false,
+    defaultHour: new Date().getHours(),
+    defaultMinute: new Date().getMinutes()
+  });
+}
 
 // ══════════════════════════════════════════════════════
 // BROKER COLOR PICKER SYNC

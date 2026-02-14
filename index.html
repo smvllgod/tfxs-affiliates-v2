@@ -1024,11 +1024,8 @@
             // QFTD: only count actual qualified_cpa events (not mock logic)
             const qftDs = filteredEarnings.filter(e => e.type === 'QCPA').length;
             // ROI calculation using real deposit data + formula from backend
-            const totalDeposit = filteredEarnings.reduce((acc, curr) => {
-                // Use firstDeposit from matching registration if available
-                const reg = filteredRegs.find(r => r.userId === curr.userId);
-                return acc + (reg ? reg.firstDeposit : 0);
-            }, 0);
+            // Sum firstDeposit per unique user from registrations (not per earning event)
+            const totalDeposit = filteredRegs.reduce((acc, reg) => acc + (reg.firstDeposit || 0), 0);
             const roiFormula = window._tfxsRoiFormula || "deposit_div_commission";
             const roi = window.calculateROI ? window.calculateROI(roiFormula, totalDeposit, totalCommission) : (totalCommission > 0 ? (totalDeposit / totalCommission).toFixed(2) : "0.00");
 
@@ -1445,7 +1442,7 @@
                     type: 'areaspline',
                     height: null,
                     backgroundColor: 'transparent',
-                    spacing: window.innerWidth < 640 ? [8, 4, 6, 4] : [4, 8, 0, 8],
+                    spacing: window.innerWidth < 640 ? [8, 4, 6, 4] : [24, 8, 0, 8],
                     animation: { duration: 600, easing: 'easeOutCubic' },
                     reflow: true,
                     zooming: { type: 'x' },
