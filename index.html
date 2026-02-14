@@ -607,7 +607,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-in-up" style="animation-delay: 0.2s;">
             
             <!-- Chart Section -->
-            <div class="lg:col-span-2 glass-panel rounded-2xl p-4 md:p-5 flex flex-col border border-white/5 chart-card-desktop">
+            <div class="lg:col-span-2 glass-panel rounded-2xl p-4 md:p-5 flex flex-col border border-white/5">
                 <div class="flex justify-between items-center mb-2">
                     <div>
                         <h3 class="text-lg font-bold text-white" data-i18n="dash.revenueAnalytics">Revenue Analytics</h3>
@@ -625,16 +625,16 @@
                     </div>
                 </div>
                 <div id="chartArea" class="relative w-full" style="flex:1 1 0%; min-height:0; overflow:visible;">
-                <style>@media(min-width:1024px){#chartArea{min-height:380px;flex:1 1 auto}.chart-card-desktop{overflow:visible !important}}</style>
+                <style>@media(min-width:1024px){#chartArea{min-height:380px;flex:1 1 auto}}</style>
                     <div id="revenueChartContainer" style="width:100%;height:100%;overflow:visible;"></div>
                 </div>
             </div>
 
             <!-- Side Widgets -->
             <div class="space-y-6 flex flex-col">
-                <!-- Insights & Global Map -->
-                <div class="glass-panel rounded-2xl p-6 flex-1 flex flex-col border border-white/5 bg-gradient-to-br from-brand-900/10 to-black/50">
-                    <div class="flex items-center justify-between mb-4 border-b border-white/5 pb-4">
+                <!-- Globe Card -->
+                <div class="glass-panel rounded-2xl p-6 flex flex-col border border-white/5 bg-gradient-to-br from-brand-900/10 to-black/50">
+                    <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center gap-2">
                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                              <h3 class="text-sm font-bold text-white uppercase tracking-widest" data-i18n="dash.liveActivity">Live Activity</h3>
@@ -653,12 +653,19 @@
                     </div>
                     
                     <!-- 3D Globe Container -->
-                    <div class="relative w-full h-[300px] bg-transparent rounded-lg mb-6 overflow-hidden flex items-center justify-center cursor-move" id="globe-container">
+                    <div class="relative w-full h-[220px] bg-transparent rounded-lg overflow-hidden flex items-center justify-center cursor-move" id="globe-container">
                         <canvas id="globeCanvas"></canvas>
                         <!-- Globe Overlay Vignette -->
                         <div class="absolute inset-0 pointer-events-none bg-radial-gradient"></div>
                     </div>
+                </div>
 
+                <!-- Activity Feed Card -->
+                <div class="glass-panel rounded-2xl p-6 flex-1 flex flex-col border border-white/5">
+                    <div class="flex items-center gap-2 mb-4 pb-3 border-b border-white/5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        <h3 class="text-sm font-bold text-white uppercase tracking-widest" data-i18n="dash.recentEvents">Recent Events</h3>
+                    </div>
                     <ul id="activity-feed" class="space-y-4">
                         <!-- Populated by JS from real DB -->
                     </ul>
