@@ -1,0 +1,1470 @@
+/* ═══════════════════════════════════════════════════════════════
+   TFXS AFFILIATES — Shared Styles v2.0
+   Dark-themed utility classes used across all pages
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Prevent overscroll bounce revealing background ─────── */
+html, body { overscroll-behavior: none; }
+html { background-color: #050505; }
+
+/* ── Custom scrollbar ──────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+html { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent; }
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── Glass panels ──────────────────────────────────────────── */
+.glass-panel {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 1rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.glass-panel-hover:hover {
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.1);
+}
+
+/* ── Form inputs ───────────────────────────────────────────── */
+.form-input {
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.75rem;
+  font-size: 0.8125rem;
+  color: #fff;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-input::placeholder { color: rgba(161,161,170,0.5); }
+.form-input:focus {
+  border-color: rgba(220,38,38,0.5);
+  box-shadow: 0 0 0 3px rgba(220,38,38,0.1);
+}
+.form-input:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Select ────────────────────────────────────────────────── */
+.form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2rem;
+}
+
+/* ── Buttons ───────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-gradient {
+  background: linear-gradient(135deg, #dc2626, #991b1b);
+  color: #fff;
+}
+.btn-gradient:hover:not(:disabled) {
+  box-shadow: 0 8px 25px rgba(220,38,38,0.3);
+  transform: translateY(-1px);
+}
+.btn-ghost {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #a1a1aa;
+}
+.btn-ghost:hover:not(:disabled) {
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+}
+.btn-success {
+  background: linear-gradient(135deg, #059669, #047857);
+  color: #fff;
+}
+.btn-danger {
+  background: rgba(220,38,38,0.15);
+  border: 1px solid rgba(220,38,38,0.3);
+  color: #ef4444;
+}
+.btn-danger:hover:not(:disabled) {
+  background: rgba(220,38,38,0.25);
+}
+
+/* ── Badge / Tag chips ─────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.badge-green  { background: rgba(34,197,94,0.15); color: #4ade80; }
+.badge-red    { background: rgba(239,68,68,0.15); color: #f87171; }
+.badge-yellow { background: rgba(234,179,8,0.15);  color: #facc15; }
+.badge-blue   { background: rgba(59,130,246,0.15); color: #60a5fa; }
+.badge-gray   { background: rgba(161,161,170,0.15); color: #a1a1aa; }
+
+/* ── Halo background ───────────────────────────────────────── */
+.halo-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(ellipse 140% 70% at 50% -5%, rgba(220,38,38,0.14) 0%, rgba(220,38,38,0.08) 20%, rgba(220,38,38,0.04) 38%, rgba(220,38,38,0.015) 55%, rgba(220,38,38,0.004) 72%, rgba(220,38,38,0) 100%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ── Table styles ──────────────────────────────────────────── */
+.table-dark th {
+  padding: 0.625rem 0.75rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #71717a;
+  text-align: left;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.table-dark td {
+  padding: 0.625rem 0.75rem;
+  font-size: 0.75rem;
+  color: #d4d4d8;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+.table-dark tr:hover td { background: rgba(255,255,255,0.02); }
+
+/* ── Status dots ───────────────────────────────────────────── */
+.status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+.status-dot-green { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+.status-dot-red   { background: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.5); }
+.status-dot-yellow { background: #eab308; box-shadow: 0 0 6px rgba(234,179,8,0.5); }
+
+/* ── Mobile hamburger nav ──────────────────────────────────── */
+#mobile-menu {
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+#mobile-menu.open {
+  max-height: 400px;
+  opacity: 1;
+}
+
+/* ── Animations ────────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in-up { animation: fadeInUp 0.4s ease both; }
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 4px rgba(220,38,38,0.3); }
+  50%      { box-shadow: 0 0 12px rgba(220,38,38,0.6); }
+}
+.pulse-glow { animation: pulse-glow 2s infinite; }
+
+/* ── Server time ghost fix ─────────────────────────────────── */
+.server-time-label { min-width: 140px; }
+
+/* ── Loading spinner ───────────────────────────────────────── */
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.1);
+  border-top-color: #dc2626;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── AFP chip (searchable dropdown) ────────────────────────── */
+.afp-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: ui-monospace, monospace;
+  background: rgba(220,38,38,0.12);
+  border: 1px solid rgba(220,38,38,0.25);
+  color: #f87171;
+}
+.afp-chip .remove-chip {
+  cursor: pointer;
+  margin-left: 2px;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+.afp-chip .remove-chip:hover { opacity: 1; }
+
+/* ═══════════════════════════════════════════════════════════════
+   LIGHT THEME OVERRIDES
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Base backgrounds & text */
+.light-theme,
+.light-theme body { background-color: #f5f5f7 !important; color: #1d1d1f !important; }
+
+.light-theme .halo-bg {
+  background: radial-gradient(ellipse 140% 70% at 50% -5%, rgba(220,38,38,0.07) 0%, rgba(220,38,38,0.03) 25%, rgba(220,38,38,0.01) 50%, rgba(220,38,38,0) 80%) !important;
+}
+
+/* Glass panels */
+.light-theme .glass-panel {
+  background: rgba(255,255,255,0.97) !important;
+  border-color: rgba(0,0,0,0.08) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04) !important;
+  backdrop-filter: blur(12px) !important;
+}
+.light-theme .glass-panel-hover:hover {
+  background: rgba(255,255,255,0.9) !important;
+  border-color: rgba(0,0,0,0.12) !important;
+}
+
+/* Nav link pill container */
+.light-theme #nav-links {
+  background: rgba(0,0,0,0.04) !important;
+  border-color: rgba(0,0,0,0.06) !important;
+}
+.light-theme #nav-links a { color: #6b7280 !important; }
+.light-theme #nav-links a:hover { color: #111 !important; background: rgba(0,0,0,0.05) !important; }
+.light-theme #nav-links a.text-brand-500,
+.light-theme #nav-links a[class*="text-brand-500"] { color: #dc2626 !important; background: rgba(220,38,38,0.08) !important; }
+
+/* Text colors — keep white text ONLY on solid colored backgrounds (buttons, badges, pills) */
+.light-theme .text-white { color: #1d1d1f !important; }
+.light-theme .btn-gradient .text-white,
+.light-theme .btn-gradient.text-white,
+.light-theme .bg-brand-500 .text-white,
+.light-theme .bg-brand-500.text-white,
+.light-theme .bg-brand-600 .text-white,
+.light-theme .bg-brand-600.text-white,
+.light-theme .bg-brand-900.text-white,
+.light-theme .bg-red-600.text-white,
+.light-theme .bg-red-600 .text-white,
+.light-theme .bg-green-600.text-white,
+.light-theme .bg-green-600 .text-white,
+.light-theme .bg-amber-500.text-white,
+.light-theme .bg-amber-500 .text-white,
+.light-theme .bg-purple-600.text-white,
+.light-theme .bg-purple-600 .text-white,
+.light-theme .bg-blue-600.text-white,
+.light-theme .bg-blue-600 .text-white { color: #ffffff !important; }
+.light-theme .text-gray-400, .light-theme .text-gray-500 { color: #6b7280 !important; }
+.light-theme .text-gray-600 { color: #9ca3af !important; }
+.light-theme .text-gray-300 { color: #4b5563 !important; }
+
+/* Form inputs */
+.light-theme .form-input,
+.light-theme input[class*="form-input"],
+.light-theme select[class*="form-input"] {
+  background: rgba(0,0,0,0.03) !important;
+  border-color: rgba(0,0,0,0.1) !important;
+  color: #1d1d1f !important;
+}
+.light-theme .form-input:focus {
+  border-color: rgba(220,38,38,0.5) !important;
+  box-shadow: 0 0 0 3px rgba(220,38,38,0.08) !important;
+}
+
+/* Custom dropdowns in light mode */
+.light-theme .custom-select button {
+  background: rgba(0,0,0,0.03) !important;
+  border-color: rgba(0,0,0,0.1) !important;
+  color: #1d1d1f !important;
+}
+.light-theme .custom-select button:hover {
+  border-color: rgba(0,0,0,0.2) !important;
+}
+.light-theme .custom-select button svg {
+  color: #6b7280 !important;
+}
+.light-theme .custom-select > div:not(.custom-select-opt) {
+  background: #ffffff !important;
+  border-color: rgba(0,0,0,0.1) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+}
+/* Broker dropdown portal — light mode */
+.light-theme #broker-select-dropdown {
+  background: #ffffff !important;
+  border-color: rgba(0,0,0,0.1) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+}
+.light-theme .custom-select-opt {
+  color: #1d1d1f !important;
+}
+.light-theme .custom-select-opt:hover {
+  background: rgba(0,0,0,0.05) !important;
+}
+.light-theme .custom-select-opt.font-medium {
+  background: rgba(220,38,38,0.06) !important;
+  color: #dc2626 !important;
+}
+
+/* Cards with bg-white/5 etc */
+.light-theme [class*="bg-white/5"],
+.light-theme [class*="bg-white/\[0.02\]"],
+.light-theme [class*="bg-white/\[0.03\]"] {
+  background: rgba(0,0,0,0.03) !important;
+}
+.light-theme [class*="bg-white/10"] { background: rgba(0,0,0,0.05) !important; }
+
+/* Borders */
+.light-theme [class*="border-white/5"],
+.light-theme [class*="border-white/10"],
+.light-theme [class*="border-white/8"],
+.light-theme [class*="border-white/\[0.08\]"] {
+  border-color: rgba(0,0,0,0.08) !important;
+}
+
+/* Divider */
+.light-theme .h-8.w-\[1px\].bg-white\/10 { background: rgba(0,0,0,0.1) !important; }
+
+/* Scrollbar */
+.light-theme ::-webkit-scrollbar-track { background: #f5f5f7 !important; }
+.light-theme ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15) !important; }
+.light-theme ::-webkit-scrollbar-thumb:hover { background: #dc2626 !important; }
+
+/* Table */
+.light-theme .table-dark th { color: #6b7280 !important; border-bottom-color: rgba(0,0,0,0.08) !important; }
+.light-theme .table-dark td { color: #374151 !important; border-bottom-color: rgba(0,0,0,0.04) !important; }
+.light-theme .table-dark tr:hover td { background: rgba(0,0,0,0.02) !important; }
+
+/* Badges */
+.light-theme .badge-green { background: rgba(34,197,94,0.12) !important; }
+.light-theme .badge-red { background: rgba(239,68,68,0.12) !important; }
+.light-theme .badge-yellow { background: rgba(234,179,8,0.12) !important; }
+
+/* Notification dropdown */
+.light-theme #lang-dropdown,
+.light-theme #notification-dropdown,
+.light-theme .notification-bell-btn + div,
+.light-theme .notification-bell-btn ~ div,
+.light-theme .relative > div[class*="bg-[#0A0A0A]"],
+.light-theme div[class*="bg-[#0A0A0A]"] {
+  background: #ffffff !important;
+  border: 1px solid rgba(0,0,0,0.06) !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.03) !important;
+}
+
+/* Selection */
+.light-theme ::selection { background: rgba(220,38,38,0.15); color: #1d1d1f; }
+
+/* Avatar ring */
+.light-theme [class*="ring-brand-500"] { --tw-ring-color: rgba(220,38,38,0.15) !important; }
+
+/* Connecting overlay */
+.light-theme #connecting-overlay { background: rgba(245,245,247,0.9) !important; }
+
+/* KPI card values */
+.light-theme .text-2xl.font-bold, .light-theme .text-3xl.font-bold { color: #1d1d1f !important; }
+
+/* Flatpickr overrides for light */
+.light-theme .flatpickr-calendar {
+  background: #fff !important;
+  border-color: rgba(0,0,0,0.1) !important;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12) !important;
+}
+.light-theme .flatpickr-months .flatpickr-month {
+  color: #1d1d1f !important;
+  fill: #374151 !important;
+}
+.light-theme .flatpickr-current-month .flatpickr-monthDropdown-months {
+  color: #1d1d1f !important;
+  background: transparent !important;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.light-theme .flatpickr-current-month .flatpickr-monthDropdown-months option {
+  background: #fff !important;
+  color: #1d1d1f !important;
+}
+/* Static month name (when using monthSelectorType: "static") */
+.flatpickr-current-month .cur-month {
+  font-weight: 600;
+}
+.light-theme .flatpickr-current-month .cur-month {
+  color: #1d1d1f !important;
+}
+.light-theme .flatpickr-current-month input.cur-year {
+  color: #1d1d1f !important;
+}
+.light-theme .flatpickr-day { color: #374151 !important; }
+.light-theme .flatpickr-day.prevMonthDay,
+.light-theme .flatpickr-day.nextMonthDay { color: #d1d5db !important; }
+.light-theme .flatpickr-day:hover {
+  background: rgba(220,38,38,0.08) !important;
+}
+.light-theme .flatpickr-day.inRange {
+  background: rgba(220,38,38,0.06) !important;
+  box-shadow: -5px 0 0 rgba(220,38,38,0.06), 5px 0 0 rgba(220,38,38,0.06) !important;
+}
+.light-theme .flatpickr-weekday { color: #9ca3af !important; }
+.light-theme .flatpickr-next-month,
+.light-theme .flatpickr-prev-month { fill: #dc2626 !important; color: #dc2626 !important; }
+.light-theme .flatpickr-next-month:hover svg,
+.light-theme .flatpickr-prev-month:hover svg { fill: #991b1b !important; }
+.light-theme .flatpickr-current-month .numInputWrapper span.arrowUp:after {
+  border-bottom-color: #dc2626 !important;
+}
+.light-theme .flatpickr-current-month .numInputWrapper span.arrowDown:after {
+  border-top-color: #dc2626 !important;
+}
+.light-theme .flatpickr-calendar.arrowTop:before,
+.light-theme .flatpickr-calendar.arrowTop:after {
+  border-bottom-color: rgba(0,0,0,0.08) !important;
+}
+
+/* Dropdown portals — light mode */
+.light-theme #timeframe-dropdown-portal {
+  background: #ffffff !important;
+  border-color: rgba(0,0,0,0.1) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+}
+
+/* Admin custom-select dropdowns — must escape glass-panel stacking context */
+[data-cs-dd] {
+  z-index: 9999 !important;
+}
+.custom-select {
+  position: relative;
+  z-index: auto;
+}
+/* When a custom-select dropdown is open, boost the parent glass-panel */
+.glass-panel:has([data-cs-dd]:not(.hidden)) {
+  z-index: 200 !important;
+  position: relative;
+}
+
+/* bg-[#1a1a1a] elements (admin dropdowns etc.) */
+.light-theme [class*="bg-\\[\\#1a1a1a\\]"] {
+  background: #fff !important;
+}
+
+/* ── Modals & Overlays ──────────────────────────────────── */
+.light-theme #payout-modal,
+.light-theme #txn-detail-modal,
+.light-theme #qr-modal { background: rgba(0,0,0,0.35) !important; }
+
+.light-theme #payout-modal .glass-panel,
+.light-theme #payout-modal > div > div,
+.light-theme #qr-modal > div > div,
+.light-theme .modal-overlay > div { background: #fff !important; border-color: rgba(0,0,0,0.1) !important; }
+
+/* Transaction detail modal card — white bg */
+.light-theme #txn-detail-modal > #txn-modal-content,
+.light-theme #txn-detail-modal > .glass-panel {
+  background: #fff !important;
+  border-color: rgba(0,0,0,0.1) !important;
+}
+/* Inner detail cells in transaction modal */
+.light-theme #txn-modal-body [class*="bg-white/5"] {
+  background: rgba(0,0,0,0.04) !important;
+  border-color: rgba(0,0,0,0.08) !important;
+}
+.light-theme #txn-modal-body .text-white { color: #1d1d1f !important; }
+.light-theme #txn-modal-body .text-gray-300 { color: #4b5563 !important; }
+.light-theme #txn-modal-body .text-gray-500 { color: #6b7280 !important; }
+
+/* Balance info popup */
+.light-theme #balance-info-popup,
+.light-theme [id="balance-info-popup"] {
+  background: #fff !important;
+  border-color: rgba(0,0,0,0.1) !important;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12) !important;
+}
+
+/* Balance info button — hover should darken, not go white */
+.light-theme #balance-info-btn {
+  color: #9ca3af !important;
+}
+.light-theme #balance-info-btn:hover {
+  color: #1d1d1f !important;
+}
+
+/* Black background elements */
+.light-theme [class*="bg-black/"],
+.light-theme [class*="bg-black\\/"] {
+  background: rgba(0,0,0,0.04) !important;
+}
+.light-theme [class*="bg-\\[\\#050505\\]"],
+.light-theme [class*="bg-\\[\\#0e0e0e\\]"],
+.light-theme [class*="bg-\\[\\#0A0A0A\\]"],
+.light-theme [class*="bg-\\[\\#111\\]"],
+.light-theme [class*="bg-\\[\\#0a0a0a\\]"] {
+  background: #fff !important;
+}
+
+/* Option elements */
+.light-theme option { background: #fff !important; color: #1d1d1f !important; }
+
+/* Select elements with dark backgrounds */
+.light-theme select {
+  background-color: rgba(0,0,0,0.04) !important;
+  color: #1d1d1f !important;
+  border-color: rgba(0,0,0,0.1) !important;
+}
+
+/* Broker select dropdown arrow — visible in light mode */
+.light-theme #broker-select,
+.light-theme #dashboard-timeframe,
+.light-theme select.text-white {
+  color: #1d1d1f !important;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 5l3 3 3-3' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 10px center !important;
+  background-size: 12px !important;
+  padding-right: 28px !important;
+}
+
+/* Ghost buttons */
+.light-theme .btn-ghost {
+  background: rgba(0,0,0,0.04) !important;
+  border-color: rgba(0,0,0,0.1) !important;
+  color: #6b7280 !important;
+}
+.light-theme .btn-ghost:hover:not(:disabled) {
+  background: rgba(0,0,0,0.08) !important;
+  color: #1d1d1f !important;
+}
+
+/* Spinner */
+.light-theme .spinner { border-color: rgba(0,0,0,0.1) !important; border-top-color: #dc2626 !important; }
+
+/* AFP chip */
+.light-theme .afp-chip { background: rgba(220,38,38,0.08) !important; border-color: rgba(220,38,38,0.2) !important; }
+
+/* Notification dropdown (dynamic JS — covered by #notification-dropdown above) */
+/* Notification dropdown text colors in light mode */
+.light-theme #notification-dropdown .text-white,
+.light-theme .notification-bell-btn + div .text-white,
+.light-theme .notification-bell-btn ~ div .text-white { color: #1d1d1f !important; }
+.light-theme #notification-dropdown .text-gray-400,
+.light-theme .notification-bell-btn + div .text-gray-400,
+.light-theme .notification-bell-btn ~ div .text-gray-400 { color: #6b7280 !important; }
+.light-theme #notification-dropdown .text-gray-500,
+.light-theme .notification-bell-btn + div .text-gray-500,
+.light-theme .notification-bell-btn ~ div .text-gray-500 { color: #9ca3af !important; }
+.light-theme #notification-dropdown .text-gray-600,
+.light-theme .notification-bell-btn + div .text-gray-600,
+.light-theme .notification-bell-btn ~ div .text-gray-600 { color: #9ca3af !important; }
+.light-theme #notification-dropdown [class*="border-white/5"],
+.light-theme .notification-bell-btn + div [class*="border-white/5"],
+.light-theme .notification-bell-btn ~ div [class*="border-white/5"] { border-color: rgba(0,0,0,0.06) !important; }
+.light-theme #notification-dropdown [class*="hover\\:bg-white/5"]:hover,
+.light-theme .notification-bell-btn + div [class*="hover\\:bg-white/5"]:hover,
+.light-theme .notification-bell-btn ~ div [class*="hover\\:bg-white/5"]:hover { background: rgba(0,0,0,0.04) !important; }
+
+/* Notification dropdown — items spacing fix */
+#notification-dropdown > .space-y-0 > div {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding: 8px 8px !important;
+  border-radius: 8px;
+  margin-bottom: 4px !important;
+}
+#notification-dropdown > .space-y-0 > div:last-child {
+  margin-bottom: 0 !important;
+}
+#notification-dropdown {
+  padding-left: 14px !important;
+  padding-right: 14px !important;
+}
+#notification-dropdown > .flex.justify-between {
+  margin-bottom: 8px;
+}
+/* Notification list — add spacing between items */
+#notification-list > div {
+  margin-bottom: 3px !important;
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+#notification-list > div:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Mobile menu */
+.light-theme #mobile-menu {
+  background: #fff !important;
+  border-color: rgba(0,0,0,0.08) !important;
+}
+
+/* ApexCharts (donut/bar) */
+.light-theme .apexcharts-tooltip { background: #fff !important; border-color: rgba(0,0,0,0.1) !important; color: #1d1d1f !important; }
+.light-theme .apexcharts-tooltip-title { background: #f9fafb !important; border-color: rgba(0,0,0,0.06) !important; }
+.light-theme .apexcharts-text { fill: #6b7280 !important; }
+.light-theme .apexcharts-legend-text { color: #374151 !important; }
+
+/* KPI sparklines — keep as-is, they work on light bg */
+
+/* Payout submit when disabled (auto-payout) */
+.light-theme #payout-submit-btn:disabled {
+  background: rgba(16,185,129,0.08) !important;
+  border-color: rgba(16,185,129,0.25) !important;
+}
+
+/* Globe fullscreen modal */
+.light-theme #globe-modal {
+  background: radial-gradient(ellipse at center, #fef2f2 0%, #f5f5f7 50%, #f5f5f7 100%) !important;
+}
+.light-theme #globe-modal [class*="bg-black"] { background: rgba(255,255,255,0.85) !important; }
+
+/* Payout modal sections with bg-white/[0.03] etc. */
+.light-theme [class*="bg-white\\/\\[0.0"] { background: rgba(0,0,0,0.03) !important; }
+
+/* Highcharts light-mode overrides */
+.light-theme .highcharts-background { fill: transparent !important; }
+.light-theme .highcharts-tooltip-box { fill: rgba(255,255,255,0.96) !important; stroke: rgba(0,0,0,0.1) !important; }
+.light-theme .highcharts-tooltip text { fill: #1d1d1f !important; }
+.light-theme .highcharts-tooltip span { color: #1d1d1f; }
+.light-theme .highcharts-tooltip span[style*="color:"] { color: inherit; }
+.light-theme .highcharts-tooltip b[style*="color:#fff"],
+.light-theme .highcharts-tooltip b[style*="color: #fff"] { color: #1d1d1f !important; }
+.light-theme .highcharts-grid-line { stroke: rgba(0,0,0,0.06) !important; }
+.light-theme .highcharts-axis-line { stroke: rgba(0,0,0,0.08) !important; }
+.light-theme .highcharts-crosshair { stroke: rgba(0,0,0,0.15) !important; }
+.light-theme .highcharts-xaxis-labels text { fill: #71717a !important; }
+.light-theme .highcharts-yaxis-labels text { fill: #71717a !important; }
+.light-theme .highcharts-axis-title { fill: #71717a !important; color: #71717a !important; }
+.light-theme .highcharts-legend-item text { fill: #374151 !important; }
+.light-theme .highcharts-title { color: #1d1d1f !important; fill: #1d1d1f !important; }
+.light-theme .highcharts-subtitle { color: #6b7280 !important; fill: #6b7280 !important; }
+.light-theme .highcharts-reset-zoom rect { fill: rgba(0,0,0,0.06) !important; stroke: rgba(0,0,0,0.1) !important; }
+.light-theme .highcharts-reset-zoom text { fill: #52525b !important; }
+
+/* Brand text color for light mode */
+.light-theme .text-brand-500 { color: #dc2626 !important; }
+.light-theme .text-brand-600 { color: #b91c1c !important; }
+
+/* Toast notifications */
+.light-theme #toast-container > div,
+.light-theme [style*="background: rgba(0,0,0,0.9)"],
+.light-theme [style*="background: rgba(10,10,10"] {
+  background: rgba(255,255,255,0.55) !important;
+  color: #1d1d1f !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08) !important;
+  border-color: rgba(0,0,0,0.08) !important;
+  backdrop-filter: blur(20px) saturate(1.4) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(1.4) !important;
+}
+.light-theme #toast-container .text-gray-400 { color: #6b7280 !important; }
+.light-theme #toast-container .text-white { color: #1d1d1f !important; }
+.light-theme #toast-container [class*="bg-white/10"] { background: rgba(0,0,0,0.06) !important; }
+
+/* Network buttons in payout modal */
+.light-theme .payout-network-btn,
+.light-theme [class*="rounded-lg"][class*="border"][class*="cursor-pointer"] {
+  border-color: rgba(0,0,0,0.1) !important;
+}
+
+/* Date picker input */
+.light-theme input[type="text"][readonly] {
+  background: rgba(0,0,0,0.03) !important;
+  color: #1d1d1f !important;
+  border-color: rgba(0,0,0,0.1) !important;
+}
+
+/* ── Admin Settings Page ────────────────────────────────── */
+.light-theme .admin-tab { color: #6b7280 !important; border-color: transparent !important; }
+.light-theme .admin-tab.active { color: #dc2626 !important; background: rgba(220,38,38,0.06) !important; border-color: rgba(220,38,38,0.15) !important; }
+.light-theme .admin-tab:hover:not(.active) { color: #374151 !important; background: rgba(0,0,0,0.03) !important; }
+.light-theme .stat-card { background: rgba(255,255,255,0.8) !important; border-color: rgba(0,0,0,0.08) !important; }
+.light-theme .stat-card:hover { border-color: rgba(220,38,38,0.2) !important; }
+.light-theme .modal-overlay { background: rgba(0,0,0,0.4) !important; }
+.light-theme .chart-range { background: rgba(0,0,0,0.03) !important; color: #6b7280 !important; }
+.light-theme .chart-range.active { background: rgba(220,38,38,0.08) !important; color: #dc2626 !important; }
+
+/* Deal tier cards in light mode */
+.light-theme [class*="bg-black/40"] { background: rgba(0,0,0,0.03) !important; }
+.light-theme [class*="border-white/5"]:not(.glass-panel):not(header):not(nav):not(table):not(thead):not(tbody) { border-color: rgba(0,0,0,0.08) !important; }
+.light-theme [class*="border-white/10"] { border-color: rgba(0,0,0,0.1) !important; }
+.light-theme .deal-tier-card {
+  background: rgba(0,0,0,0.02) !important;
+  border-color: rgba(0,0,0,0.08) !important;
+}
+.light-theme .deal-tier-elite {
+  background: rgba(239,68,68,0.06) !important;
+  border-color: rgba(239,68,68,0.2) !important;
+}
+.light-theme .deal-tier-elite[style*="border-color"] {
+  filter: saturate(1.3);
+}
+.light-theme .deal-tier-shimmer {
+  background: linear-gradient(to right, transparent, rgba(0,0,0,0.03), transparent) !important;
+}
+.light-theme .deal-tier-commission {
+  color: #1d1d1f !important;
+}
+.light-theme .deal-tier-elite .deal-tier-commission[style*="color"] {
+  filter: brightness(0.85) saturate(1.4);
+}
+
+/* ── Reports tab-btn light mode ────────────────────────── */
+.light-theme .tab-btn {
+  color: #6b7280 !important;
+}
+.light-theme .tab-btn:hover { color: #374151 !important; }
+.light-theme .tab-btn.active {
+  background: rgba(220,38,38,0.08) !important;
+  color: #dc2626 !important;
+  border-color: #dc2626 !important;
+}
+
+/* ── Global confirm dialog (auth.js) light mode ─────── */
+.light-theme #tfxs-confirm-modal {
+  background: rgba(0,0,0,0.3) !important;
+}
+.light-theme #tfxs-confirm-box {
+  background: rgba(255,255,255,0.95) !important;
+  border-color: rgba(0,0,0,0.1) !important;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.15) !important;
+}
+.light-theme #tfxs-confirm-title { color: #1d1d1f !important; }
+.light-theme #tfxs-confirm-msg { color: #6b7280 !important; }
+.light-theme #tfxs-confirm-cancel { color: #6b7280 !important; background: rgba(0,0,0,0.04) !important; border-color: rgba(0,0,0,0.1) !important; }
+
+/* ── Copy button hover in light mode ──────── */
+.light-theme #copy-link-btn {
+  border-color: rgba(220,38,38,0.25) !important;
+  color: #dc2626 !important;
+}
+.light-theme #copy-link-btn:hover {
+  background: rgba(220,38,38,0.08) !important;
+  color: #b91c1c !important;
+  border-color: rgba(220,38,38,0.35) !important;
+}
+
+/* ── Red buttons softer in light mode ──────── */
+.light-theme .btn-gradient {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  box-shadow: 0 2px 8px rgba(220,38,38,0.15) !important;
+  color: #fff !important;
+}
+.light-theme .btn-gradient:hover:not(:disabled) {
+  box-shadow: 0 4px 16px rgba(220,38,38,0.2) !important;
+}
+/* Disabled payout button light mode */
+.light-theme #request-payout-btn:disabled {
+  background: rgba(220,38,38,0.08) !important;
+  color: #b91c1c !important;
+  border: 1px solid rgba(220,38,38,0.2) !important;
+  opacity: 0.7;
+}
+/* KYC warning in light mode */
+.light-theme #kyc-payout-warning {
+  background: rgba(245,158,11,0.08) !important;
+  border-color: rgba(245,158,11,0.25) !important;
+}
+.light-theme #kyc-payout-warning span {
+  color: #92400e !important;
+}
+
+/* ── Commission tier cards glow in light mode ──────── */
+.light-theme [class*="bg-brand-500/10"] { background: rgba(220,38,38,0.08) !important; }
+.light-theme [class*="bg-blue-500/10"] { background: rgba(37,99,235,0.08) !important; }
+.light-theme [class*="bg-purple-500/10"] { background: rgba(147,51,234,0.08) !important; }
+.light-theme [class*="bg-emerald-500/10"] { background: rgba(16,185,129,0.08) !important; }
+.light-theme [class*="bg-amber-500/10"] { background: rgba(245,158,11,0.08) !important; }
+.light-theme [class*="bg-cyan-500/10"] { background: rgba(6,182,212,0.08) !important; }
+
+.light-theme [class*="border-brand-500/30"] { border-color: rgba(220,38,38,0.35) !important; }
+.light-theme [class*="border-blue-500/30"] { border-color: rgba(37,99,235,0.35) !important; }
+.light-theme [class*="border-purple-500/30"] { border-color: rgba(147,51,234,0.35) !important; }
+.light-theme [class*="border-emerald-500/30"] { border-color: rgba(16,185,129,0.35) !important; }
+.light-theme [class*="border-amber-500/30"] { border-color: rgba(245,158,11,0.35) !important; }
+.light-theme [class*="border-cyan-500/30"] { border-color: rgba(6,182,212,0.35) !important; }
+
+/* Elite tier cards — add subtle colored shadow glow in light mode */
+.light-theme [class*="border-brand-500/30"][class*="border"] { box-shadow: 0 0 12px rgba(220,38,38,0.12) !important; }
+.light-theme [class*="border-blue-500/30"][class*="border"] { box-shadow: 0 0 12px rgba(37,99,235,0.12) !important; }
+.light-theme [class*="border-purple-500/30"][class*="border"] { box-shadow: 0 0 12px rgba(147,51,234,0.12) !important; }
+.light-theme [class*="border-emerald-500/30"][class*="border"] { box-shadow: 0 0 12px rgba(16,185,129,0.12) !important; }
+.light-theme [class*="border-amber-500/30"][class*="border"] { box-shadow: 0 0 12px rgba(245,158,11,0.12) !important; }
+.light-theme [class*="border-cyan-500/30"][class*="border"] { box-shadow: 0 0 12px rgba(6,182,212,0.12) !important; }
+
+/* Dynamic broker-colored tier cards (inline border-color style) — light mode */
+.light-theme [style*="border-color:"][style*="background:"] {
+  box-shadow: 0 0 10px rgba(0,0,0,0.06) !important;
+  filter: none !important;
+  background: rgba(0,0,0,0.02) !important;
+}
+
+/* Commission tier glow — visible in light mode */
+.light-theme [class*="shadow-\\[0_0_15px_rgba(220"] { box-shadow: 0 0 15px rgba(220,38,38,0.25) !important; }
+.light-theme [class*="shadow-\\[0_0_15px_rgba(37"] { box-shadow: 0 0 15px rgba(37,99,235,0.25) !important; }
+.light-theme [class*="shadow-\\[0_0_15px_rgba(147"] { box-shadow: 0 0 15px rgba(147,51,234,0.25) !important; }
+.light-theme [class*="shadow-\\[0_0_15px_rgba(16"] { box-shadow: 0 0 15px rgba(16,185,129,0.25) !important; }
+.light-theme [class*="shadow-\\[0_0_15px_rgba(245"] { box-shadow: 0 0 15px rgba(245,158,11,0.25) !important; }
+.light-theme [class*="shadow-\\[0_0_15px_rgba(6"] { box-shadow: 0 0 15px rgba(6,182,212,0.25) !important; }
+/* Dynamic tier cards with inline box-shadow style — boost for light mode */
+.light-theme [style*="box-shadow: 0 0 15px"] { filter: saturate(1.3) !important; }
+
+/* Tier card shimmer visible in light mode */
+@keyframes shimmer-light {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.light-theme [class*="animate-\\[shimmer"] {
+  background: linear-gradient(90deg, transparent, rgba(0,0,0,0.04), transparent) !important;
+}
+
+/* Normal (non-elite) tier cards in light mode */
+.light-theme .bg-black\/40 {
+  background: rgba(0,0,0,0.025) !important;
+}
+.light-theme .border-white\/5 {
+  border-color: rgba(0,0,0,0.06) !important;
+}
+
+/* Auto-payout toggle in light mode — let JS inline styles control colors */
+
+/* ── Payment method cards ──────────────────────────── */
+/* Dark mode (default) */
+.payment-card {
+  background: rgba(255,255,255,0.03);
+  border-color: rgba(255,255,255,0.1);
+}
+.payment-card:hover {
+  background: rgba(255,255,255,0.08);
+}
+.payment-card.selected {
+  border-color: #ef4444 !important;
+  background: rgba(239,68,68,0.1) !important;
+  box-shadow: 0 0 15px rgba(239,68,68,0.2);
+}
+.payment-card-title {
+  color: #fff;
+}
+
+/* Light mode */
+.light-theme .payment-card {
+  background: rgba(0,0,0,0.02);
+  border-color: rgba(0,0,0,0.1);
+}
+.light-theme .payment-card:hover {
+  background: rgba(0,0,0,0.04);
+}
+.light-theme .payment-card.selected {
+  border-color: #dc2626 !important;
+  background: rgba(220,38,38,0.05) !important;
+  box-shadow: 0 0 15px rgba(220,38,38,0.1);
+}
+.light-theme .payment-card-title {
+  color: #1d1d1f;
+}
+
+/* ── Admin toasts (green/red/amber) light mode ──────── */
+.light-theme .toast {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12) !important;
+}
+
+/* ── Country dropdown in light mode ──────── */
+.light-theme #country-dropdown,
+.light-theme #phone-code-dropdown {
+  background: #ffffff !important;
+  border: 1px solid rgba(0,0,0,0.08) !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.1) !important;
+}
+.light-theme #phone-code-dropdown .hover\:bg-white\/10:hover,
+.light-theme #phone-code-dropdown .phone-code-opt:hover {
+  background: rgba(0,0,0,0.04) !important;
+}
+.light-theme #phone-code-dropdown .text-white {
+  color: #1d1d1f !important;
+}
+.light-theme #phone-code-dropdown .text-gray-500,
+.light-theme #phone-code-dropdown .text-gray-400 {
+  color: #6b7280 !important;
+}
+.light-theme #phone-code-dropdown #phone-code-search {
+  background: rgba(0,0,0,0.04) !important;
+  border-color: rgba(0,0,0,0.1) !important;
+  color: #1d1d1f !important;
+}
+.light-theme #phone-code-btn {
+  background: rgba(0,0,0,0.03) !important;
+  border-color: rgba(0,0,0,0.1) !important;
+}
+.light-theme #phone-code-btn:hover {
+  background: rgba(0,0,0,0.06) !important;
+}
+.light-theme #phone-code-label {
+  color: #4b5563 !important;
+}
+.light-theme #country-dropdown .country-opt { color: #1d1d1f !important; }
+.light-theme #country-dropdown .country-opt .text-white { color: #1d1d1f !important; }
+.light-theme #country-dropdown .country-opt:hover { background: rgba(0,0,0,0.04) !important; }
+
+/* ── Country dropdown scrollbar ──────── */
+#country-dropdown::-webkit-scrollbar { width: 6px; }
+#country-dropdown::-webkit-scrollbar-track { background: transparent; }
+#country-dropdown::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+.light-theme #country-dropdown::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); }
+
+/* ═══════════════════════════════════════════════════════════════
+   RTL support
+   ═══════════════════════════════════════════════════════════════ */
+.rtl { direction: rtl; text-align: right; }
+.rtl .text-right { text-align: left; }
+.rtl .text-left { text-align: right; }
+
+/* ── Flag images (replaces emoji flags) ────────────────────── */
+.flag-img {
+  display: inline-block;
+  width: 1.2em;
+  height: 0.9em;
+  object-fit: cover;
+  border-radius: 2px;
+  vertical-align: middle;
+  box-shadow: 0 0 0 0.5px rgba(255,255,255,0.15);
+}
+.light-theme .flag-img {
+  box-shadow: 0 0 0 0.5px rgba(0,0,0,0.12);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE RESPONSIVENESS
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Mobile base (< 640px) ─────────────────────────────────── */
+@media (max-width: 639px) {
+
+  /* === Navigation === */
+  nav .max-w-\[1600px\] {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    gap: 8px !important;
+  }
+  /* Hide server time on mobile */
+  nav .hidden.lg\:flex { display: none !important; }
+  nav .h-8.w-\[1px\] { display: none !important; }
+
+  /* Compact lang/theme on mobile */
+  #lang-selector-anchor .lang-code { display: none !important; }
+  #lang-selector-anchor button { padding: 6px !important; gap: 4px !important; min-width: unset !important; }
+  #lang-selector-anchor button svg { display: none !important; }
+  #lang-selector-anchor .lang-flag { font-size: 1.2rem !important; }
+
+  /* === Portal-based Mobile Menu (created by app.js on <body>) === */
+  #mobile-menu-portal {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 99999 !important;
+  }
+  #mobile-menu-portal.hidden {
+    display: none !important;
+  }
+  #mobile-menu-panel {
+    position: absolute !important;
+    top: 56px !important;
+    left: 12px !important;
+    right: 12px !important;
+    z-index: 99999 !important;
+  }
+
+  /* Keep #nav-links hidden on mobile — portal handles menu */
+  #nav-links {
+    display: none !important;
+  }
+
+  /* Hide avatar text on mobile, keep circle */
+  #nav-avatar-link .text-right { display: none !important; }
+
+  /* Language dropdown — absolute from its wrapper */
+  #lang-dropdown {
+    position: absolute !important;
+    top: 100% !important;
+    right: 0 !important;
+    left: auto !important;
+    z-index: 9999 !important;
+    margin-top: 4px !important;
+  }
+
+  /* === KPI icons visible on mobile === */
+  .kpi-tooltip .absolute.top-0.right-0 {
+    opacity: 0.15 !important;
+  }
+  .kpi-tooltip .absolute.top-0.right-0 svg {
+    width: 2rem !important;
+    height: 2rem !important;
+  }
+
+  /* === Main content === */
+  main {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    margin-top: 12px !important;
+  }
+
+  /* === Header (Balance + Quick Share) — stack vertically === */
+  header.flex {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+  header .glass-panel {
+    flex: unset !important;
+    width: 100% !important;
+  }
+
+  /* === Reports page header — stack title + download button === */
+  header.flex.justify-between.items-end {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+  header.flex.justify-between.items-end h1 {
+    font-size: 1.75rem !important;
+  }
+  header.flex.justify-between.items-end .btn-gradient {
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  /* Balance area */
+  #balance-display {
+    font-size: 1.75rem !important;
+  }
+
+  /* Quick Share — full width stacking */
+  .flex.flex-col.sm\:flex-row {
+    flex-direction: column !important;
+  }
+  .sm\:w-\[180px\] {
+    width: 100% !important;
+  }
+  #affiliate-link {
+    font-size: 0.7rem !important;
+  }
+
+  /* === Filters row — wrap and compact === */
+  .flex.flex-wrap.items-center.gap-4 {
+    gap: 8px !important;
+  }
+  .flex.flex-wrap.items-center.gap-4 > * {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+  #date-range {
+    width: 130px !important;
+    font-size: 0.7rem !important;
+  }
+
+  /* === Reports filters row — stack on mobile === */
+  .flex.flex-col.md\:flex-row.justify-between.items-end {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+  /* Reports tabs — scroll horizontally */
+  .flex.bg-white\/5.p-1.rounded-xl {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    flex-shrink: 0 !important;
+  }
+  .tab-btn {
+    padding: 6px 12px !important;
+    font-size: 0.6rem !important;
+    white-space: nowrap !important;
+  }
+  /* Reports timeframe controls — stack */
+  .flex.items-center.gap-3:has(#rep-timeframe-wrapper) {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+  .flex.items-center.gap-3:has(#rep-timeframe-wrapper) .glass-panel {
+    width: 100% !important;
+  }
+  .flex.items-center.gap-3:has(#rep-timeframe-wrapper) #date-range {
+    width: 100% !important;
+  }
+
+  /* === KPI Grid === */
+  .grid.grid-cols-2 {
+    gap: 8px !important;
+  }
+  .glass-panel.p-4 {
+    padding: 12px !important;
+  }
+  .kpi-tooltip .text-xl,
+  .kpi-tooltip .text-2xl {
+    font-size: 1.1rem !important;
+  }
+  /* KPI icons — visible but subtle on mobile (set in earlier block) */
+
+  /* === Charts area === */
+  .grid.grid-cols-1.lg\:grid-cols-2 {
+    gap: 12px !important;
+  }
+  .grid.grid-cols-1.lg\:grid-cols-3 {
+    gap: 12px !important;
+  }
+
+  /* === Revenue chart — fill the card, no excess whitespace === */
+  #chartArea {
+    flex: none !important;
+    height: 260px !important;
+  }
+  #revenueChartContainer {
+    overflow: visible !important;
+    height: 100% !important;
+  }
+  #revenueChartContainer .highcharts-container,
+  #revenueChartContainer .highcharts-container svg {
+    overflow: visible !important;
+  }
+  /* Let the chart container parent shrink */
+  .lg\:col-span-2.glass-panel {
+    padding: 12px !important;
+  }
+  .lg\:col-span-2.glass-panel .flex.justify-between {
+    flex-direction: column !important;
+    gap: 4px !important;
+    align-items: flex-start !important;
+  }
+  /* Revenue Analytics title - left aligned on mobile */
+  .lg\:col-span-2.glass-panel .flex.justify-between > div:first-child {
+    width: 100% !important;
+    text-align: left !important;
+  }
+  .lg\:col-span-2.glass-panel .flex.justify-between > div:first-child h3 {
+    text-align: left !important;
+  }
+  /* Revenue chart legend — smaller on mobile */
+  #chart-legend {
+    gap: 12px !important;
+  }
+  #chart-legend .text-\[11px\] {
+    font-size: 10px !important;
+  }
+
+  /* === Globe === */
+  #globe-container {
+    height: 260px !important;
+    min-height: 260px !important;
+  }
+  #globe-container canvas {
+    /* Let JS handle canvas sizing via ResizeObserver — no CSS distortion */
+    object-fit: contain !important;
+  }
+
+  /* === Donut / Top 10 chart === */
+  .grid.grid-cols-1.md\:grid-cols-2 {
+    gap: 12px !important;
+  }
+  /* Donut chart — compact header on mobile */
+  #donut-title {
+    font-size: 0.85rem !important;
+  }
+  #donut-subtitle {
+    font-size: 8px !important;
+    word-break: break-word !important;
+    line-height: 1.4 !important;
+  }
+  #countryDonutChart {
+    min-height: 240px !important;
+  }
+  /* Top 10 bar chart — compact on mobile */
+  #countryBarChart {
+    min-height: 200px !important;
+  }
+
+  /* === Transactions table — horizontal scroll === */
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+  table {
+    min-width: 600px;
+  }
+  table th, table td {
+    padding: 8px 10px !important;
+    font-size: 0.65rem !important;
+    white-space: nowrap;
+  }
+
+  /* === Modals — full width on mobile === */
+  #payout-modal > div > div,
+  #txn-detail-modal > div,
+  #txn-modal-content,
+  #qr-modal > div > div {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    margin: 0 auto !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+  }
+
+  /* === Payout modal — grid fixes === */
+  #payout-modal .grid.grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 6px !important;
+  }
+  #payout-modal .grid.grid-cols-4 .text-base {
+    font-size: 0.85rem !important;
+  }
+  /* Payout schedule + withdrawal row — stack */
+  #payout-modal .flex.gap-2:has(#payout-next-date) {
+    flex-direction: column !important;
+  }
+  #payout-modal .w-44 {
+    width: 100% !important;
+  }
+  /* Payout network + wallet — stack */
+  #payout-modal .grid.grid-cols-\[auto_1fr\] {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  #payout-modal .flex.flex-col.gap-1\.5 {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+  #payout-modal .flex.flex-col.gap-1\.5 label {
+    flex: 1 1 auto !important;
+  }
+  /* Payout modal padding tighter */
+  #payout-modal-content .p-5 {
+    padding: 14px !important;
+  }
+  #payout-modal-content .px-5 {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  /* === Globe fullscreen modal === */
+  #globe-modal {
+    padding: 0 !important;
+  }
+  #globe-modal .absolute.top-0 {
+    padding: 12px 16px !important;
+  }
+  #globe-modal h2 {
+    font-size: 0.9rem !important;
+    letter-spacing: 0.1em !important;
+  }
+  #globe-modal #close-globe-modal {
+    padding: 8px 12px !important;
+    font-size: 0.6rem !important;
+  }
+  #globe-modal #modal-globe-container {
+    margin-top: 60px !important;
+  }
+  #globe-modal #modal-globe-container canvas {
+    /* Let JS handle canvas sizing via initGlobe() — no CSS distortion */
+    object-fit: contain !important;
+  }
+  #globe-modal .grid.grid-cols-1.md\:grid-cols-3 {
+    grid-template-columns: 1fr !important;
+    gap: 6px !important;
+    padding: 10px 12px !important;
+  }
+  #globe-modal .bg-black\/50 {
+    padding: 8px 10px !important;
+  }
+  #globe-modal .bg-black\/50 p:first-child {
+    font-size: 8px !important;
+  }
+  #globe-modal .bg-black\/50 .text-sm {
+    font-size: 0.7rem !important;
+  }
+  #globe-modal .bg-black\/50 .text-lg {
+    font-size: 0.85rem !important;
+  }
+  #globe-modal .bg-black\/50 .text-2xl {
+    font-size: 1.2rem !important;
+  }
+
+  /* === Notification dropdown on mobile === */
+  #notification-dropdown {
+    position: absolute !important;
+    top: 100% !important;
+    right: 0 !important;
+    left: auto !important;
+    width: 300px !important;
+    max-width: calc(100vw - 24px) !important;
+    max-height: 70vh !important;
+    overflow-y: auto !important;
+    border-radius: 1rem !important;
+    margin-top: 4px !important;
+  }
+
+  /* === Balance info popup === */
+  #balance-info-popup {
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
+    min-width: unset !important;
+  }
+
+  /* === Sparkline containers === */
+  .sparkline-container {
+    height: 30px !important;
+  }
+
+  /* === Transaction filters (pill buttons) === */
+  .txn-filter-btn {
+    padding: 4px 8px !important;
+    font-size: 0.6rem !important;
+  }
+  /* Transaction filter dropdowns — stack */
+  .flex.flex-wrap.gap-3:has(#txn-country-wrapper) {
+    flex-direction: column !important;
+    gap: 6px !important;
+  }
+  #txn-country-btn, #txn-amount-btn {
+    width: 100% !important;
+    min-width: unset !important;
+  }
+
+  /* === Settings page === */
+  .grid.grid-cols-1.md\:grid-cols-2 {
+    grid-template-columns: 1fr !important;
+  }
+  .grid.grid-cols-4.sm\:grid-cols-6.md\:grid-cols-8 {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+
+  /* === Deals page === */
+  .grid.gap-8 {
+    gap: 16px !important;
+  }
+
+  /* === Reports page === */
+  .overflow-x-auto table {
+    min-width: 500px;
+  }
+
+  /* === Admin settings page === */
+  .grid.grid-cols-3 {
+    grid-template-columns: 1fr !important;
+  }
+  .grid.grid-cols-2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* === Toast — full width on mobile === */
+  .fixed.bottom-6.right-6 {
+    right: 12px !important;
+    left: 12px !important;
+    bottom: 12px !important;
+    max-width: unset !important;
+  }
+
+  /* === Footer / padding === */
+  body { padding-bottom: 60px !important; }
+
+  /* === Side widgets column — tighter spacing === */
+  .space-y-6.flex.flex-col {
+    gap: 12px !important;
+  }
+  .space-y-6.flex.flex-col > * {
+    margin-top: 0 !important;
+  }
+
+  /* === Activity feed items — tighter === */
+  #activity-feed {
+    gap: 8px !important;
+  }
+  #activity-feed > li {
+    margin-top: 0 !important;
+  }
+}
+
+/* ── Small tablets (640px - 767px) ─────────────────────────── */
+@media (min-width: 640px) and (max-width: 767px) {
+  main {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  header.flex {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+  header .glass-panel {
+    flex: unset !important;
+    width: 100% !important;
+  }
+
+  #notification-dropdown {
+    width: 320px !important;
+  }
+}
+
+/* ── Tablet (768px - 1023px) ───────────────────────────────── */
+@media (min-width: 768px) and (max-width: 1023px) {
+  main {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+
+  /* KPI — 3 cols on tablet */
+  .grid.grid-cols-2.sm\:grid-cols-2.md\:grid-cols-3.lg\:grid-cols-5 {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+/* ── Touch improvements ────────────────────────────────────── */
+@media (hover: none) and (pointer: coarse) {
+  /* Larger tap targets */
+  button, a, select, .cursor-pointer {
+    min-height: 40px;
+  }
+
+  /* Remove hover effects that feel weird on touch */
+  .glass-hover:hover {
+    background: inherit !important;
+    border-color: inherit !important;
+  }
+
+  /* Prevent text selection during scroll */
+  .overflow-x-auto {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
+/* ── Safe area padding (notch phones) ──────────────────────── */
+@supports (padding: env(safe-area-inset-bottom)) {
+  body {
+    padding-bottom: calc(60px + env(safe-area-inset-bottom));
+  }
+  nav {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TFXS — Email Templates Preview</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  * { box-sizing: border-box; }
+  body { font-family: 'Inter', system-ui, sans-serif; margin: 0; scroll-behavior: smooth; }
+  .preview-frame { border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden; transition: box-shadow 0.3s; }
+  .preview-frame:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+  .preview-frame.dark { background: #111; }
+  .preview-frame.light { background: #f5f5f5; border-color: #e0e0e0; }
+  .email-html { padding: 24px; }
+  .tab-active { background: rgba(220,38,38,0.15); color: #ef4444; border-color: #ef4444; }
+  .tab-inactive { background: rgba(255,255,255,0.03); color: #71717a; border-color: transparent; }
+  .tab-inactive:hover { color: #a1a1aa; background: rgba(255,255,255,0.06); }
+  .sidebar-item { transition: all 0.15s; }
+  .sidebar-item:hover { background: rgba(255,255,255,0.06); }
+  .sidebar-item.active { background: rgba(220,38,38,0.1); border-left-color: #ef4444 !important; color: #ef4444; }
+  .category-badge { font-size: 8px; padding: 2px 6px; border-radius: 4px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .cat-account { background: rgba(59,130,246,0.15); color: #3b82f6; }
+  .cat-payout { background: rgba(251,191,36,0.15); color: #fbbf24; }
+  .cat-kyc { background: rgba(168,85,247,0.15); color: #a855f7; }
+  .cat-security { background: rgba(34,197,94,0.15); color: #22c55e; }
+  .cat-webhook { background: rgba(249,115,22,0.15); color: #f97316; }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+</style>
+</head>
+<body class="bg-[#050505] text-white min-h-screen flex">
+
+<!-- Sidebar -->
+<aside class="hidden lg:flex flex-col w-64 min-h-screen bg-[#0a0a0a] border-r border-white/5 fixed top-0 left-0 z-40">
+  <div class="p-5 border-b border-white/5 flex items-center gap-3">
+    <img src="assets/icon-512.png" alt="TFXS" class="w-8 h-8 rounded-lg">
+    <div>
+      <h1 class="text-xs font-bold tracking-wide">EMAIL PREVIEW</h1>
+      <p class="text-[9px] text-gray-600 font-mono mt-0.5">15 templates</p>
+    </div>
+  </div>
+  <nav class="flex-1 overflow-y-auto py-3" id="sidebar-nav"></nav>
+  <div class="p-4 border-t border-white/5">
+    <p class="text-[9px] text-gray-600 text-center font-mono">TFXS Affiliates &copy; 2026</p>
+  </div>
+</aside>
+
+<!-- Main -->
+<main class="flex-1 lg:ml-64">
+  <!-- Top bar -->
+  <div class="sticky top-0 z-50 bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-white/5 px-6 py-3">
+    <div class="max-w-5xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3 lg:hidden">
+        <img src="assets/icon-512.png" alt="TFXS" class="w-7 h-7 rounded-lg">
+        <h1 class="text-xs font-bold">Email Preview</h1>
+      </div>
+      <div class="hidden lg:flex items-center gap-2">
+        <span class="text-[10px] text-gray-500 font-mono">DISPLAY MODE:</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="setTheme('dark')" id="btn-dark" class="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border tab-active transition-all">Dark</button>
+        <button onclick="setTheme('light')" id="btn-light" class="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border tab-inactive transition-all">Light</button>
+        <button onclick="setTheme('both')" id="btn-both" class="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border tab-inactive transition-all">Both</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Email List -->
+  <div class="max-w-5xl mx-auto px-6 py-8 space-y-12" id="email-list"></div>
+</main>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// TEMPLATE SYSTEM — Mirrors backend exactly
+// ═══════════════════════════════════════════════════════════════
+const LOGO_URL = "assets/icon-512.png";
+const FRONTEND_URL = "https://affiliates.theforexskyline.com";
+
+function emailTemplate(subtitle, bodyHtml, buttonText, buttonUrl) {
+  const buttonBlock = buttonText && buttonUrl
+    ? `<div style="text-align:center;margin:30px 0;"><a href="${buttonUrl}" style="display:inline-block;background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;padding:14px 32px;border-radius:12px;text-decoration:none;font-weight:bold;font-size:14px;letter-spacing:1px;">${buttonText}</a></div>`
+    : "";
+  return `<div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;background:#0a0a0a;color:#d4d4d8;padding:40px;border-radius:16px;border:1px solid rgba(255,255,255,0.08);">
+<div style="text-align:center;margin-bottom:30px;">
+<img src="${LOGO_URL}" alt="TFXS" width="60" height="60" style="display:block;margin:0 auto 16px;border-radius:12px;">
+<h1 style="color:#fff;font-size:24px;margin:0;">TFXS <span style="opacity:0.5;font-weight:300;">AFFILIATES</span></h1>
+<p style="color:#71717a;font-size:11px;letter-spacing:2px;margin-top:8px;">${subtitle}</p>
+</div>
+${bodyHtml}
+${buttonBlock}
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.05);margin:20px 0;">
+<p style="color:#52525b;font-size:10px;text-align:center;">&copy; 2026 TFXS Network &mdash; <a href="${FRONTEND_URL}" style="color:#52525b;">affiliates.theforexskyline.com</a></p>
+</div>`;
+}
+
+function infoBox(label, value, color) {
+  const colorMap = { red: "239,68,68", green: "34,197,94", gold: "251,191,36", blue: "59,130,246", yellow: "251,191,36", purple: "168,85,247" };
+  const rgb = colorMap[color] || "255,255,255";
+  const textColors = { red: "#ef4444", green: "#22c55e", gold: "#fbbf24", blue: "#3b82f6", yellow: "#fbbf24", purple: "#a855f7" };
+  const tc = textColors[color] || "#fff";
+  return `<div style="background:rgba(${rgb},0.08);border:1px solid rgba(${rgb},0.2);border-radius:12px;padding:20px;margin:20px 0;text-align:center;"><p style="color:#71717a;font-size:10px;text-transform:uppercase;letter-spacing:2px;margin:0 0 8px;">${label}</p><p style="color:${tc};font-size:28px;font-weight:bold;font-family:monospace;margin:0;">${value}</p></div>`;
+}
+
+function detailsBlock(pairs) {
+  const rows = pairs.map(([k, v]) => `<p style="margin:4px 0;color:#a1a1aa;"><strong style="color:#fff;">${k}:</strong> ${v}</p>`).join("");
+  return `<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;margin:16px 0;">${rows}</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ALL 15 TEMPLATES — Grouped by category, matching backend 1:1
+// ═══════════════════════════════════════════════════════════════
+const templates = [
+  // ─── ACCOUNT (4) ───────────────────────────────────────────
+  {
+    id: 1, name: "Welcome / Credentials", category: "account",
+    subject: "🔴 TFXS Affiliates — Welcome",
+    fn: "sendCredentialsEmail(email, displayName, afp, password)",
+    html: emailTemplate("WELCOME",
+      `<p style="color:#d4d4d8;">Welcome <strong style="color:#fff;">Jordan Smith</strong>,</p>
+<p style="color:#a1a1aa;">Your affiliate account has been created. Here are your credentials:</p>
+${infoBox("Your Affiliate ID", "TFXS-ABC123", "red")}
+${detailsBlock([["Email", "jordan@example.com"], ["Password", "xR7kP2!A1"]])}
+<p style="color:#71717a;font-size:11px;">Keep these credentials safe. You can change your password anytime from Settings.</p>`,
+      "ACCESS DASHBOARD", FRONTEND_URL)
+  },
+  {
+    id: 2, name: "Account Approved", category: "account",
+    subject: "✅ TFXS Affiliates — Account Approved",
+    fn: "sendAccountApprovedEmail(email, displayName, afp)",
+    html: emailTemplate("ACCOUNT APPROVED",
+      `<p style="color:#d4d4d8;">Hi <strong style="color:#fff;">Jordan Smith</strong>,</p>
+<p style="color:#a1a1aa;">Great news! Your affiliate account has been <strong style="color:#22c55e;">approved</strong>.</p>
+${infoBox("Your Affiliate ID", "TFXS-ABC123", "green")}
+<p style="color:#a1a1aa;">You can now access your dashboard, view your referral links, and start earning commissions.</p>`,
+      "GO TO DASHBOARD", FRONTEND_URL)
+  },
+  {
+    id: 3, name: "Account Rejected", category: "account",
+    subject: "❌ TFXS Affiliates — Application Update",
+    fn: "sendAccountRejectedEmail(email, displayName, reason)",
+    html: emailTemplate("APPLICATION UPDATE",
+      `<p style="color:#d4d4d8;">Hi <strong style="color:#fff;">Jordan Smith</strong>,</p>
+<p style="color:#a1a1aa;">We've reviewed your affiliate application and unfortunately, it has been <strong style="color:#ef4444;">declined</strong> at this time.</p>
+<div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:16px;margin:16px 0;"><p style="color:#a1a1aa;margin:0;"><strong style="color:#fff;">Reason:</strong> Incomplete application — missing website/social media information.</p></div>
+<p style="color:#a1a1aa;">If you believe this was a mistake, please contact our support team.</p>`,
+      null, null)
+  },
+  {
+    id: 14, name: "Self-Signup Welcome", category: "account",
+    subject: "🔴 TFXS Affiliates — Welcome Aboard!",
+    fn: "sendSignupWelcomeEmail(email, displayName, afp)",
+    html: emailTemplate("WELCOME ABOARD",
+      `<p style="color:#d4d4d8;">Hi <strong style="color:#fff;">Jordan Smith</strong>,</p>
+<p style="color:#a1a1aa;">Thank you for signing up as a TFXS affiliate! Your application is being reviewed by our team.</p>
+${infoBox("Your Affiliate ID", "TFXS-XY9K2P", "red")}
+<p style="color:#a1a1aa;">You'll receive an email once your account has been approved. This usually takes 1-2 business days.</p>`,
+      null, null)
+  },
+
+  // ─── PAYOUT (4) ────────────────────────────────────────────
+  {
+    id: 4, name: "Payout Requested", category: "payout",
+    subject: "📤 TFXS Affiliates — Payout Request Received",
+    fn: "sendPayoutRequestedEmail(email, displayName, amount, method, wallet)",
+    html: emailTemplate("PAYOUT REQUEST",
+      `<p style="color:#d4d4d8;">Hi <strong style="color:#fff;">Jordan Smith</strong>,</p>
+<p style="color:#a1a1aa;">Your payout request has been submitted and is now pending review.</p>
+${infoBox("Amount Requested", "$1,250.00", "gold")}
+${detailsBlock([["Payment Method", "USDT-TRC20"], ["Wallet Address", "TXyz...abc123"], ["Status", "⏳ Pending Review"]])}
+<p style="color:#71717a;font-size:11px;">You will receive an email once your payout has been processed.</p>`,
+      "VIEW PAYOUT HISTORY", `${FRONTEND_URL}/settings`)
+  },
+  {
+    id: 5, name: "Payout Paid", category: "payout",
+    subject: "💸 TFXS Affiliates — Payout Sent",
+    fn: "sendPayoutPaidEmail(email, displayName, amount, method, wallet)",
+    html: emailTemplate("PAYOUT PROCESSED",
+      `<p style="color:#d4d4d8;">Hi <strong style="color:#fff;">Jordan Smith</strong>,</p>
+<p style="color:#a1a1aa;">Your payout has been <strong style="color:#22c55e;">processed and sent</strong>!</p>
+${infoBox("Amount Paid", "$1,250.00", "green")}
+${detailsBlock([["Payment Method", "USDT-TRC20"], ["Wallet Address", "TXyz...abc123"], ["Status", "✅ Paid"]])}
+<p style="color:#71717a;font-size:11px;">Please allow a few minutes for the transaction to confirm on the blockchain.</p>`,
+      "VIEW DASHBOARD", FRONTEND_URL)
+  },
+  {
+    id: 6, name: "Payout Rejected", category: "payout",
+    subject: "❌ TFXS Affiliates — Payout Declined",
+    fn: "sendPayoutRejectedEmail(email, displayName, amount, reason)",
+    html: emailTemplate("PAYOUT DECLINED",
+      `<p style="color:#d4d4d8;">Hi <strong style="color:#fff;">Jordan Smith</strong>,</p>
+<p style="color:#a1a1aa;">Your payout request of <strong style="color:#fff;">$1,250.00</strong> has been <strong style="color:#ef4444;">declined</strong>.</p>
+<div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:16px;margin:16px 0;"><p style="color:#a1a1aa;margin:0;"><strong style="color:#fff;">Reason:</strong> KYC verification required before payout.</p></div>
+<p style="color:#a1a1aa;">Your balance has been restored. If you have questions, please contact support.</p>`,
+      "VIEW DASHBOARD", FRONTEND_URL)
+  },
+  {
+    id: 15, name: "Payout Reminder", category: "payout",
+    subject: "💰 TFXS Affiliates — Payout Window Open",
+    fn: "sendPayoutReminderEmail(email, displayName, available, schedule)",
+    html: emailTemplate("PAYOUT REMINDER",
+      `<p style="color:#d4d4d8;">Hi <strong style="color:#fff;">Jordan Smith</strong>,</p>
+<p style="color:#a1a1aa;">Your payout window is now open! You can submit your payout request for the current period.</p>
+${infoBox("Available Balance", "$3,750.00", "green")}
+${detailsBlock([["Schedule", "1st & 15th"], ["Window", "3 days from today"]])}
+<p style="color:#a1a1aa;">Log in to your dashboard to request your payout before the window closes.</p>`,
+      "REQUEST PAYOUT", FRONTEND_URL)
+  },
+
+  // ─── KYC (3) ───────────────────────────────────────────────
+  {
+    id: 7, name: "KYC Submitted", category: "kyc",
+    subject: "📄 TFXS Affiliates — KYC Documents Received",
+    fn: "sendKycSubmittedEmail(email, displayName, docType)",
+    html: emailTemplate("KYC VERIFICATION",
+      `<p style="color:#d4d4d8;">Hi <strong style="color:#fff;">Jordan Smith</strong>,</p>
+<p style="color:#a1a1aa;">We've received your KYC verification documents and they are now under review.</p>
+${detailsBlock([["Document Type", "Passport"], ["Status", "⏳ Under Review"]])}
+<p style="color:#a1a1aa;">This process usually takes 1-2 business days. You'll receive an email once your verification is complete.</p>`,
+      null, null)
+  },
+  {
+    id: 8, name: "KYC Approved", category: "kyc",
+    subject: "✅ TFXS Affiliates — KYC Approved",
+    fn: "sendKycApprovedEmail(email, displayName)",
+    html: emailTemplate("KYC APPROVED",
+      `<p style="color:#d4d4d8;">Hi <strong style="color:#fff;">Jordan Smith</strong>,</p>
+<p style="color:#a1a1aa;">Your identity verification has been <strong style="color:#22c55e;">approved</strong>!</p>
+${infoBox("Verification Status", "✓ VERIFIED", "green")}
+<p style="color:#a1a1aa;">You can now request payouts from your dashboard. Keep earning those commissions! 🚀</p>`,
+      "REQUEST PAYOUT", `${FRONTEND_URL}/settings`)
+  },
+  {
+    id: 9, name: "KYC Rejected", category: "kyc",
+    subject: "❌ TFXS Affiliates — KYC Rejected",
+    fn: "sendKycRejectedEmail(email, displayName, reason)",
+    html: emailTemplate("KYC REJECTED",
+      `<p style="color:#d4d4d8;">Hi <strong style="color:#fff;">Jordan Smith</strong>,</p>
+<p style="color:#a1a1aa;">Unfortunately, your identity verification has been <strong style="color:#ef4444;">rejected</strong>.</p>
+<div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:16px;margin:16px 0;"><p style="color:#a1a1aa;margin:0;"><strong style="color:#fff;">Reason:</strong> Document is expired. Please upload a valid document.</p></div>
+<p style="color:#a1a1aa;">Please review the reason above and re-submit your documents with the necessary corrections.</p>`,
+      "RE-SUBMIT KYC", `${FRONTEND_URL}/settings`)
+  },
+
+  // ─── SECURITY (1) ──────────────────────────────────────────
+  {
+    id: 10, name: "Password Changed", category: "security",
+    subject: "🔒 TFXS Affiliates — Password Changed",
+    fn: "sendPasswordChangedEmail(email, displayName)",
+    html: emailTemplate("PASSWORD CHANGED",
+      `<p style="color:#d4d4d8;">Hi <strong style="color:#fff;">Jordan Smith</strong>,</p>
+<p style="color:#a1a1aa;">Your password has been <strong style="color:#22c55e;">successfully changed</strong>.</p>
+<p style="color:#a1a1aa;">If you didn't make this change, please contact support immediately or reset your password.</p>`,
+      "GO TO DASHBOARD", FRONTEND_URL)
+  },
+
+  // ─── WEBHOOK / CellXpert (3) ───────────────────────────────
+  {
+    id: 11, name: "Commission Earned", category: "webhook",
+    subject: "💰 TFXS Affiliates — New Commission",
+    fn: "sendCommissionEarnedEmail(email, displayName, eventType, amount, userId)",
+    html: emailTemplate("NEW COMMISSION",
+      `<p style="color:#d4d4d8;">Hi <strong style="color:#fff;">Jordan Smith</strong>,</p>
+<p style="color:#a1a1aa;">You've earned a new commission! 🎉</p>
+${infoBox("Commission Earned", "$250.00", "green")}
+${detailsBlock([["Event", "Qualified FTD"], ["Trader ID", "startrader-3411419"]])}
+<p style="color:#a1a1aa;">Keep up the great work! Check your dashboard for detailed analytics.</p>`,
+      "VIEW DASHBOARD", FRONTEND_URL)
+  },
+  {
+    id: 12, name: "New Registration", category: "webhook",
+    subject: "👤 TFXS Affiliates — New Client Registered!",
+    fn: "sendNewRegistrationEmail(email, displayName, userId, country, trackCode)",
+    html: emailTemplate("NEW REGISTRATION",
+      `<p style="color:#d4d4d8;">Hi <strong style="color:#fff;">Jordan Smith</strong>,</p>
+<p style="color:#a1a1aa;">A new client just registered through your affiliate link! 🎉</p>
+${infoBox("New Client", "startrader-3411419", "blue")}
+${detailsBlock([["Trader ID", "startrader-3411419"], ["Country", "Norway"], ["Tracking Code", "TFXS-ABC123"]])}
+<p style="color:#a1a1aa;">Once your client makes their first deposit, you'll start earning commissions. Share your link to keep growing!</p>`,
+      "VIEW DASHBOARD", FRONTEND_URL)
+  },
+  {
+    id: 13, name: "New FTD", category: "webhook",
+    subject: "🏦 TFXS Affiliates — Client First Deposit!",
+    fn: "sendNewFtdEmail(email, displayName, userId, depositAmount, depositId, country, potentialCommission)",
+    html: emailTemplate("FIRST DEPOSIT",
+      `<p style="color:#d4d4d8;">Hi <strong style="color:#fff;">Jordan Smith</strong>,</p>
+<p style="color:#a1a1aa;">Great news — one of your referred clients just made their <strong style="color:#fbbf24;">first deposit</strong>! 💰</p>
+${infoBox("Deposit Amount", "$5,000.00", "yellow")}
+<div style="background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);border-radius:12px;padding:16px;margin:16px 0;text-align:center;">
+<p style="color:#71717a;font-size:10px;text-transform:uppercase;letter-spacing:2px;margin:0 0 8px;">Potential Commission</p>
+<p style="color:#22c55e;font-size:24px;font-weight:bold;font-family:monospace;margin:0;">$250.00</p>
+<p style="color:#52525b;font-size:10px;margin:6px 0 0;">Based on your current deal tier</p>
+</div>
+${detailsBlock([["Trader ID", "startrader-3411419"], ["Deposit ID", "DEP-8472"], ["Country", "Norway"]])}
+<div style="background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.15);border-radius:10px;padding:12px;margin:16px 0;">
+<p style="color:#a1a1aa;font-size:11px;margin:0;">⏱ <strong style="color:#fbbf24;">Note:</strong> Commissions typically take up to <strong style="color:#fff;">24 hours</strong> to be processed and appear on your dashboard. You will receive a separate email once your commission is confirmed.</p>
+</div>
+<p style="color:#a1a1aa;">Your referral is now an active trader. Keep promoting to maximize your earnings!</p>`,
+      "VIEW EARNINGS", FRONTEND_URL)
+  }
+];
+
+// ═══════════════════════════════════════════════════════════════
+// UI LOGIC
+// ═══════════════════════════════════════════════════════════════
+const catMeta = {
+  account:  { label: "Account",  cls: "cat-account",  icon: "👤" },
+  payout:   { label: "Payout",   cls: "cat-payout",   icon: "💸" },
+  kyc:      { label: "KYC",      cls: "cat-kyc",      icon: "📄" },
+  security: { label: "Security", cls: "cat-security",  icon: "🔒" },
+  webhook:  { label: "Webhook",  cls: "cat-webhook",  icon: "⚡" }
+};
+
+let currentTheme = "dark";
+
+function setTheme(t) {
+  currentTheme = t;
+  ["dark", "light", "both"].forEach(k => {
+    const btn = document.getElementById(`btn-${k}`);
+    btn.className = `px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-all ${t === k ? "tab-active" : "tab-inactive"}`;
+  });
+  renderAll();
+}
+
+function buildSidebar() {
+  const nav = document.getElementById("sidebar-nav");
+  if (!nav) return;
+  const groups = {};
+  templates.forEach(t => {
+    if (!groups[t.category]) groups[t.category] = [];
+    groups[t.category].push(t);
+  });
+
+  let html = "";
+  for (const [cat, items] of Object.entries(groups)) {
+    const m = catMeta[cat];
+    html += `<div class="mb-1">
+      <div class="px-4 py-2 text-[9px] font-bold text-gray-600 uppercase tracking-widest flex items-center gap-2">
+        <span>${m.icon}</span> ${m.label}
+        <span class="ml-auto text-gray-700 font-mono">${items.length}</span>
+      </div>`;
+    items.forEach(t => {
+      html += `<a href="#email-${t.id}" class="sidebar-item block px-4 py-2 pl-5 text-[11px] text-gray-400 hover:text-white cursor-pointer border-l-2 border-transparent" data-id="${t.id}">
+        <span class="font-mono text-gray-600 mr-1.5">#${t.id}</span>${t.name}
+      </a>`;
+    });
+    html += `</div>`;
+  }
+  nav.innerHTML = html;
+}
+
+function renderAll() {
+  const container = document.getElementById("email-list");
+  let lastCat = "";
+  container.innerHTML = templates.map(t => {
+    const m = catMeta[t.category];
+    const darkFrame = `<div class="preview-frame dark"><div class="email-html">${t.html}</div></div>`;
+    const lightFrame = `<div class="preview-frame light"><div class="email-html">${t.html}</div></div>`;
+
+    let frames = "";
+    if (currentTheme === "dark") frames = darkFrame;
+    else if (currentTheme === "light") frames = lightFrame;
+    else frames = `<div class="grid md:grid-cols-2 gap-4">
+      <div><p class="text-[9px] text-gray-600 uppercase tracking-widest mb-2 text-center font-mono">Dark Background</p>${darkFrame}</div>
+      <div><p class="text-[9px] text-gray-600 uppercase tracking-widest mb-2 text-center font-mono">Light Background</p>${lightFrame}</div>
+    </div>`;
+
+    // Category divider
+    let divider = "";
+    if (t.category !== lastCat) {
+      lastCat = t.category;
+      divider = `<div class="flex items-center gap-3 mb-6 mt-2 first:mt-0">
+        <span class="text-lg">${m.icon}</span>
+        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest">${m.label} Emails</h2>
+        <div class="flex-1 h-px bg-white/5"></div>
+      </div>`;
+    }
+
+    return `${divider}<div id="email-${t.id}" class="scroll-mt-20">
+      <div class="flex items-center gap-3 mb-2 flex-wrap">
+        <span class="text-[10px] font-mono text-gray-600 bg-white/5 px-2 py-0.5 rounded">#${t.id}</span>
+        <span class="category-badge ${m.cls}">${m.label}</span>
+        <h3 class="text-sm font-bold text-white">${t.name}</h3>
+      </div>
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-[9px] text-gray-600 font-mono uppercase">Subject:</span>
+          <span class="text-[11px] text-gray-400">${t.subject}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-[9px] text-gray-600 font-mono uppercase">Function:</span>
+          <code class="text-[10px] text-gray-500 font-mono bg-white/3 px-1.5 py-0.5 rounded">${t.fn}</code>
+        </div>
+      </div>
+      ${frames}
+    </div>`;
+  }).join("");
+
+  // Re-observe for sidebar highlighting
+  setupScrollSpy();
+}
+
+function setupScrollSpy() {
+  if (window._emailObserver) window._emailObserver.disconnect();
+  window._emailObserver = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const id = e.target.id.replace("email-", "");
+        document.querySelectorAll(".sidebar-item").forEach(s => {
+          s.classList.toggle("active", s.dataset.id === id);
+        });
+      }
+    });
+  }, { rootMargin: "-15% 0px -65% 0px" });
+
+  templates.forEach(t => {
+    const el = document.getElementById(`email-${t.id}`);
+    if (el) window._emailObserver.observe(el);
+  });
+}
+
+// Init
+buildSidebar();
+renderAll();
+</script>
+</body>
+</html>

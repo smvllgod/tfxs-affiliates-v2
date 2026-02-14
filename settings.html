@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>((t)=>{if(t==="light")document.documentElement.classList.add("light-theme")})(localStorage.getItem("tfxs_theme")||"light")</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TFXS Affiliate | Settings</title>
+    <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#DC2626">
+    <meta property="og:title" content="TFXS Affiliates — Settings">
+    <meta property="og:description" content="Account settings and preferences.">
+    <meta property="og:image" content="assets/logo.svg">
+    <meta name="theme-color" content="#dc2626">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/shared.css">
+    <script>
+      // Admin redirect — if admin lands on user settings, bounce to admin panel
+      (function() {
+        try {
+          var t = localStorage.getItem('tfxs_jwt');
+          if (t) { var p = JSON.parse(atob(t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))); if (p.is_admin) { window.location.replace('/admin-settings'); } }
+        } catch(e) {}
+      })();
+    </script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fff1f2',
+                            100: '#ffe4e6',
+                            500: '#ef4444', 
+                            600: '#dc2626',
+                            900: '#7f1d1d',
+                            neon: '#ff3333',
+                            yellow: '#fbbf24',
+                            dark: '#050505',
+                            panel: '#0A0A0A'
+                        }
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #050505;
+            color: #d4d4d8;
+        }
+
+        .halo-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(ellipse 140% 70% at 50% -5%, rgba(220,38,38,0.14) 0%, rgba(220,38,38,0.08) 20%, rgba(220,38,38,0.04) 38%, rgba(220,38,38,0.015) 55%, rgba(220,38,38,0.004) 72%, rgba(220,38,38,0) 100%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .glass-panel {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+        }
+
+        .form-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: all 0.3s;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #ef4444;
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #dc2626; }
+    </style>
+</head>
+<body class="antialiased font-sans min-h-screen relative overflow-x-hidden selection:bg-brand-500 selection:text-white pb-20">
+
+    <div class="halo-bg"></div>
+
+    <nav class="sticky top-0 z-50 w-full glass-panel border-b-0 border-white/5 py-3 sm:py-4">
+        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 flex items-center justify-between gap-3 sm:gap-4 relative">
+            <div class="flex items-center gap-4 sm:gap-10">
+                <a href="/" class="flex items-center gap-2 group cursor-pointer no-underline">
+                    <img src="assets/logo.svg" alt="TFXS Logo" class="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow-[0_0_15px_rgba(220,38,38,0.5)]">
+                    <span class="hidden sm:inline text-lg sm:text-xl font-bold tracking-tight text-white group-hover:text-brand-500 transition-colors">TFXS<span class="opacity-50 font-light"> AFFILIATES</span></span>
+                </a>
+
+                <div id="nav-links" class="hidden md:flex items-center gap-1 bg-white/5 p-1 rounded-lg border border-white/5">
+                    <a href="/" class="px-4 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition rounded-md hover:bg-white/5" data-i18n="nav.dashboard">Dashboard</a>
+                    <a href="/reports" class="px-4 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition rounded-md hover:bg-white/5" data-i18n="nav.reports">Reports</a>
+                    <a href="/deals" class="px-4 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition rounded-md hover:bg-white/5" data-i18n="nav.deals">Deals</a>
+                    <a href="/assets" class="px-4 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition rounded-md hover:bg-white/5" data-i18n="nav.assets">Assets</a>
+                    <a href="/settings" class="px-4 py-1.5 text-xs font-semibold text-brand-500 bg-white/10 rounded-md shadow-sm" data-i18n="nav.settings">Settings</a>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 sm:gap-6">
+                <div class="hidden lg:flex flex-col items-end">
+                    <span class="text-[10px] text-gray-500 font-mono btn-primary uppercase tracking-wider" data-i18n="nav.serverTime">Server Time</span>
+                    <span id="server-time" class="text-xs font-mono font-bold text-white">--:--:--</span>
+                </div>
+                <div class="h-8 w-[1px] bg-white/10 hidden lg:block"></div>
+                
+                <!-- Language Selector -->
+                <div id="lang-selector-anchor"></div>
+                <!-- Theme Toggle -->
+                <div id="theme-toggle-anchor"></div>
+
+                <!-- Notification Bell -->
+                <button class="notification-bell-btn relative p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                    <span id="notif-badge" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-brand-500 text-white text-[9px] font-bold shadow-[0_0_8px_#ef4444]" style="display:none;">0</span>
+                </button>
+
+                <!-- Mobile Menu Toggle -->
+                <button id="mobile-menu-toggle" class="md:hidden p-2 text-gray-400 hover:text-white transition rounded-lg hover:bg-white/5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+
+                <a id="nav-avatar-link" href="/settings" class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-sm font-bold text-white leading-none nav-display-name">—</p>
+                        <p class="text-[10px] text-brand-500 font-mono mt-1 nav-afp-label">—</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-b from-gray-700 to-black border border-white/20 relative overflow-hidden ring-2 ring-brand-500/20">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=default" alt="Avatar" class="w-full h-full object-cover opacity-80">
+                    </div>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Connecting overlay — full-page, fixed at top -->
+    <div id="connecting-overlay" class="fixed inset-0 z-[9998]" style="background:rgba(5,5,5,0.85); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);">
+        <div class="flex items-center justify-center gap-3 px-6 py-3 mt-[72px]" style="background:linear-gradient(90deg, transparent, rgba(220,38,38,0.06), transparent);">
+            <div class="relative w-5 h-5 flex-shrink-0">
+                <div class="absolute inset-0 rounded-full border-2 border-white/10"></div>
+                <div class="absolute inset-0 rounded-full border-2 border-t-red-500 animate-spin"></div>
+            </div>
+            <p class="text-xs font-mono text-gray-400 tracking-wider" data-i18n="dash.connecting">Connecting to live data<span class="connecting-dots"></span></p>
+            <p class="text-[10px] text-gray-600 ml-1" data-i18n="dash.mayTake">— may take a few seconds</p>
+        </div>
+    </div>
+    <style>
+        @keyframes connectDots { 0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} }
+        .connecting-dots::after { content:''; animation: connectDots 1.5s steps(4,end) infinite; }
+    </style>
+
+    <main class="max-w-[1000px] mx-auto px-4 sm:px-6 lg:px-12 mt-8 sm:mt-12 space-y-8 animate-fade-in-up">
+        
+        <header>
+             <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight" data-i18n="set.title">Settings</h1>
+             <p class="text-gray-400 mt-2 font-light" data-i18n="set.subtitle">Customise your profile and update payment preferences.</p>
+        </header>
+
+        <div class="glass-panel p-8 rounded-2xl border border-white/5">
+            
+            <!-- Avatar Selection -->
+            <div class="mb-10 border-b border-white/5 pb-10">
+                <div class="flex justify-between items-end mb-6">
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider" data-i18n="set.selectAvatar">Select Avatar</h3>
+                    <span class="text-[10px] text-gray-500 font-mono" data-i18n="set.clickToSelect">CLICK TO SELECT</span>
+                </div>
+                <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-4" id="avatar-grid">
+                    <!-- Populated by JS -->
+                </div>
+                <input type="hidden" id="selected-avatar-seed" value="Jordan">
+            </div>
+
+            <!-- Profile Info -->
+            <h3 class="text-sm font-bold text-white mb-6 uppercase tracking-wider" data-i18n="set.profileInfo">Profile Information</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 border-b border-white/5 pb-10">
+                <div>
+                     <label class="block text-xs font-mono text-gray-400 mb-2" data-i18n="set.displayName">Display Name</label>
+                     <input type="text" id="settings-name" value="" placeholder="Your display name" class="w-full px-4 py-3 rounded-xl form-input text-sm">
+                </div>
+                <div>
+                     <label class="block text-xs font-mono text-gray-400 mb-2" data-i18n="set.email">Email Address <span class="text-gray-600 text-[9px] ml-1 inline-flex items-center gap-0.5"><svg class="w-3 h-3 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg> <span data-i18n="set.locked">Locked</span></span></label>
+                     <input type="email" id="settings-email" value="" placeholder="your@email.com" class="w-full px-4 py-3 rounded-xl form-input text-sm opacity-60 cursor-not-allowed" readonly disabled>
+                </div>
+                <div>
+                     <label class="block text-xs font-mono text-gray-400 mb-2" data-i18n="set.phone">Phone Number</label>
+                     <div class="flex gap-0 relative">
+                         <button type="button" id="phone-code-btn" class="flex items-center gap-1.5 px-3 py-3 rounded-l-xl form-input text-sm border-r-0 min-w-[90px] hover:bg-white/5 transition-colors" style="border-top-right-radius:0;border-bottom-right-radius:0;width:auto;">
+                             <span id="phone-code-flag" class="text-lg">🇺🇸</span>
+                             <span id="phone-code-label" class="text-xs font-mono text-gray-400">+1</span>
+                             <svg class="w-3 h-3 text-gray-500 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                         </button>
+                         <input type="tel" id="settings-phone" value="" placeholder="(555) 123-4567" data-i18n-ph="set.phonePlaceholder" class="flex-1 px-4 py-3 rounded-r-xl form-input text-sm" style="border-top-left-radius:0;border-bottom-left-radius:0;">
+                         <div id="phone-code-dropdown" class="absolute left-0 top-full mt-1 z-50 hidden w-72 max-h-52 overflow-y-auto rounded-xl border border-white/10 bg-[#111] shadow-2xl">
+                         </div>
+                     </div>
+                     <input type="hidden" id="phone-country-code" value="+1">
+                </div>
+                <div class="md:col-span-2">
+                     <label class="block text-xs font-mono text-gray-400 mb-2" data-i18n="set.address">Address</label>
+                     <input type="text" id="settings-street" value="" placeholder="123 Main Street, Apt 4B" data-i18n-ph="set.streetPlaceholder" class="w-full px-4 py-3 rounded-xl form-input text-sm">
+                </div>
+                <div>
+                     <label class="block text-xs font-mono text-gray-400 mb-2" data-i18n="set.city">City</label>
+                     <input type="text" id="settings-city" value="" placeholder="New York" data-i18n-ph="set.cityPlaceholder" class="w-full px-4 py-3 rounded-xl form-input text-sm">
+                </div>
+                <div>
+                     <label class="block text-xs font-mono text-gray-400 mb-2" data-i18n="set.state">State / Province</label>
+                     <input type="text" id="settings-state" value="" placeholder="NY" data-i18n-ph="set.statePlaceholder" class="w-full px-4 py-3 rounded-xl form-input text-sm">
+                </div>
+                <div>
+                     <label class="block text-xs font-mono text-gray-400 mb-2" data-i18n="set.zip">Postal / ZIP Code</label>
+                     <input type="text" id="settings-zip" value="" placeholder="10001" data-i18n-ph="set.zipPlaceholder" class="w-full px-4 py-3 rounded-xl form-input text-sm">
+                </div>
+                <div class="relative">
+                     <label class="block text-xs font-mono text-gray-400 mb-2" data-i18n="set.country">Country</label>
+                     <input type="text" id="settings-country" value="" placeholder="United States" data-i18n-ph="set.countryPlaceholder" autocomplete="off" class="w-full px-4 py-3 pl-12 rounded-xl form-input text-sm">
+                     <span id="country-flag" class="absolute left-4 bottom-0 h-[46px] flex items-center text-lg pointer-events-none"></span>
+                     <div id="country-dropdown" class="absolute left-0 right-0 top-full mt-1 z-50 hidden max-h-52 overflow-y-auto rounded-xl border border-white/10 bg-[#111] shadow-2xl"></div>
+                </div>
+            </div>
+
+            <!-- Payment Methods -->
+            <h3 class="text-sm font-bold text-white mb-6 uppercase tracking-wider flex items-center gap-3">
+                <span data-i18n="set.payoutSettings">Payout Settings</span>
+                <button id="auto-payout-toggle" onclick="toggleAutoPayout()" class="relative flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider transition-all cursor-pointer border" style="display:none;">
+                    <span class="relative w-7 h-4 rounded-full transition-colors" id="auto-payout-track">
+                        <span class="absolute top-0.5 left-0.5 w-3 h-3 rounded-full bg-white shadow transition-transform" id="auto-payout-dot"></span>
+                    </span>
+                    <span id="auto-payout-label" data-i18n="set.autoPayout">Auto-Payout</span>
+                </button>
+            </h3>
+            
+            <div class="space-y-6">
+                <!-- Method Selector -->
+                <div>
+                    <label class="block text-xs font-mono text-gray-400 mb-3" data-i18n="set.paymentMethod">Payment Method</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="payment-method-grid">
+                        <label class="cursor-pointer relative group" onclick="selectPaymentMethod(this)">
+                            <input type="radio" name="payment_method" value="trc20" checked class="sr-only">
+                            <div class="payment-card p-4 rounded-xl border transition-all h-full flex flex-col justify-center selected">
+                                <div class="flex items-center justify-between mb-1">
+                                    <div class="flex items-center gap-2">
+                                        <img src="https://cdn.jsdelivr.net/npm/cryptocurrency-icons@0.18.1/svg/color/usdt.svg" class="w-6 h-6" alt="USDT">
+                                        <span class="font-bold payment-card-title">USDT</span>
+                                    </div>
+                                    <svg class="w-4 h-4 text-green-500 payment-check" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                </div>
+                                <div class="text-[10px] text-gray-400 font-mono">TRC-20 Network</div>
+                            </div>
+                        </label>
+
+                        <label class="cursor-pointer relative group" onclick="selectPaymentMethod(this)">
+                            <input type="radio" name="payment_method" value="bep20" class="sr-only">
+                            <div class="payment-card p-4 rounded-xl border transition-all h-full flex flex-col justify-center">
+                                <div class="flex items-center justify-between mb-1">
+                                    <div class="flex items-center gap-2">
+                                        <img src="https://cdn.jsdelivr.net/npm/cryptocurrency-icons@0.18.1/svg/color/usdt.svg" class="w-6 h-6" alt="USDT">
+                                        <span class="font-bold payment-card-title">USDT</span>
+                                    </div>
+                                    <svg class="w-4 h-4 text-green-500 payment-check hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                </div>
+                                <div class="text-[10px] text-gray-400 font-mono">BEP-20 (BSC) Network</div>
+                            </div>
+                        </label>
+
+                        <label class="cursor-pointer relative group" onclick="selectPaymentMethod(this)">
+                            <input type="radio" name="payment_method" value="btc" class="sr-only">
+                            <div class="payment-card p-4 rounded-xl border transition-all h-full flex flex-col justify-center">
+                                <div class="flex items-center justify-between mb-1">
+                                    <div class="flex items-center gap-2">
+                                        <img src="https://cdn.jsdelivr.net/npm/cryptocurrency-icons@0.18.1/svg/color/btc.svg" class="w-6 h-6" alt="BTC">
+                                        <span class="font-bold payment-card-title">Bitcoin</span>
+                                    </div>
+                                    <svg class="w-4 h-4 text-green-500 payment-check hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                </div>
+                                <div class="text-[10px] text-gray-400 font-mono">BTC Native Segwit</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Wallet Address -->
+                <div>
+                     <label class="block text-xs font-mono text-gray-400 mb-2" data-i18n="set.walletAddress">Wallet Address</label>
+                     <div class="relative group">
+                        <input type="text" id="settings-wallet" value="" placeholder="Enter your wallet address" data-i18n-ph="set.walletPlaceholder" class="w-full px-4 py-3 rounded-xl form-input text-sm font-mono text-brand-500 pl-10 group-focus-within:text-white transition-colors">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-4 w-4 text-gray-500 group-focus-within:text-brand-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                        </div>
+                     </div>
+                     <p class="text-[10px] text-brand-500/80 mt-2 flex items-center gap-1 bg-brand-500/5 p-2 rounded-lg border border-brand-500/10 inline-flex" data-i18n="set.networkWarning">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        Please verify the network carefully. Transfers on the wrong network will be permanently lost.
+                     </p>
+                </div>
+            </div>
+
+            <!-- KYC Verification Section -->
+            <div class="mt-10 border-t border-white/5 pt-10" id="kyc-section">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                        <svg class="w-4 h-4 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        <span data-i18n="set.kyc">Identity Verification (KYC)</span>
+                    </h3>
+                    <div id="kyc-status-badge"></div>
+                </div>
+
+                <!-- KYC Status Display -->
+                <div id="kyc-status-box" class="mb-6 rounded-xl p-4 border" style="display:none;"></div>
+
+                <!-- KYC Upload Form (hidden when already submitted) -->
+                <div id="kyc-upload-form">
+                    <p class="text-xs text-gray-400 mb-5 leading-relaxed" data-i18n="set.kycDesc">
+                        To enable payouts, please verify your identity by uploading a valid government-issued document. 
+                        Your data is handled securely and only reviewed by administrators.
+                    </p>
+                    <div class="space-y-5">
+                        <!-- Document Type -->
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2" data-i18n="set.docType">Document Type</label>
+                            <div id="kyc-doc-wrapper" class="custom-select relative w-full md:w-64">
+                                <button type="button" id="kyc-doc-btn" class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm bg-white/5 border border-white/10 text-white hover:border-white/20 transition">
+                                    <span id="kyc-doc-label" data-i18n="set.passport">Passport</span>
+                                    <svg class="w-4 h-4 text-gray-400 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                </button>
+                                <div id="kyc-doc-dropdown" class="hidden absolute left-0 right-0 mt-1 rounded-xl bg-[#1a1a1a] border border-white/10 shadow-xl z-50 overflow-hidden">
+                                    <div id="kyc-doc-options">
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="passport" data-i18n="set.passport">Passport</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="national_id" data-i18n="set.nationalId">National ID Card</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="drivers_license" data-i18n="set.driversLicense">Driver's License</div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="kyc-doc-type" value="passport">
+                            </div>
+                        </div>
+
+                        <!-- Image Uploads -->
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2" data-i18n="set.uploadDocs">Upload Document Images <span class="text-gray-600">(max 3 images, 5 MB each)</span></label>
+                            <div class="flex flex-wrap gap-3" id="kyc-preview-grid"></div>
+                            <label class="mt-3 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-white/20 hover:border-brand-500/50 bg-white/[0.02] hover:bg-brand-500/5 cursor-pointer transition-all group">
+                                <svg class="w-5 h-5 text-gray-500 group-hover:text-brand-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                <span class="text-xs text-gray-400 group-hover:text-white transition-colors" data-i18n="set.chooseFiles">Choose files</span>
+                                <input type="file" id="kyc-file-input" accept="image/*" multiple class="hidden" onchange="handleKycFiles(this.files)">
+                            </label>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button id="kyc-submit-btn" onclick="submitKyc()" class="btn-gradient px-6 py-3 rounded-xl text-sm font-bold tracking-wider uppercase" disabled data-i18n="set.submitKyc">
+                            Submit for Verification
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Change Password Section -->
+            <div class="mt-10 border-t border-white/5 pt-10">
+                <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-6" data-i18n="set.changePassword">Change Password</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2" data-i18n="set.currentPw">Current Password</label>
+                        <input type="password" id="current-password" placeholder="Enter current password" class="w-full px-4 py-3 rounded-xl form-input text-sm">
+                    </div>
+                    <div></div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2" data-i18n="set.newPw">New Password</label>
+                        <input type="password" id="new-password" placeholder="Enter new password" class="w-full px-4 py-3 rounded-xl form-input text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2" data-i18n="set.confirmPw">Confirm New Password</label>
+                        <input type="password" id="confirm-password" placeholder="Confirm new password" class="w-full px-4 py-3 rounded-xl form-input text-sm">
+                    </div>
+                </div>
+                <div class="mt-4 flex justify-end">
+                    <button id="change-password-btn" class="px-6 py-2.5 rounded-xl text-xs font-bold text-white uppercase tracking-wider hover:opacity-90 transition transform active:scale-95 border border-white/10 bg-white/5 hover:bg-white/10" data-i18n="set.updatePw">Update Password</button>
+                </div>
+            </div>
+            
+             <div class="mt-8 pt-6 border-t border-white/5 flex justify-end">
+                <button id="save-settings" class="btn-gradient px-8 py-3 rounded-xl shadow-lg shadow-brand-500/20 text-xs font-bold text-white uppercase tracking-wider hover:opacity-90 transition transform active:scale-95" data-i18n="set.saveChanges">Save Changes</button>
+            </div>
+        </div>
+
+    </main>
+    <script src="js/theme.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script>
+        // --- KYC Doc Type Custom Dropdown ---
+        (function() {
+            const wrapper = document.getElementById('kyc-doc-wrapper');
+            const btn = document.getElementById('kyc-doc-btn');
+            const label = document.getElementById('kyc-doc-label');
+            const dd = document.getElementById('kyc-doc-dropdown');
+            const hidden = document.getElementById('kyc-doc-type');
+            if (!btn || !dd) return;
+
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const open = !dd.classList.contains('hidden');
+                document.querySelectorAll('.custom-select-dd-open').forEach(d => { d.classList.add('hidden'); d.classList.remove('custom-select-dd-open'); });
+                if (!open) { dd.classList.remove('hidden'); dd.classList.add('custom-select-dd-open'); btn.querySelector('svg').classList.add('rotate-180'); }
+                else { btn.querySelector('svg').classList.remove('rotate-180'); }
+            });
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('#kyc-doc-wrapper')) { dd.classList.add('hidden'); btn.querySelector('svg').classList.remove('rotate-180'); }
+            });
+
+            dd.querySelectorAll('.custom-select-opt').forEach(opt => {
+                opt.addEventListener('click', () => {
+                    hidden.value = opt.dataset.value;
+                    label.textContent = opt.textContent;
+                    dd.classList.add('hidden');
+                    btn.querySelector('svg').classList.remove('rotate-180');
+                    dd.querySelectorAll('.custom-select-opt').forEach(o => o.classList.remove('bg-white/5', 'font-medium'));
+                    opt.classList.add('bg-white/5', 'font-medium');
+                });
+            });
+        })();
+
+        // --- Avatar Logic ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const seeds = ['Jordan', 'Felix', 'Aneka', 'Zuck', 'Elon', 'Vitalik', 'Satoshi', 'Doge',
+                           'Luna', 'Kai', 'Nova', 'Aria', 'Rex', 'Zara', 'Blaze', 'Onyx'];
+            const grid = document.getElementById('avatar-grid');
+            const currentSeedInput = document.getElementById('selected-avatar-seed');
+            
+            function renderAvatarGrid(selectedSeed) {
+                grid.innerHTML = '';
+                seeds.forEach(seed => {
+                    const div = document.createElement('div');
+                    const isSelected = seed === selectedSeed;
+                    
+                    div.className = `aspect-square rounded-full bg-white/5 border-2 hover:border-white/40 cursor-pointer overflow-hidden transition-all duration-300 relative group active:scale-90 ${isSelected ? 'border-brand-500 ring-4 ring-brand-500/10 scale-105' : 'border-transparent opacity-70 hover:opacity-100'}`;
+                    div.innerHTML = `<img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}" class="w-full h-full object-cover" draggable="false">`;
+                    
+                    div.onclick = () => {
+                         Array.from(grid.children).forEach(c => {
+                             c.className = "aspect-square rounded-full bg-white/5 border-2 border-transparent hover:border-white/40 cursor-pointer overflow-hidden transition-all duration-300 relative group active:scale-90 opacity-70 hover:opacity-100";
+                         });
+                         div.className = "aspect-square rounded-full bg-white/5 border-2 border-brand-500 ring-4 ring-brand-500/10 scale-105 cursor-pointer overflow-hidden transition-all duration-300 relative group active:scale-90";
+                         currentSeedInput.value = seed;
+                    };
+                    grid.appendChild(div);
+                });
+            }
+
+            renderAvatarGrid('Jordan'); // default
+
+            // ── Load saved settings from backend ──
+            const API = window.TFXS_API;
+            if (API) {
+                const affiliateId = API.getAffiliateId();
+                API.fetchSettings(affiliateId).then(res => {
+                    if (res.ok && res.data) {
+                        const s = res.data;
+                        // Populate fields
+                        const nameInput = document.getElementById('settings-name');
+                        const emailInput = document.getElementById('settings-email');
+                        const walletInput = document.getElementById('settings-wallet');
+                        const phoneInput = document.getElementById('settings-phone');
+                        const streetInput = document.getElementById('settings-street');
+                        const cityInput = document.getElementById('settings-city');
+                        const stateInput = document.getElementById('settings-state');
+                        const zipInput = document.getElementById('settings-zip');
+                        const countryInput = document.getElementById('settings-country');
+
+                        if (s.display_name && nameInput) nameInput.value = s.display_name;
+                        if (s.email && emailInput) emailInput.value = s.email;
+                        if (s.wallet_address && walletInput) walletInput.value = s.wallet_address;
+                        if (s.phone && phoneInput) phoneInput.value = s.phone;
+                        if (s.address_street && streetInput) streetInput.value = s.address_street;
+                        if (s.address_city && cityInput) cityInput.value = s.address_city;
+                        if (s.address_state && stateInput) stateInput.value = s.address_state;
+                        if (s.address_zip && zipInput) zipInput.value = s.address_zip;
+                        if (s.address_country && countryInput) {
+                            countryInput.value = s.address_country;
+                            // Set flag emoji directly without opening the dropdown
+                            if (typeof window._setCountryFlag === 'function') {
+                                window._setCountryFlag(s.address_country);
+                            }
+                        }
+                        if (s.avatar_seed) {
+                            currentSeedInput.value = s.avatar_seed;
+                            renderAvatarGrid(s.avatar_seed);
+                        }
+                        if (s.payment_method) {
+                            const radio = document.querySelector(`input[name="payment_method"][value="${s.payment_method}"]`);
+                            if (radio) {
+                                radio.checked = true;
+                                const label = radio.closest('label');
+                                if (label) selectPaymentMethod(label);
+                            }
+                        }
+                        // Update nav avatar + name if available
+                        if (s.display_name) {
+                            const navName = document.querySelector('nav .text-sm.font-bold');
+                            if (navName) navName.textContent = s.display_name;
+                        }
+                        if (s.avatar_seed) {
+                            const navAvatar = document.querySelector('nav img[alt="Avatar"]');
+                            if (navAvatar) navAvatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${s.avatar_seed}`;
+                        }
+                        // Auto-payout toggle state
+                        loadAutoPayoutState(s);
+                    }
+                }).catch(err => {
+                    console.warn("[Settings] Could not load saved settings:", err.message);
+                });
+            }
+        });
+
+        // --- Country Autocomplete with Flags ---
+        (function() {
+            const COUNTRIES = [
+                {n:"Afghanistan",c:"AF",f:"🇦🇫"},{n:"Albania",c:"AL",f:"🇦🇱"},{n:"Algeria",c:"DZ",f:"🇩🇿"},{n:"Andorra",c:"AD",f:"🇦🇩"},{n:"Angola",c:"AO",f:"🇦🇴"},{n:"Antigua and Barbuda",c:"AG",f:"🇦🇬"},{n:"Argentina",c:"AR",f:"🇦🇷"},{n:"Armenia",c:"AM",f:"🇦🇲"},{n:"Australia",c:"AU",f:"🇦🇺"},{n:"Austria",c:"AT",f:"🇦🇹"},
+                {n:"Azerbaijan",c:"AZ",f:"🇦🇿"},{n:"Bahamas",c:"BS",f:"🇧🇸"},{n:"Bahrain",c:"BH",f:"🇧🇭"},{n:"Bangladesh",c:"BD",f:"🇧🇩"},{n:"Barbados",c:"BB",f:"🇧🇧"},{n:"Belarus",c:"BY",f:"🇧🇾"},{n:"Belgium",c:"BE",f:"🇧🇪"},{n:"Belize",c:"BZ",f:"🇧🇿"},{n:"Benin",c:"BJ",f:"🇧🇯"},{n:"Bhutan",c:"BT",f:"🇧🇹"},
+                {n:"Bolivia",c:"BO",f:"🇧🇴"},{n:"Bosnia and Herzegovina",c:"BA",f:"🇧🇦"},{n:"Botswana",c:"BW",f:"🇧🇼"},{n:"Brazil",c:"BR",f:"🇧🇷"},{n:"Brunei",c:"BN",f:"🇧🇳"},{n:"Bulgaria",c:"BG",f:"🇧🇬"},{n:"Burkina Faso",c:"BF",f:"🇧🇫"},{n:"Burundi",c:"BI",f:"🇧🇮"},{n:"Cabo Verde",c:"CV",f:"🇨🇻"},{n:"Cambodia",c:"KH",f:"🇰🇭"},
+                {n:"Cameroon",c:"CM",f:"🇨🇲"},{n:"Canada",c:"CA",f:"🇨🇦"},{n:"Central African Republic",c:"CF",f:"🇨🇫"},{n:"Chad",c:"TD",f:"🇹🇩"},{n:"Chile",c:"CL",f:"🇨🇱"},{n:"China",c:"CN",f:"🇨🇳"},{n:"Colombia",c:"CO",f:"🇨🇴"},{n:"Comoros",c:"KM",f:"🇰🇲"},{n:"Congo",c:"CG",f:"🇨🇬"},{n:"Costa Rica",c:"CR",f:"🇨🇷"},
+                {n:"Côte d'Ivoire",c:"CI",f:"🇨🇮"},{n:"Croatia",c:"HR",f:"🇭🇷"},{n:"Cuba",c:"CU",f:"🇨🇺"},{n:"Cyprus",c:"CY",f:"🇨🇾"},{n:"Czech Republic",c:"CZ",f:"🇨🇿"},{n:"Denmark",c:"DK",f:"🇩🇰"},{n:"Djibouti",c:"DJ",f:"🇩🇯"},{n:"Dominica",c:"DM",f:"🇩🇲"},{n:"Dominican Republic",c:"DO",f:"🇩🇴"},{n:"Ecuador",c:"EC",f:"🇪🇨"},
+                {n:"Egypt",c:"EG",f:"🇪🇬"},{n:"El Salvador",c:"SV",f:"🇸🇻"},{n:"Equatorial Guinea",c:"GQ",f:"🇬🇶"},{n:"Eritrea",c:"ER",f:"🇪🇷"},{n:"Estonia",c:"EE",f:"🇪🇪"},{n:"Eswatini",c:"SZ",f:"🇸🇿"},{n:"Ethiopia",c:"ET",f:"🇪🇹"},{n:"Fiji",c:"FJ",f:"🇫🇯"},{n:"Finland",c:"FI",f:"🇫🇮"},{n:"France",c:"FR",f:"🇫🇷"},
+                {n:"Gabon",c:"GA",f:"🇬🇦"},{n:"Gambia",c:"GM",f:"🇬🇲"},{n:"Georgia",c:"GE",f:"🇬🇪"},{n:"Germany",c:"DE",f:"🇩🇪"},{n:"Ghana",c:"GH",f:"🇬🇭"},{n:"Greece",c:"GR",f:"🇬🇷"},{n:"Grenada",c:"GD",f:"🇬🇩"},{n:"Guatemala",c:"GT",f:"🇬🇹"},{n:"Guinea",c:"GN",f:"🇬🇳"},{n:"Guinea-Bissau",c:"GW",f:"🇬🇼"},
+                {n:"Guyana",c:"GY",f:"🇬🇾"},{n:"Haiti",c:"HT",f:"🇭🇹"},{n:"Honduras",c:"HN",f:"🇭🇳"},{n:"Hungary",c:"HU",f:"🇭🇺"},{n:"Iceland",c:"IS",f:"🇮🇸"},{n:"India",c:"IN",f:"🇮🇳"},{n:"Indonesia",c:"ID",f:"🇮🇩"},{n:"Iran",c:"IR",f:"🇮🇷"},{n:"Iraq",c:"IQ",f:"🇮🇶"},{n:"Ireland",c:"IE",f:"🇮🇪"},
+                {n:"Israel",c:"IL",f:"🇮🇱"},{n:"Italy",c:"IT",f:"🇮🇹"},{n:"Jamaica",c:"JM",f:"🇯🇲"},{n:"Japan",c:"JP",f:"🇯🇵"},{n:"Jordan",c:"JO",f:"🇯🇴"},{n:"Kazakhstan",c:"KZ",f:"🇰🇿"},{n:"Kenya",c:"KE",f:"🇰🇪"},{n:"Kiribati",c:"KI",f:"🇰🇮"},{n:"Kuwait",c:"KW",f:"🇰🇼"},{n:"Kyrgyzstan",c:"KG",f:"🇰🇬"},
+                {n:"Laos",c:"LA",f:"🇱🇦"},{n:"Latvia",c:"LV",f:"🇱🇻"},{n:"Lebanon",c:"LB",f:"🇱🇧"},{n:"Lesotho",c:"LS",f:"🇱🇸"},{n:"Liberia",c:"LR",f:"🇱🇷"},{n:"Libya",c:"LY",f:"🇱🇾"},{n:"Liechtenstein",c:"LI",f:"🇱🇮"},{n:"Lithuania",c:"LT",f:"🇱🇹"},{n:"Luxembourg",c:"LU",f:"🇱🇺"},{n:"Madagascar",c:"MG",f:"🇲🇬"},
+                {n:"Malawi",c:"MW",f:"🇲🇼"},{n:"Malaysia",c:"MY",f:"🇲🇾"},{n:"Maldives",c:"MV",f:"🇲🇻"},{n:"Mali",c:"ML",f:"🇲🇱"},{n:"Malta",c:"MT",f:"🇲🇹"},{n:"Marshall Islands",c:"MH",f:"🇲🇭"},{n:"Mauritania",c:"MR",f:"🇲🇷"},{n:"Mauritius",c:"MU",f:"🇲🇺"},{n:"Mexico",c:"MX",f:"🇲🇽"},{n:"Micronesia",c:"FM",f:"🇫🇲"},
+                {n:"Moldova",c:"MD",f:"🇲🇩"},{n:"Monaco",c:"MC",f:"🇲🇨"},{n:"Mongolia",c:"MN",f:"🇲🇳"},{n:"Montenegro",c:"ME",f:"🇲🇪"},{n:"Morocco",c:"MA",f:"🇲🇦"},{n:"Mozambique",c:"MZ",f:"🇲🇿"},{n:"Myanmar",c:"MM",f:"🇲🇲"},{n:"Namibia",c:"NA",f:"🇳🇦"},{n:"Nauru",c:"NR",f:"🇳🇷"},{n:"Nepal",c:"NP",f:"🇳🇵"},
+                {n:"Netherlands",c:"NL",f:"🇳🇱"},{n:"New Zealand",c:"NZ",f:"🇳🇿"},{n:"Nicaragua",c:"NI",f:"🇳🇮"},{n:"Niger",c:"NE",f:"🇳🇪"},{n:"Nigeria",c:"NG",f:"🇳🇬"},{n:"North Korea",c:"KP",f:"🇰🇵"},{n:"North Macedonia",c:"MK",f:"🇲🇰"},{n:"Norway",c:"NO",f:"🇳🇴"},{n:"Oman",c:"OM",f:"🇴🇲"},{n:"Pakistan",c:"PK",f:"🇵🇰"},
+                {n:"Palau",c:"PW",f:"🇵🇼"},{n:"Palestine",c:"PS",f:"🇵🇸"},{n:"Panama",c:"PA",f:"🇵🇦"},{n:"Papua New Guinea",c:"PG",f:"🇵🇬"},{n:"Paraguay",c:"PY",f:"🇵🇾"},{n:"Peru",c:"PE",f:"🇵🇪"},{n:"Philippines",c:"PH",f:"🇵🇭"},{n:"Poland",c:"PL",f:"🇵🇱"},{n:"Portugal",c:"PT",f:"🇵🇹"},{n:"Qatar",c:"QA",f:"🇶🇦"},
+                {n:"Romania",c:"RO",f:"🇷🇴"},{n:"Russia",c:"RU",f:"🇷🇺"},{n:"Rwanda",c:"RW",f:"🇷🇼"},{n:"Saint Kitts and Nevis",c:"KN",f:"🇰🇳"},{n:"Saint Lucia",c:"LC",f:"🇱🇨"},{n:"Saint Vincent",c:"VC",f:"🇻🇨"},{n:"Samoa",c:"WS",f:"🇼🇸"},{n:"San Marino",c:"SM",f:"🇸🇲"},{n:"São Tomé and Príncipe",c:"ST",f:"🇸🇹"},{n:"Saudi Arabia",c:"SA",f:"🇸🇦"},
+                {n:"Senegal",c:"SN",f:"🇸🇳"},{n:"Serbia",c:"RS",f:"🇷🇸"},{n:"Seychelles",c:"SC",f:"🇸🇨"},{n:"Sierra Leone",c:"SL",f:"🇸🇱"},{n:"Singapore",c:"SG",f:"🇸🇬"},{n:"Slovakia",c:"SK",f:"🇸🇰"},{n:"Slovenia",c:"SI",f:"🇸🇮"},{n:"Solomon Islands",c:"SB",f:"🇸🇧"},{n:"Somalia",c:"SO",f:"🇸🇴"},{n:"South Africa",c:"ZA",f:"🇿🇦"},
+                {n:"South Korea",c:"KR",f:"🇰🇷"},{n:"South Sudan",c:"SS",f:"🇸🇸"},{n:"Spain",c:"ES",f:"🇪🇸"},{n:"Sri Lanka",c:"LK",f:"🇱🇰"},{n:"Sudan",c:"SD",f:"🇸🇩"},{n:"Suriname",c:"SR",f:"🇸🇷"},{n:"Sweden",c:"SE",f:"🇸🇪"},{n:"Switzerland",c:"CH",f:"🇨🇭"},{n:"Syria",c:"SY",f:"🇸🇾"},{n:"Taiwan",c:"TW",f:"🇹🇼"},
+                {n:"Tajikistan",c:"TJ",f:"🇹🇯"},{n:"Tanzania",c:"TZ",f:"🇹🇿"},{n:"Thailand",c:"TH",f:"🇹🇭"},{n:"Timor-Leste",c:"TL",f:"🇹🇱"},{n:"Togo",c:"TG",f:"🇹🇬"},{n:"Tonga",c:"TO",f:"🇹🇴"},{n:"Trinidad and Tobago",c:"TT",f:"🇹🇹"},{n:"Tunisia",c:"TN",f:"🇹🇳"},{n:"Turkey",c:"TR",f:"🇹🇷"},{n:"Turkmenistan",c:"TM",f:"🇹🇲"},
+                {n:"Tuvalu",c:"TV",f:"🇹🇻"},{n:"Uganda",c:"UG",f:"🇺🇬"},{n:"Ukraine",c:"UA",f:"🇺🇦"},{n:"United Arab Emirates",c:"AE",f:"🇦🇪"},{n:"United Kingdom",c:"GB",f:"🇬🇧"},{n:"United States",c:"US",f:"🇺🇸"},{n:"Uruguay",c:"UY",f:"🇺🇾"},{n:"Uzbekistan",c:"UZ",f:"🇺🇿"},{n:"Vanuatu",c:"VU",f:"🇻🇺"},{n:"Vatican City",c:"VA",f:"🇻🇦"},
+                {n:"Venezuela",c:"VE",f:"🇻🇪"},{n:"Vietnam",c:"VN",f:"🇻🇳"},{n:"Yemen",c:"YE",f:"🇾🇪"},{n:"Zambia",c:"ZM",f:"🇿🇲"},{n:"Zimbabwe",c:"ZW",f:"🇿🇼"}
+            ];
+
+            const input = document.getElementById('settings-country');
+            const dd = document.getElementById('country-dropdown');
+            const flagEl = document.getElementById('country-flag');
+            if (!input || !dd || !flagEl) return;
+
+            function setFlag(name) {
+                const c = COUNTRIES.find(x => x.n.toLowerCase() === (name || '').toLowerCase());
+                flagEl.textContent = c ? c.f : '';
+            }
+            // Expose globally so settings loader can set flag without opening dropdown
+            window._setCountryFlag = setFlag;
+
+            function render(list) {
+                if (!list.length) { dd.classList.add('hidden'); return; }
+                dd.innerHTML = list.map(c => `
+                    <div class="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-white/10 transition text-sm country-opt" data-name="${c.n}">
+                        <span class="text-lg">${c.f}</span>
+                        <span class="text-white">${c.n}</span>
+                    </div>
+                `).join('');
+                dd.classList.remove('hidden');
+                dd.querySelectorAll('.country-opt').forEach(opt => {
+                    opt.addEventListener('click', () => {
+                        input.value = opt.dataset.name;
+                        setFlag(opt.dataset.name);
+                        dd.classList.add('hidden');
+                    });
+                });
+            }
+
+            input.addEventListener('input', () => {
+                const q = input.value.trim().toLowerCase();
+                if (!q) { dd.classList.add('hidden'); setFlag(''); return; }
+                const matches = COUNTRIES.filter(c => c.n.toLowerCase().startsWith(q));
+                const partial = matches.length < 8 ? COUNTRIES.filter(c => c.n.toLowerCase().includes(q) && !c.n.toLowerCase().startsWith(q)) : [];
+                render([...matches, ...partial].slice(0, 12));
+                setFlag(input.value.trim());
+            });
+
+            input.addEventListener('focus', () => {
+                const q = input.value.trim().toLowerCase();
+                if (q) { const m = COUNTRIES.filter(c => c.n.toLowerCase().includes(q)).slice(0, 12); render(m); }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('#settings-country') && !e.target.closest('#country-dropdown')) dd.classList.add('hidden');
+            });
+
+            // Set initial flag if value exists
+            setTimeout(() => setFlag(input.value), 500);
+        })();
+
+        // --- Phone Country Code Dropdown ---
+        (function() {
+            const DIAL_CODES = [
+                {n:"United States",c:"US",f:"🇺🇸",d:"+1"},{n:"United Kingdom",c:"GB",f:"🇬🇧",d:"+44"},{n:"France",c:"FR",f:"🇫🇷",d:"+33"},{n:"Germany",c:"DE",f:"🇩🇪",d:"+49"},{n:"Italy",c:"IT",f:"🇮🇹",d:"+39"},{n:"Spain",c:"ES",f:"🇪🇸",d:"+34"},
+                {n:"Canada",c:"CA",f:"🇨🇦",d:"+1"},{n:"Australia",c:"AU",f:"🇦🇺",d:"+61"},{n:"Netherlands",c:"NL",f:"🇳🇱",d:"+31"},{n:"Belgium",c:"BE",f:"🇧🇪",d:"+32"},{n:"Switzerland",c:"CH",f:"🇨🇭",d:"+41"},{n:"Portugal",c:"PT",f:"🇵🇹",d:"+351"},
+                {n:"Sweden",c:"SE",f:"🇸🇪",d:"+46"},{n:"Norway",c:"NO",f:"🇳🇴",d:"+47"},{n:"Denmark",c:"DK",f:"🇩🇰",d:"+45"},{n:"Finland",c:"FI",f:"🇫🇮",d:"+358"},{n:"Ireland",c:"IE",f:"🇮🇪",d:"+353"},{n:"Austria",c:"AT",f:"🇦🇹",d:"+43"},
+                {n:"Poland",c:"PL",f:"🇵🇱",d:"+48"},{n:"Czech Republic",c:"CZ",f:"🇨🇿",d:"+420"},{n:"Romania",c:"RO",f:"🇷🇴",d:"+40"},{n:"Hungary",c:"HU",f:"🇭🇺",d:"+36"},{n:"Greece",c:"GR",f:"🇬🇷",d:"+30"},{n:"Croatia",c:"HR",f:"🇭🇷",d:"+385"},
+                {n:"Bulgaria",c:"BG",f:"🇧🇬",d:"+359"},{n:"Slovakia",c:"SK",f:"🇸🇰",d:"+421"},{n:"Slovenia",c:"SI",f:"🇸🇮",d:"+386"},{n:"Lithuania",c:"LT",f:"🇱🇹",d:"+370"},{n:"Latvia",c:"LV",f:"🇱🇻",d:"+371"},{n:"Estonia",c:"EE",f:"🇪🇪",d:"+372"},
+                {n:"Cyprus",c:"CY",f:"🇨🇾",d:"+357"},{n:"Malta",c:"MT",f:"🇲🇹",d:"+356"},{n:"Luxembourg",c:"LU",f:"🇱🇺",d:"+352"},{n:"Iceland",c:"IS",f:"🇮🇸",d:"+354"},
+                {n:"Russia",c:"RU",f:"🇷🇺",d:"+7"},{n:"Ukraine",c:"UA",f:"🇺🇦",d:"+380"},{n:"Turkey",c:"TR",f:"🇹🇷",d:"+90"},{n:"Israel",c:"IL",f:"🇮🇱",d:"+972"},
+                {n:"United Arab Emirates",c:"AE",f:"🇦🇪",d:"+971"},{n:"Saudi Arabia",c:"SA",f:"🇸🇦",d:"+966"},{n:"Qatar",c:"QA",f:"🇶🇦",d:"+974"},{n:"Kuwait",c:"KW",f:"🇰🇼",d:"+965"},{n:"Bahrain",c:"BH",f:"🇧🇭",d:"+973"},{n:"Oman",c:"OM",f:"🇴🇲",d:"+968"},
+                {n:"India",c:"IN",f:"🇮🇳",d:"+91"},{n:"China",c:"CN",f:"🇨🇳",d:"+86"},{n:"Japan",c:"JP",f:"🇯🇵",d:"+81"},{n:"South Korea",c:"KR",f:"🇰🇷",d:"+82"},{n:"Singapore",c:"SG",f:"🇸🇬",d:"+65"},{n:"Malaysia",c:"MY",f:"🇲🇾",d:"+60"},
+                {n:"Thailand",c:"TH",f:"🇹🇭",d:"+66"},{n:"Indonesia",c:"ID",f:"🇮🇩",d:"+62"},{n:"Philippines",c:"PH",f:"🇵🇭",d:"+63"},{n:"Vietnam",c:"VN",f:"🇻🇳",d:"+84"},{n:"Pakistan",c:"PK",f:"🇵🇰",d:"+92"},{n:"Bangladesh",c:"BD",f:"🇧🇩",d:"+880"},
+                {n:"Brazil",c:"BR",f:"🇧🇷",d:"+55"},{n:"Mexico",c:"MX",f:"🇲🇽",d:"+52"},{n:"Argentina",c:"AR",f:"🇦🇷",d:"+54"},{n:"Colombia",c:"CO",f:"🇨🇴",d:"+57"},{n:"Chile",c:"CL",f:"🇨🇱",d:"+56"},{n:"Peru",c:"PE",f:"🇵🇪",d:"+51"},
+                {n:"South Africa",c:"ZA",f:"🇿🇦",d:"+27"},{n:"Nigeria",c:"NG",f:"🇳🇬",d:"+234"},{n:"Kenya",c:"KE",f:"🇰🇪",d:"+254"},{n:"Egypt",c:"EG",f:"🇪🇬",d:"+20"},{n:"Morocco",c:"MA",f:"🇲🇦",d:"+212"},{n:"Ghana",c:"GH",f:"🇬🇭",d:"+233"},
+                {n:"Tunisia",c:"TN",f:"🇹🇳",d:"+216"},{n:"Algeria",c:"DZ",f:"🇩🇿",d:"+213"},{n:"Serbia",c:"RS",f:"🇷🇸",d:"+381"},{n:"Montenegro",c:"ME",f:"🇲🇪",d:"+382"},{n:"North Macedonia",c:"MK",f:"🇲🇰",d:"+389"},{n:"Bosnia and Herzegovina",c:"BA",f:"🇧🇦",d:"+387"},
+                {n:"Albania",c:"AL",f:"🇦🇱",d:"+355"},{n:"Moldova",c:"MD",f:"🇲🇩",d:"+373"},{n:"Georgia",c:"GE",f:"🇬🇪",d:"+995"},{n:"Armenia",c:"AM",f:"🇦🇲",d:"+374"},{n:"Azerbaijan",c:"AZ",f:"🇦🇿",d:"+994"},
+                {n:"New Zealand",c:"NZ",f:"🇳🇿",d:"+64"},{n:"Taiwan",c:"TW",f:"🇹🇼",d:"+886"},{n:"Hong Kong",c:"HK",f:"🇭🇰",d:"+852"},{n:"Macau",c:"MO",f:"🇲🇴",d:"+853"},
+                {n:"Afghanistan",c:"AF",f:"🇦🇫",d:"+93"},{n:"Iraq",c:"IQ",f:"🇮🇶",d:"+964"},{n:"Iran",c:"IR",f:"🇮🇷",d:"+98"},{n:"Jordan",c:"JO",f:"🇯🇴",d:"+962"},{n:"Lebanon",c:"LB",f:"🇱🇧",d:"+961"},{n:"Syria",c:"SY",f:"🇸🇾",d:"+963"},
+                {n:"Nepal",c:"NP",f:"🇳🇵",d:"+977"},{n:"Sri Lanka",c:"LK",f:"🇱🇰",d:"+94"},{n:"Myanmar",c:"MM",f:"🇲🇲",d:"+95"},{n:"Cambodia",c:"KH",f:"🇰🇭",d:"+855"},{n:"Laos",c:"LA",f:"🇱🇦",d:"+856"},
+                {n:"Mongolia",c:"MN",f:"🇲🇳",d:"+976"},{n:"Kazakhstan",c:"KZ",f:"🇰🇿",d:"+7"},{n:"Uzbekistan",c:"UZ",f:"🇺🇿",d:"+998"},{n:"Turkmenistan",c:"TM",f:"🇹🇲",d:"+993"},{n:"Tajikistan",c:"TJ",f:"🇹🇯",d:"+992"},{n:"Kyrgyzstan",c:"KG",f:"🇰🇬",d:"+996"},
+                {n:"Costa Rica",c:"CR",f:"🇨🇷",d:"+506"},{n:"Panama",c:"PA",f:"🇵🇦",d:"+507"},{n:"Uruguay",c:"UY",f:"🇺🇾",d:"+598"},{n:"Ecuador",c:"EC",f:"🇪🇨",d:"+593"},{n:"Venezuela",c:"VE",f:"🇻🇪",d:"+58"},{n:"Bolivia",c:"BO",f:"🇧🇴",d:"+591"},
+                {n:"Paraguay",c:"PY",f:"🇵🇾",d:"+595"},{n:"Cuba",c:"CU",f:"🇨🇺",d:"+53"},{n:"Dominican Republic",c:"DO",f:"🇩🇴",d:"+1"},{n:"Jamaica",c:"JM",f:"🇯🇲",d:"+1"},{n:"Trinidad and Tobago",c:"TT",f:"🇹🇹",d:"+1"},
+                {n:"Ethiopia",c:"ET",f:"🇪🇹",d:"+251"},{n:"Tanzania",c:"TZ",f:"🇹🇿",d:"+255"},{n:"Uganda",c:"UG",f:"🇺🇬",d:"+256"},{n:"Cameroon",c:"CM",f:"🇨🇲",d:"+237"},{n:"Senegal",c:"SN",f:"🇸🇳",d:"+221"},
+                {n:"Côte d'Ivoire",c:"CI",f:"🇨🇮",d:"+225"},{n:"Madagascar",c:"MG",f:"🇲🇬",d:"+261"},{n:"Mozambique",c:"MZ",f:"🇲🇿",d:"+258"},{n:"Zimbabwe",c:"ZW",f:"🇿🇼",d:"+263"},{n:"Angola",c:"AO",f:"🇦🇴",d:"+244"},
+                {n:"Libya",c:"LY",f:"🇱🇾",d:"+218"},{n:"Sudan",c:"SD",f:"🇸🇩",d:"+249"},{n:"Belarus",c:"BY",f:"🇧🇾",d:"+375"},{n:"Brunei",c:"BN",f:"🇧🇳",d:"+673"},{n:"Maldives",c:"MV",f:"🇲🇻",d:"+960"}
+            ];
+
+            const btn = document.getElementById('phone-code-btn');
+            const dd = document.getElementById('phone-code-dropdown');
+            const flagEl = document.getElementById('phone-code-flag');
+            const labelEl = document.getElementById('phone-code-label');
+            const hiddenInput = document.getElementById('phone-country-code');
+            if (!btn || !dd) return;
+
+            let searchStr = '';
+            let searchTimeout = null;
+
+            function selectCode(item) {
+                flagEl.textContent = item.f;
+                labelEl.textContent = item.d;
+                hiddenInput.value = item.d;
+                dd.classList.add('hidden');
+            }
+
+            function renderPhoneCodes() {
+                const list = DIAL_CODES;
+                dd.innerHTML = list.map(c => `
+                    <div class="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-white/10 transition text-sm phone-code-opt" data-code="${c.d}" data-flag="${c.f}" data-name="${c.n}">
+                        <span class="text-lg">${c.f}</span>
+                        <span class="text-white flex-1">${c.n}</span>
+                        <span class="text-xs font-mono text-gray-500">${c.d}</span>
+                    </div>
+                `).join('');
+                dd.querySelectorAll('.phone-code-opt').forEach(opt => {
+                    opt.addEventListener('click', () => {
+                        selectCode({ f: opt.dataset.flag, d: opt.dataset.code, n: opt.dataset.name });
+                    });
+                });
+            }
+
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (dd.classList.contains('hidden')) {
+                    renderPhoneCodes();
+                    dd.classList.remove('hidden');
+                } else {
+                    dd.classList.add('hidden');
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('#phone-code-btn') && !e.target.closest('#phone-code-dropdown')) dd.classList.add('hidden');
+            });
+
+            // Auto-detect country code when user types in the phone field
+            const phoneInput = document.getElementById('settings-phone');
+            if (phoneInput) {
+                phoneInput.addEventListener('input', function() {
+                    let val = this.value.trim();
+                    if (!val.startsWith('+')) return;
+                    // Try matching longest code first (4 digits down to 1)
+                    for (let len = 4; len >= 1; len--) {
+                        const codeCandidate = val.substring(0, len + 1); // includes '+'
+                        const match = DIAL_CODES.find(c => c.d === codeCandidate);
+                        if (match && val.length > codeCandidate.length) {
+                            selectCode(match);
+                            // Strip the country code from the phone number
+                            this.value = val.substring(codeCandidate.length);
+                            break;
+                        }
+                    }
+                });
+            }
+
+            // Expose globally for settings loader
+            window._setPhoneCode = function(dialCode) {
+                const item = DIAL_CODES.find(c => c.d === dialCode);
+                if (item) selectCode(item);
+            };
+        })();
+
+        // --- Save Button Logic (sends to backend) ---
+        document.getElementById('save-settings').addEventListener('click', async function() {
+             const btn = this;
+             const originalText = btn.textContent;
+             const API = window.TFXS_API;
+
+             // Gather form values
+             const displayName = document.getElementById('settings-name').value.trim();
+             const avatarSeed = document.getElementById('selected-avatar-seed').value;
+             const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+             const walletAddress = document.getElementById('settings-wallet').value.trim();
+             const phone = document.getElementById('settings-phone').value.trim();
+             const phoneCode = document.getElementById('phone-country-code') ? document.getElementById('phone-country-code').value : '+1';
+             const fullPhone = phone ? phoneCode + ' ' + phone : '';
+             const address_street = document.getElementById('settings-street').value.trim();
+             const address_city = document.getElementById('settings-city').value.trim();
+             const address_state = document.getElementById('settings-state').value.trim();
+             const address_zip = document.getElementById('settings-zip').value.trim();
+             const address_country = document.getElementById('settings-country').value.trim();
+
+             // Loading State
+             btn.textContent = "Saving...";
+             btn.disabled = true;
+             btn.classList.add('opacity-75');
+             
+             try {
+                 const affiliateId = API ? API.getAffiliateId() : null;
+
+                 if (API) {
+                     await API.saveSettings({
+                         affiliate_id: affiliateId || "default",
+                         display_name: displayName,
+                         avatar_seed: avatarSeed,
+                         payment_method: paymentMethod,
+                         wallet_address: walletAddress,
+                         phone: fullPhone,
+                         address_street: address_street,
+                         address_city: address_city,
+                         address_state: address_state,
+                         address_zip: address_zip,
+                         address_country: address_country
+                     });
+                 }
+
+                 // Also save to localStorage as instant cache
+                 const email = document.getElementById('settings-email').value.trim();
+                 const settingsCache = { displayName, email, avatarSeed, paymentMethod, walletAddress, phone, address_street, address_city, address_state, address_zip, address_country };
+                 localStorage.setItem('tfxs_settings', JSON.stringify(settingsCache));
+
+                 // Update nav on this page
+                 const navName = document.querySelector('nav .text-sm.font-bold');
+                 if (navName) navName.textContent = displayName;
+                 const navAvatar = document.querySelector('nav img[alt="Avatar"]');
+                 if (navAvatar) navAvatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}`;
+
+                 // Success State
+                 btn.textContent = "✓ Saved";
+                 btn.style.background = '#16a34a';
+                 btn.classList.remove('btn-gradient');
+                 btn.classList.add('bg-green-600'); 
+
+                 if (typeof showToast === 'function') showToast("Settings saved successfully", "success");
+
+             } catch (err) {
+                 console.error("[Settings] Save failed:", err);
+                 btn.textContent = "✗ Error";
+                 btn.style.background = '#dc2626';
+
+                 // Still save to localStorage as fallback
+                 const emailFallback = document.getElementById('settings-email').value.trim();
+                 const settingsCache = { displayName, email: emailFallback, avatarSeed, paymentMethod, walletAddress };
+                 localStorage.setItem('tfxs_settings', JSON.stringify(settingsCache));
+
+                 if (typeof showToast === 'function') showToast("Saved locally — backend sync will retry", "info");
+             }
+             
+             setTimeout(() => {
+                 btn.textContent = originalText;
+                 btn.disabled = false;
+                 btn.style.background = ''; 
+                 btn.classList.add('btn-gradient');
+                 btn.classList.remove('bg-green-600', 'opacity-75');
+             }, 2000);
+        });
+
+        // --- Auto-Payout Toggle Logic ---
+        let _autoPayoutEnabled = false;
+        let _autoPayoutLocked = false;
+
+        function renderAutoPayoutToggle() {
+            const btn = document.getElementById('auto-payout-toggle');
+            const track = document.getElementById('auto-payout-track');
+            const dot = document.getElementById('auto-payout-dot');
+            const label = document.getElementById('auto-payout-label');
+            if (!btn) return;
+
+            btn.style.display = 'flex';
+
+            if (_autoPayoutLocked) {
+                // Admin locked — greyed out, not clickable
+                btn.classList.add('cursor-not-allowed', 'opacity-50');
+                btn.onclick = null;
+                btn.style.background = 'rgba(107,114,128,0.08)';
+                btn.style.borderColor = 'rgba(107,114,128,0.2)';
+                track.style.background = 'rgba(107,114,128,0.3)';
+                dot.style.transform = 'translateX(0)';
+                label.textContent = 'Locked by Admin';
+                label.style.color = '#6b7280';
+            } else if (_autoPayoutEnabled) {
+                btn.classList.remove('cursor-not-allowed', 'opacity-50');
+                btn.onclick = toggleAutoPayout;
+                btn.style.background = 'rgba(16,185,129,0.1)';
+                btn.style.borderColor = 'rgba(16,185,129,0.3)';
+                track.style.background = 'rgba(16,185,129,0.6)';
+                dot.style.transform = 'translateX(12px)';
+                label.textContent = 'Auto-Payout ON';
+                label.style.color = '#059669';
+            } else {
+                btn.classList.remove('cursor-not-allowed', 'opacity-50');
+                btn.onclick = toggleAutoPayout;
+                btn.style.background = 'rgba(239,68,68,0.08)';
+                btn.style.borderColor = 'rgba(239,68,68,0.2)';
+                track.style.background = 'rgba(239,68,68,0.4)';
+                dot.style.transform = 'translateX(0)';
+                label.textContent = 'Auto-Payout OFF';
+                label.style.color = '#dc2626';
+            }
+        }
+
+        /* ── Payment method card selection ── */
+        function selectPaymentMethod(label) {
+            // Remove selected state from all cards
+            document.querySelectorAll('#payment-method-grid .payment-card').forEach(card => {
+                card.classList.remove('selected');
+                const check = card.querySelector('.payment-check');
+                if (check) check.classList.add('hidden');
+            });
+            // Add selected state to clicked card
+            const card = label.querySelector('.payment-card');
+            if (card) {
+                card.classList.add('selected');
+                const check = card.querySelector('.payment-check');
+                if (check) check.classList.remove('hidden');
+            }
+        }
+
+        // On page load, apply selection to the checked radio's card
+        document.addEventListener('DOMContentLoaded', () => {
+            const checked = document.querySelector('#payment-method-grid input[name="payment_method"]:checked');
+            if (checked) {
+                const label = checked.closest('label');
+                if (label) selectPaymentMethod(label);
+            }
+        });
+
+        async function toggleAutoPayout() {
+            if (_autoPayoutLocked) return;
+            _autoPayoutEnabled = !_autoPayoutEnabled;
+            renderAutoPayoutToggle();
+            try {
+                const API = window.TFXS_API;
+                if (API) {
+                    const affiliateId = API.getAffiliateId();
+                    await API.saveSettings({ affiliate_id: affiliateId, auto_payout_enabled: _autoPayoutEnabled });
+                    if (typeof showToast === 'function') showToast(_autoPayoutEnabled ? 'Auto-payout enabled' : 'Auto-payout disabled', 'success');
+                }
+            } catch (err) {
+                _autoPayoutEnabled = !_autoPayoutEnabled; // revert
+                renderAutoPayoutToggle();
+                if (typeof showToast === 'function') showToast('Could not save setting', 'error');
+            }
+        }
+
+        // Load auto-payout state from settings
+        function loadAutoPayoutState(settingsData) {
+            if (!settingsData) return;
+            _autoPayoutEnabled = settingsData.auto_payout_enabled === 'true';
+            _autoPayoutLocked = settingsData.auto_payout_locked === 'true';
+            renderAutoPayoutToggle();
+        }
+
+        // --- KYC Logic ---
+        const kycImages = []; // base64 array
+
+        function handleKycFiles(files) {
+            const grid = document.getElementById('kyc-preview-grid');
+            const remaining = 3 - kycImages.length;
+            const toProcess = Array.from(files).slice(0, remaining);
+
+            toProcess.forEach(file => {
+                if (file.size > 5 * 1024 * 1024) {
+                    if (typeof showToast === 'function') showToast(`${file.name} exceeds 5 MB limit`, "error");
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const base64 = e.target.result;
+                    kycImages.push(base64);
+                    renderKycPreviews();
+                    document.getElementById('kyc-submit-btn').disabled = kycImages.length === 0;
+                };
+                reader.readAsDataURL(file);
+            });
+            // reset input so same file can be re-selected
+            document.getElementById('kyc-file-input').value = '';
+        }
+
+        function renderKycPreviews() {
+            const grid = document.getElementById('kyc-preview-grid');
+            grid.innerHTML = kycImages.map((img, i) => `
+                <div class="relative group">
+                    <img src="${img}" class="w-24 h-24 object-cover rounded-xl border border-white/10">
+                    <button onclick="removeKycImage(${i})" class="absolute -top-2 -right-2 w-5 h-5 bg-red-600 text-white rounded-full text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">&times;</button>
+                </div>
+            `).join('');
+            document.getElementById('kyc-submit-btn').disabled = kycImages.length === 0;
+            // hide file input if max reached
+            if (kycImages.length >= 3) {
+                document.getElementById('kyc-file-input').closest('label').style.display = 'none';
+            } else {
+                document.getElementById('kyc-file-input').closest('label').style.display = '';
+            }
+        }
+
+        function removeKycImage(idx) {
+            kycImages.splice(idx, 1);
+            renderKycPreviews();
+        }
+
+        async function submitKyc() {
+            if (kycImages.length === 0) return;
+            const btn = document.getElementById('kyc-submit-btn');
+            btn.textContent = 'Uploading...';
+            btn.disabled = true;
+            try {
+                const jwt = localStorage.getItem('tfxs_jwt');
+                const res = await fetch(`${API_BASE}/api/kyc/submit`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwt}` },
+                    body: JSON.stringify({ document_type: document.getElementById('kyc-doc-type').value, images: kycImages })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Upload failed');
+                if (typeof showToast === 'function') showToast('Documents submitted for review!', 'success');
+                loadKycStatus(); // refresh display
+            } catch (err) {
+                if (typeof showToast === 'function') showToast(err.message, 'error');
+                btn.textContent = 'Submit for Verification';
+                btn.disabled = false;
+            }
+        }
+
+        async function loadKycStatus() {
+            const badge = document.getElementById('kyc-status-badge');
+            const statusBox = document.getElementById('kyc-status-box');
+            const uploadForm = document.getElementById('kyc-upload-form');
+            try {
+                const jwt = localStorage.getItem('tfxs_jwt');
+                const res = await fetch(`${API_BASE}/api/kyc/status`, {
+                    headers: { 'Authorization': `Bearer ${jwt}` }
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Failed');
+
+                const kycDoc = data.data; // { status, document_type, submitted_at, admin_note } or null
+                const s = kycDoc ? (kycDoc.status || 'none') : 'none';
+                if (s === 'none') {
+                    badge.innerHTML = `<span class="text-[10px] px-2 py-1 rounded-full bg-gray-500/10 text-gray-400 border border-gray-500/20">Not Submitted</span>`;
+                    statusBox.style.display = 'none';
+                    uploadForm.style.display = '';
+                } else if (s === 'pending') {
+                    badge.innerHTML = `<span class="text-[10px] px-2 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1"><span class="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse"></span>Under Review</span>`;
+                    statusBox.style.display = '';
+                    statusBox.className = 'mb-6 rounded-xl p-4 border border-amber-500/20 bg-amber-500/5';
+                    statusBox.innerHTML = `
+                        <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-amber-400 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <div>
+                                <p class="text-sm text-amber-300 font-bold">Documents Under Review</p>
+                                <p class="text-xs text-gray-400 mt-1">Your identity documents have been submitted and are being reviewed by our team. This usually takes 24-48 hours.</p>
+                            </div>
+                        </div>`;
+                    uploadForm.style.display = 'none';
+                } else if (s === 'approved') {
+                    badge.innerHTML = `<span class="text-[10px] px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Verified</span>`;
+                    statusBox.style.display = '';
+                    statusBox.className = 'mb-6 rounded-xl p-4 border border-emerald-500/20 bg-emerald-500/5';
+                    statusBox.innerHTML = `
+                        <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-emerald-400 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                            <div>
+                                <p class="text-sm text-emerald-300 font-bold">Identity Verified</p>
+                                <p class="text-xs text-gray-400 mt-1">Your KYC has been approved. Payouts are now enabled.</p>
+                            </div>
+                        </div>`;
+                    uploadForm.style.display = 'none';
+                } else if (s === 'rejected') {
+                    const note = (kycDoc && kycDoc.admin_note) || '';
+                    badge.innerHTML = `<span class="text-[10px] px-2 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">Rejected</span>`;
+                    statusBox.style.display = '';
+                    statusBox.className = 'mb-6 rounded-xl p-4 border border-red-500/20 bg-red-500/5';
+                    statusBox.innerHTML = `
+                        <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-red-400 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <div>
+                                <p class="text-sm text-red-300 font-bold">Verification Rejected</p>
+                                ${note ? `<p class="text-xs text-gray-400 mt-1"><strong>Reason:</strong> ${note}</p>` : ''}
+                                <p class="text-xs text-gray-400 mt-1">Please re-upload valid documents below.</p>
+                            </div>
+                        </div>`;
+                    uploadForm.style.display = '';
+                    // clear old images
+                    kycImages.length = 0;
+                    renderKycPreviews();
+                }
+            } catch (err) {
+                console.warn('[KYC] Could not load status:', err.message);
+            }
+        }
+
+        // Load KYC status on page load
+        loadKycStatus();
+
+        // --- Change Password Logic ---
+        document.getElementById('change-password-btn').addEventListener('click', async function() {
+            const btn = this;
+            const API = window.TFXS_API;
+            if (!API || !API.changePassword) { await tfxsAlert("Password change is not available.", { variant: 'info' }); return; }
+
+            const current = document.getElementById('current-password').value;
+            const newPw = document.getElementById('new-password').value;
+            const confirmPw = document.getElementById('confirm-password').value;
+
+            if (!current || !newPw || !confirmPw) { await tfxsAlert("Please fill in all password fields.", { variant: 'warning' }); return; }
+            if (newPw.length < 8) { await tfxsAlert("New password must be at least 8 characters.", { variant: 'warning' }); return; }
+            if (newPw !== confirmPw) { await tfxsAlert("New passwords do not match.", { variant: 'warning' }); return; }
+
+            btn.textContent = "Updating...";
+            btn.disabled = true;
+
+            try {
+                await API.changePassword(current, newPw);
+                document.getElementById('current-password').value = '';
+                document.getElementById('new-password').value = '';
+                document.getElementById('confirm-password').value = '';
+                btn.textContent = "✓ Updated";
+                btn.style.background = 'rgba(22,163,74,0.3)';
+                btn.style.borderColor = 'rgba(22,163,74,0.5)';
+                if (typeof showToast === 'function') showToast("Password updated successfully", "success");
+            } catch (err) {
+                btn.textContent = "✗ Failed";
+                btn.style.background = 'rgba(220,38,38,0.2)';
+                btn.style.borderColor = 'rgba(220,38,38,0.4)';
+                await tfxsAlert(err.message || "Password update failed.", { variant: 'danger', title: 'Error' });
+            }
+
+            setTimeout(() => {
+                btn.textContent = "Update Password";
+                btn.disabled = false;
+                btn.style.background = '';
+                btn.style.borderColor = '';
+            }, 2000);
+        });
+
+        // Server Time Clock
+        function updateServerTime() {
+            const timeElement = document.getElementById("server-time");
+            if (!timeElement) return;
+
+            const now = new Date();
+            
+            const timeString = now.toLocaleTimeString("en-US", { 
+                hour12: false, 
+                hour: "2-digit", 
+                minute: "2-digit", 
+                second: "2-digit" 
+            });
+
+            const offset = -now.getTimezoneOffset() / 60;
+            const sign = offset >= 0 ? "+" : "-";
+            const absOffset = Math.abs(offset);
+            const timezoneString = `UTC${sign}${absOffset}`;
+
+            timeElement.textContent = `${timeString} ${timezoneString}`;
+        }
+
+        updateServerTime();
+        setInterval(updateServerTime, 1000);
+    </script>
+    <script src="js/settings-loader.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

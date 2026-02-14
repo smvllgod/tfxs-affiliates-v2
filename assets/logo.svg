@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="shield-red" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#991b1b"/>
+    </linearGradient>
+    <linearGradient id="shield-glass" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.15)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0.02)"/>
+    </linearGradient>
+    <filter id="glow-b">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <ellipse cx="100" cy="95" rx="50" ry="55" fill="rgba(220,38,38,0.06)"/>
+  <path d="M100 25 L155 55 V110 C155 140 130 160 100 175 C70 160 45 140 45 110 V55 Z" fill="url(#shield-red)" opacity="0.9" filter="url(#glow-b)"/>
+  <path d="M100 30 L150 57 V110 C150 137 127 155 100 170 C73 155 50 137 50 110 V57 Z" fill="url(#shield-glass)"/>
+  <path d="M100 60 L130 110 H70 Z" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linejoin="round" opacity="0.9"/>
+  <path d="M100 70 L122 105 H78 Z" fill="rgba(251,191,36,0.1)"/>
+  <text x="100" y="145" text-anchor="middle" fill="white" font-family="Inter,Arial,sans-serif" font-size="16" font-weight="800" letter-spacing="3" opacity="0.9">TFXS</text>
+  <text x="100" y="192" text-anchor="middle" fill="rgba(156,163,175,0.8)" font-family="Inter,Arial,sans-serif" font-size="8" font-weight="600" letter-spacing="5" class="affiliates-text">AFFILIATES</text>
+</svg>

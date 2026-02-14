@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>((t)=>{if(t==="light")document.documentElement.classList.add("light-theme")})(localStorage.getItem("tfxs_theme")||"light")</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TFXS Affiliate | Marketing Assets</title>
+    <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#DC2626">
+    <meta property="og:title" content="TFXS Affiliates — Marketing Assets">
+    <meta property="og:description" content="Download banners, landing pages and creatives.">
+    <meta property="og:image" content="assets/logo.svg">
+    <meta name="theme-color" content="#dc2626">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/shared.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fff1f2',
+                            100: '#ffe4e6',
+                            500: '#ef4444', 
+                            600: '#dc2626',
+                            900: '#7f1d1d',
+                            neon: '#ff3333',
+                            yellow: '#fbbf24',
+                            dark: '#050505',
+                            panel: '#0A0A0A'
+                        }
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #050505;
+            color: #d4d4d8;
+        }
+
+        .halo-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(ellipse 140% 70% at 50% -5%, rgba(220,38,38,0.14) 0%, rgba(220,38,38,0.08) 20%, rgba(220,38,38,0.04) 38%, rgba(220,38,38,0.015) 55%, rgba(220,38,38,0.004) 72%, rgba(220,38,38,0) 100%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .glass-panel {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .glass-hover {
+            transition: all 0.3s ease;
+        }
+        .glass-hover:hover {
+            border-color: rgba(220, 38, 38, 0.5);
+            background: rgba(30,30,30, 0.8);
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #dc2626; }
+    </style>
+</head>
+<body class="antialiased font-sans min-h-screen relative overflow-x-hidden selection:bg-brand-500 selection:text-white pb-20">
+
+    <div class="halo-bg"></div>
+
+    <nav class="sticky top-0 z-50 w-full glass-panel border-b-0 border-white/5 py-3 sm:py-4">
+        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 flex items-center justify-between gap-3 sm:gap-4 relative">
+            <div class="flex items-center gap-4 sm:gap-10">
+                <a href="/" class="flex items-center gap-2 group cursor-pointer no-underline">
+                    <img src="assets/logo.svg" alt="TFXS Logo" class="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow-[0_0_15px_rgba(220,38,38,0.5)]">
+                    <span class="hidden sm:inline text-lg sm:text-xl font-bold tracking-tight text-white group-hover:text-brand-500 transition-colors">TFXS<span class="opacity-50 font-light"> AFFILIATES</span></span>
+                </a>
+
+                <div id="nav-links" class="hidden md:flex items-center gap-1 bg-white/5 p-1 rounded-lg border border-white/5">
+                    <a href="/" class="px-4 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition rounded-md hover:bg-white/5" data-i18n="nav.dashboard">Dashboard</a>
+                    <a href="/reports" class="px-4 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition rounded-md hover:bg-white/5" data-i18n="nav.reports">Reports</a>
+                    <a href="/deals" class="px-4 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition rounded-md hover:bg-white/5" data-i18n="nav.deals">Deals</a>
+                    <a href="/assets" class="px-4 py-1.5 text-xs font-semibold text-brand-500 bg-white/10 rounded-md shadow-sm" data-i18n="nav.assets">Assets</a>
+                    <a href="/settings" class="px-4 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition rounded-md hover:bg-white/5" data-i18n="nav.settings">Settings</a>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 sm:gap-6">
+                <div class="hidden lg:flex flex-col items-end">
+                    <span class="text-[10px] text-gray-500 font-mono btn-primary uppercase tracking-wider" data-i18n="nav.serverTime">Server Time</span>
+                    <span id="server-time" class="text-xs font-mono font-bold text-white">--:--:--</span>
+                </div>
+                <div class="h-8 w-[1px] bg-white/10 hidden lg:block"></div>
+                
+                <!-- Language Selector -->
+                <div id="lang-selector-anchor"></div>
+                <!-- Theme Toggle -->
+                <div id="theme-toggle-anchor"></div>
+
+                <!-- Notification Bell -->
+                <button class="notification-bell-btn relative p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                    <span id="notif-badge" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-brand-500 text-white text-[9px] font-bold shadow-[0_0_8px_#ef4444]" style="display:none;">0</span>
+                </button>
+
+                <!-- Mobile Menu Toggle -->
+                <button id="mobile-menu-toggle" class="md:hidden p-2 text-gray-400 hover:text-white transition rounded-lg hover:bg-white/5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+
+                <a id="nav-avatar-link" href="/settings" class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-sm font-bold text-white leading-none nav-display-name">—</p>
+                        <p class="text-[10px] text-brand-500 font-mono mt-1 nav-afp-label">—</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-b from-gray-700 to-black border border-white/20 relative overflow-hidden ring-2 ring-brand-500/20">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=default" alt="Avatar" class="w-full h-full object-cover opacity-80">
+                    </div>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Connecting overlay — full-page, fixed at top -->
+    <div id="connecting-overlay" class="fixed inset-0 z-[9998]" style="background:rgba(5,5,5,0.85); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);">
+        <div class="flex items-center justify-center gap-3 px-6 py-3 mt-[72px]" style="background:linear-gradient(90deg, transparent, rgba(220,38,38,0.06), transparent);">
+            <div class="relative w-5 h-5 flex-shrink-0">
+                <div class="absolute inset-0 rounded-full border-2 border-white/10"></div>
+                <div class="absolute inset-0 rounded-full border-2 border-t-red-500 animate-spin"></div>
+            </div>
+            <p class="text-xs font-mono text-gray-400 tracking-wider" data-i18n="deals.connecting">Connecting to live data<span class="connecting-dots"></span></p>
+            <p class="text-[10px] text-gray-600 ml-1" data-i18n="deals.mayTake">— may take a few seconds</p>
+        </div>
+    </div>
+    <style>
+        @keyframes connectDots { 0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} }
+        .connecting-dots::after { content:''; animation: connectDots 1.5s steps(4,end) infinite; }
+    </style>
+
+    <main class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 mt-8 sm:mt-12 space-y-8 animate-fade-in-up">
+        
+        <header class="flex justify-between items-end gap-8">
+            <div>
+                 <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight" data-i18n="assets.title">Marketing Assets</h1>
+                 <p class="text-gray-400 mt-2 font-light" data-i18n="assets.subtitle">Your broker tracking links and marketing creatives.</p>
+            </div>
+        </header>
+
+        <!-- Dynamic Broker Links Section -->
+        <section>
+            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+                <span data-i18n="assets.trackingLinks">Your Tracking Links</span>
+            </h2>
+            <div id="broker-links-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="glass-panel rounded-2xl p-8 col-span-full flex items-center justify-center">
+                    <div class="flex items-center gap-3 text-gray-500">
+                        <div class="w-5 h-5 border-2 border-t-brand-500 border-white/10 rounded-full animate-spin"></div>
+                        <span class="text-xs font-mono" data-i18n="assets.loadingLinks">Loading broker links…</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Creatives Section — Coming Soon -->
+        <section>
+            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                <span data-i18n="assets.creatives">Creatives & Landing Pages</span>
+            </h2>
+            <div class="glass-panel rounded-2xl p-12 text-center relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-b from-brand-500/5 to-transparent pointer-events-none"></div>
+                <div class="relative">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2" data-i18n="assets.comingSoon">Coming Soon</h3>
+                    <p class="text-sm text-gray-400 max-w-md mx-auto" data-i18n="assets.bannerDesc">High-conversion banners, video sales letters, Instagram story packs, and landing page templates will be available here shortly.</p>
+                    <span class="inline-block mt-4 px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider text-brand-500 bg-brand-500/10 rounded-full border border-brand-500/20">Q1 2026</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    <script>
+        // Server Time Clock
+        function updateServerTime() {
+            const timeElement = document.getElementById("server-time");
+            if (!timeElement) return;
+
+            const now = new Date();
+            
+            // Format time: HH:MM:SS
+            const timeString = now.toLocaleTimeString("en-US", { 
+                hour12: false, 
+                hour: "2-digit", 
+                minute: "2-digit", 
+                second: "2-digit" 
+            });
+
+            // Get Timezone offset (e.g. UTC+1)
+            const offset = -now.getTimezoneOffset() / 60;
+            const sign = offset >= 0 ? "+" : "-";
+            const absOffset = Math.abs(offset);
+            const timezoneString = `UTC${sign}${absOffset}`;
+
+            timeElement.textContent = `${timeString} ${timezoneString}`;
+        }
+
+        // Update immediately and then every second
+        updateServerTime();
+        setInterval(updateServerTime, 1000);
+    </script>
+    <script src="js/theme.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/settings-loader.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+    (async function loadBrokerLinks() {
+        const grid = document.getElementById('broker-links-grid');
+        if (!grid) return;
+
+        try {
+            const affiliateId = localStorage.getItem('affiliate_id');
+            if (!affiliateId) { grid.innerHTML = '<p class="text-gray-500 text-xs col-span-full text-center py-8">Please log in to view your tracking links.</p>'; return; }
+
+            const result = await window.TFXS_API.fetchDeals(affiliateId);
+            const deals = result && result.data ? result.data : (Array.isArray(result) ? result : []);
+
+            if (!deals.length) {
+                grid.innerHTML = '<div class="glass-panel rounded-2xl p-8 col-span-full text-center"><p class="text-gray-400 text-sm">No deals assigned yet. Contact your account manager.</p></div>';
+                return;
+            }
+
+            grid.innerHTML = deals.map(deal => {
+                const rawLink = deal.broker_link || '';
+                const link = rawLink
+                    ? rawLink.replace(/\{AFP\}/gi, affiliateId).replace(/\[afp\]/gi, affiliateId).replace(/\{afp\}/gi, affiliateId)
+                    : `https://${(deal.broker || 'broker').toLowerCase().replace(/\s/g,'-')}.com/?afp=${affiliateId}`;
+                const color = deal.broker_theme_color || deal.theme_color || '#dc2626';
+                const logo = deal.broker_logo || deal.logo_url || null;
+                const model = (deal.deal_type || 'CPA').toUpperCase();
+                const payout = deal.cpa_amount ? ('$' + deal.cpa_amount) : '—';
+                const geo = deal.geo || '—';
+
+                return `
+                <div class="glass-panel rounded-2xl overflow-hidden glass-hover group">
+                    <div class="h-32 relative flex items-center justify-center border-b border-white/5" style="background:linear-gradient(135deg, ${color}15 0%, transparent 60%);">
+                        ${logo
+                            ? `<img src="${logo}" alt="${deal.broker}" class="h-12 object-contain opacity-80 group-hover:opacity-100 transition">`
+                            : `<span class="text-2xl font-bold text-white/20">${(deal.broker || 'Broker').charAt(0)}</span>`
+                        }
+                        <span class="absolute top-3 right-3 px-2 py-0.5 text-[9px] font-bold uppercase rounded" style="background:${color}20; color:${color}; border:1px solid ${color}33;">${model}</span>
+                    </div>
+                    <div class="p-5 space-y-3">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-base font-bold text-white">${deal.broker || deal.name || 'Broker'}</h3>
+                            <span class="text-xs font-mono font-bold" style="color:${color}">${payout}</span>
+                        </div>
+                        <div class="flex gap-3 text-[10px] text-gray-500">
+                            <span>GEO: <span class="text-gray-300">${geo}</span></span>
+                            <span>Deal: <span class="text-gray-300">${deal.name || '—'}</span></span>
+                        </div>
+                        <div class="relative">
+                            <input type="text" value="${link}" readonly class="w-full px-3 py-2.5 text-[11px] font-mono bg-black/30 border border-white/10 rounded-lg text-gray-300 pr-20 truncate">
+                            <button onclick="navigator.clipboard.writeText('${link.replace(/'/g, "\\'")}').then(()=>{if(window.showToast)showToast('Link copied!','success');else alert('Copied!')})" class="absolute right-1 top-1/2 -translate-y-1/2 px-3 py-1.5 text-[10px] font-bold uppercase rounded-md transition" style="background:${color}; color:white;">Copy</button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+
+        } catch (err) {
+            console.error('Assets: failed to load broker links', err);
+            grid.innerHTML = '<div class="glass-panel rounded-2xl p-8 col-span-full text-center"><p class="text-gray-400 text-sm">Unable to load broker links. Try refreshing.</p></div>';
+        }
+    })();
+    </script>
+</body>
+</html>

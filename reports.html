@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>((t)=>{if(t==="light")document.documentElement.classList.add("light-theme")})(localStorage.getItem("tfxs_theme")||"light")</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TFXS Affiliate | Reports</title>
+    <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#DC2626">
+    <meta property="og:title" content="TFXS Affiliates — Reports">
+    <meta property="og:description" content="Detailed financial reports and conversion analytics.">
+    <meta property="og:image" content="assets/logo.svg">
+    <meta property="og:type" content="website">
+    <meta name="theme-color" content="#dc2626">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fff1f2',
+                            100: '#ffe4e6',
+                            500: '#ef4444', 
+                            600: '#dc2626',
+                            900: '#7f1d1d',
+                            neon: '#ff3333',
+                            yellow: '#fbbf24',
+                            dark: '#050505',
+                            panel: '#0A0A0A'
+                        }
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #050505;
+            color: #d4d4d8;
+        }
+
+        .halo-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(ellipse 140% 70% at 50% -5%, rgba(220,38,38,0.14) 0%, rgba(220,38,38,0.08) 20%, rgba(220,38,38,0.04) 38%, rgba(220,38,38,0.015) 55%, rgba(220,38,38,0.004) 72%, rgba(220,38,38,0) 100%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .glass-panel {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-gradient::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .btn-gradient:hover::after {
+            left: 100%;
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #dc2626; }
+
+        /* Notification highlight animation */
+        @keyframes notifHighlight {
+            0% { background: rgba(239, 68, 68, 0.35); box-shadow: inset 0 0 30px rgba(239, 68, 68, 0.15); }
+            20% { background: rgba(239, 68, 68, 0.25); }
+            100% { background: transparent; box-shadow: none; }
+        }
+        .notif-highlight {
+            animation: notifHighlight 3s ease-out forwards;
+            border-radius: 4px;
+        }
+
+        /* Custom Flatpickr Theme */
+        .flatpickr-calendar {
+            background: rgba(20, 20, 20, 0.95) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+            font-family: 'Inter', sans-serif !important;
+            border-radius: 16px !important;
+        }
+        .flatpickr-calendar.arrowTop:before, .flatpickr-calendar.arrowTop:after {
+            border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+        }
+        .flatpickr-months .flatpickr-month {
+            background: transparent !important;
+            color: #fff !important;
+            fill: #fff !important;
+        }
+        .flatpickr-current-month .flatpickr-monthDropdown-months,
+        .flatpickr-current-month input.cur-year {
+            color: #fff !important;
+            font-weight: 700 !important;
+        }
+        .flatpickr-weekdays {
+            background: transparent !important;
+        }
+        .flatpickr-weekday {
+            color: #71717a !important;
+            font-weight: 600 !important;
+        }
+        .flatpickr-day {
+            color: #d4d4d8 !important;
+            border-radius: 8px !important;
+        }
+        .flatpickr-day:hover {
+            background: rgba(239, 68, 68, 0.2) !important;
+            border-color: transparent !important;
+        }
+        .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange, .flatpickr-day.selected.inRange, .flatpickr-day.startRange.inRange, .flatpickr-day.endRange.inRange, .flatpickr-day.focus, .flatpickr-day.nextMonthDay:hover, .flatpickr-day.prevMonthDay:hover {
+            background: #dc2626 !important;
+            border-color: #dc2626 !important;
+            color: white !important;
+            box-shadow: 0 0 15px rgba(220, 38, 38, 0.4) !important;
+        }
+        .flatpickr-day.inRange {
+            background: rgba(239, 68, 68, 0.1) !important;
+            border-color: transparent !important;
+            box-shadow: -5px 0 0 rgba(239, 68, 68, 0.1), 5px 0 0 rgba(239, 68, 68, 0.1) !important;
+        }
+        .flatpickr-next-month, .flatpickr-prev-month {
+            fill: #ef4444 !important;
+            color: #ef4444 !important;
+        }
+        .flatpickr-next-month:hover svg, .flatpickr-prev-month:hover svg {
+            fill: #fff !important;
+        }
+        .flatpickr-current-month .numInputWrapper span.arrowUp:after {
+            border-bottom-color: #ef4444 !important;
+        }
+        .flatpickr-current-month .numInputWrapper span.arrowDown:after {
+            border-top-color: #ef4444 !important;
+        }
+
+        .tab-btn.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-color: #ef4444;
+        }
+        /* ── Mobile table fixes: prevent cell overlap ── */
+        @media (max-width: 768px) {
+            table th, table td { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .overflow-x-auto table { min-width: 600px; }
+            .overflow-x-auto { -webkit-overflow-scrolling: touch; }
+        }
+    </style>
+</head>
+<body class="antialiased font-sans min-h-screen relative overflow-x-hidden selection:bg-brand-500 selection:text-white pb-20">
+
+    <div class="halo-bg"></div>
+
+    <nav class="sticky top-0 z-50 w-full glass-panel border-b-0 border-white/5 py-3 sm:py-4">
+        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 flex items-center justify-between gap-3 sm:gap-4 relative">
+            <div class="flex items-center gap-4 sm:gap-10">
+                <a href="/" class="flex items-center gap-2 group cursor-pointer no-underline">
+                    <img src="assets/logo.svg" alt="TFXS Logo" class="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow-[0_0_15px_rgba(220,38,38,0.5)]">
+                    <span class="hidden sm:inline text-lg sm:text-xl font-bold tracking-tight text-white group-hover:text-brand-500 transition-colors">TFXS<span class="opacity-50 font-light"> AFFILIATES</span></span>
+                </a>
+
+                <div id="nav-links" class="hidden md:flex items-center gap-1 bg-white/5 p-1 rounded-lg border border-white/5">
+                    <a href="/" class="px-4 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition rounded-md hover:bg-white/5" data-i18n="nav.dashboard">Dashboard</a>
+                    <a href="/reports" class="px-4 py-1.5 text-xs font-semibold text-brand-500 bg-white/10 rounded-md shadow-sm" data-i18n="nav.reports">Reports</a>
+                    <a href="/deals" class="px-4 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition rounded-md hover:bg-white/5" data-i18n="nav.deals">Deals</a>
+                    <a href="/assets" class="px-4 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition rounded-md hover:bg-white/5" data-i18n="nav.assets">Assets</a>
+                    <a href="/settings" class="px-4 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition rounded-md hover:bg-white/5" data-i18n="nav.settings">Settings</a>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 sm:gap-6">
+                <div class="hidden lg:flex flex-col items-end">
+                    <span class="text-[10px] text-gray-500 font-mono btn-primary uppercase tracking-wider" data-i18n="nav.serverTime">Server Time</span>
+                    <span id="server-time" class="text-xs font-mono font-bold text-white">--:--:--</span>
+                </div>
+                <div class="h-8 w-[1px] bg-white/10 hidden lg:block"></div>
+                
+                <!-- Language Selector -->
+                <div id="lang-selector-anchor"></div>
+                <!-- Theme Toggle -->
+                <div id="theme-toggle-anchor"></div>
+
+                <!-- Notification Bell -->
+                <button class="notification-bell-btn relative p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                    <span id="notif-badge" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-brand-500 text-white text-[9px] font-bold shadow-[0_0_8px_#ef4444]" style="display:none;">0</span>
+                </button>
+
+                <!-- Mobile Menu Toggle -->
+                <button id="mobile-menu-toggle" class="md:hidden p-2 text-gray-400 hover:text-white transition rounded-lg hover:bg-white/5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+
+                <a id="nav-avatar-link" href="/settings" class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-sm font-bold text-white leading-none nav-display-name">—</p>
+                        <p class="text-[10px] text-brand-500 font-mono mt-1 nav-afp-label">—</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-b from-gray-700 to-black border border-white/20 relative overflow-hidden ring-2 ring-brand-500/20">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=default" alt="Avatar" class="w-full h-full object-cover opacity-80">
+                    </div>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Connecting overlay — full-page, fixed at top -->
+    <div id="connecting-overlay" class="fixed inset-0 z-[9998]" style="background:rgba(5,5,5,0.85); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);">
+        <div class="flex items-center justify-center gap-3 px-6 py-3 mt-[72px]" style="background:linear-gradient(90deg, transparent, rgba(220,38,38,0.06), transparent);">
+            <div class="relative w-5 h-5 flex-shrink-0">
+                <div class="absolute inset-0 rounded-full border-2 border-white/10"></div>
+                <div class="absolute inset-0 rounded-full border-2 border-t-red-500 animate-spin"></div>
+            </div>
+            <p class="text-xs font-mono text-gray-400 tracking-wider" data-i18n="rep.connecting">Connecting to live data<span class="connecting-dots"></span></p>
+            <p class="text-[10px] text-gray-600 ml-1" data-i18n="rep.mayTake">— may take a few seconds</p>
+        </div>
+    </div>
+    <style>
+        @keyframes connectDots { 0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} }
+        .connecting-dots::after { content:''; animation: connectDots 1.5s steps(4,end) infinite; }
+    </style>
+
+    <main class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 mt-8 sm:mt-12 space-y-8 animate-fade-in-up relative">
+        
+        <header class="flex flex-col sm:flex-row justify-between sm:items-end gap-4 sm:gap-8">
+            <div>
+                 <h1 class="text-2xl sm:text-4xl font-bold text-white tracking-tight" data-i18n="rep.title">Financial Reports</h1>
+                 <p class="text-sm sm:text-base text-gray-400 mt-1 sm:mt-2 font-light" data-i18n="rep.subtitle">Detailed breakdown of traffic sources and conversions.</p>
+            </div>
+            
+             <button class="btn-gradient px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl shadow-[0_0_20px_rgba(220,38,38,0.4)] hover:shadow-[0_0_30px_rgba(220,38,38,0.6)] transition-all transform hover:-translate-y-1 flex-shrink-0">
+                <span class="text-xs font-bold text-white uppercase tracking-wider" data-i18n="rep.downloadPdf">Download PDF</span>
+            </button>
+        </header>
+
+        <!-- Tabs & Filters -->
+        <div class="flex flex-col gap-4 mb-8">
+            <!-- Tabs — scrollable row -->
+            <div class="flex bg-white/5 p-1 rounded-xl border border-white/5 overflow-x-auto no-scrollbar">
+                <button onclick="switchTab('earnings')" id="tab-earnings" class="tab-btn active px-4 sm:px-6 py-2 rounded-lg text-[10px] sm:text-xs font-bold text-gray-400 hover:text-white transition-all uppercase tracking-wider whitespace-nowrap" data-i18n="rep.earningsReport">Earnings Report</button>
+                <button onclick="switchTab('registrations')" id="tab-registrations" class="tab-btn px-4 sm:px-6 py-2 rounded-lg text-[10px] sm:text-xs font-bold text-gray-400 hover:text-white transition-all uppercase tracking-wider whitespace-nowrap" data-i18n="rep.registrationReport">Registration Report</button>
+                <button onclick="switchTab('payouts')" id="tab-payouts" class="tab-btn px-4 sm:px-6 py-2 rounded-lg text-[10px] sm:text-xs font-bold text-gray-400 hover:text-white transition-all uppercase tracking-wider whitespace-nowrap" data-i18n="rep.payoutReport">Payout Report</button>
+            </div>
+
+            <!-- Timeframe Controls — stacks on mobile -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <!-- Quick Timeframe Dropdown -->
+                <div id="rep-timeframe-wrapper" class="custom-select relative">
+                    <button type="button" id="rep-timeframe-btn" class="flex items-center gap-2 bg-black/40 border border-white/10 text-white text-[11px] font-bold uppercase tracking-wider rounded-lg px-3 py-2 hover:border-white/20 transition w-full sm:w-auto">
+                        <span id="rep-timeframe-label" data-i18n="rep.last7">Last 7 Days</span>
+                        <svg class="w-3 h-3 text-gray-400 transition-transform ml-auto sm:ml-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div id="rep-timeframe-dropdown" class="hidden absolute right-0 mt-1 w-44 rounded-xl bg-[#1a1a1a] border border-white/10 shadow-xl z-50 overflow-hidden">
+                        <div id="rep-timeframe-options">
+                            <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="today" data-i18n="rep.today">Today</div>
+                            <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="yesterday" data-i18n="rep.yesterday">Yesterday</div>
+                            <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="last7" data-i18n="rep.last7">Last 7 Days</div>
+                            <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="mtd" data-i18n="rep.monthToDate">Month to Date</div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="timeframe-select" value="last7">
+                </div>
+
+                <!-- Date Picker -->
+                <div class="glass-panel px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 border-white/10 flex-1 sm:flex-none">
+                    <span class="text-xs text-gray-400 flex-shrink-0" data-i18n="rep.custom">Custom:</span>
+                    <input type="text" id="date-range" class="bg-transparent text-sm text-white border-none focus:ring-0 w-full sm:w-[200px] outline-none font-mono">
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports KPI Summary -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" id="reports-kpi-section">
+            <div class="glass-panel rounded-xl p-4 border border-white/5">
+                <p class="text-[10px] text-gray-500 uppercase tracking-wider font-bold" data-i18n="rep.registrations">Registrations</p>
+                <p class="text-2xl font-bold text-white font-mono mt-1" id="report-total-regs">0</p>
+            </div>
+            <div class="glass-panel rounded-xl p-4 border border-white/5">
+                <p class="text-[10px] text-gray-500 uppercase tracking-wider font-bold" data-i18n="rep.ftds">FTDs</p>
+                <p class="text-2xl font-bold text-white font-mono mt-1" id="report-total-ftd">0</p>
+            </div>
+            <div class="glass-panel rounded-xl p-4 border border-white/5">
+                <p class="text-[10px] text-gray-500 uppercase tracking-wider font-bold" data-i18n="rep.qualifiedCpa">Qualified CPA</p>
+                <p class="text-2xl font-bold text-white font-mono mt-1" id="report-total-qcpa">0</p>
+            </div>
+            <div class="glass-panel rounded-xl p-4 border border-white/5">
+                <p class="text-[10px] text-gray-500 uppercase tracking-wider font-bold" data-i18n="rep.totalCommission">Total Commission</p>
+                <p class="text-2xl font-bold text-brand-500 font-mono mt-1" id="report-total-commission">$0.00</p>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8" id="reports-charts-section">
+            <div class="glass-panel rounded-2xl p-6 border border-white/5">
+                <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-4" data-i18n="rep.dailyEarnings">Daily Earnings</h3>
+                <div class="relative" style="height: 220px;">
+                    <canvas id="report-earnings-chart"></canvas>
+                </div>
+            </div>
+            <div class="glass-panel rounded-2xl p-6 border border-white/5">
+                <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-4" data-i18n="rep.dailyRegistrations">Daily Registrations</h3>
+                <div class="relative" style="height: 220px;">
+                    <canvas id="report-regs-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Breakdown Table -->
+        <div class="glass-panel rounded-2xl overflow-hidden border border-white/5 mb-8" id="daily-breakdown-section" style="display:none;">
+            <div class="p-6 border-b border-white/5">
+                <h3 class="text-lg font-bold text-white" data-i18n="rep.dailyBreakdown">Daily Breakdown</h3>
+                <p class="text-xs text-gray-400 mt-1" data-i18n="rep.dailyBreakdownSub">Day-by-day performance metrics.</p>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-white/5 text-[10px] uppercase text-gray-500 font-mono">
+                        <tr>
+                            <th class="px-6 py-4 font-semibold tracking-wider text-left" data-i18n="rep.date">Date</th>
+                            <th class="px-6 py-4 font-semibold tracking-wider text-center" data-i18n="rep.registrations">Registrations</th>
+                            <th class="px-6 py-4 font-semibold tracking-wider text-center" data-i18n="rep.ftds">FTDs</th>
+                            <th class="px-6 py-4 font-semibold tracking-wider text-center" data-i18n="rep.qualifiedCpa">Qualified CPA</th>
+                            <th class="px-6 py-4 font-semibold tracking-wider text-right" data-i18n="rep.commission">Commission</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-xs divide-y divide-white/5 font-mono" id="reports_daily_tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Registration Report View -->
+        <div id="view-registrations" class="hidden animate-fade-in-up">
+        <!-- Registration Report -->
+        <div class="glass-panel rounded-2xl overflow-hidden border border-white/5 mb-8">
+            <div class="p-6 border-b border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h3 class="text-lg font-bold text-white" data-i18n="rep.registrationReport">Registration Report</h3>
+                    <p class="text-xs text-gray-400 mt-1" data-i18n="rep.newSignups">New signups and first time deposits.</p>
+                </div>
+                <div class="flex gap-2 items-center">
+                    <button class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-gray-400 hover:text-white border border-white/10 rounded hover:bg-white/5 transition export-csv-btn" data-i18n="rep.exportCsv">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        Export CSV
+                    </button>
+                    <div class="relative w-full sm:w-auto">
+                        <input type="text" id="search-registrations" placeholder="Search Registrations..." data-i18n-ph="rep.searchRegs" class="bg-white/5 border border-white/10 text-white text-xs rounded-lg pl-8 pr-4 py-2 focus:border-brand-500 focus:outline-none w-full sm:w-64" oninput="regCurrentPage=1;renderReports()">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500 absolute left-2.5 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-white/5 text-[10px] uppercase text-gray-500 font-mono">
+                        <tr>
+                            <th class="px-6 py-4 font-semibold tracking-wider text-left w-1/5" data-i18n="rep.country">Country</th>
+                            <th class="px-6 py-4 font-semibold tracking-wider text-center w-1/5" data-i18n="rep.userId">User ID</th>
+                            <th class="px-6 py-4 font-semibold tracking-wider text-center w-1/5" data-i18n="rep.created">Created</th>
+                            <th class="px-6 py-4 font-semibold tracking-wider text-center w-1/5" data-i18n="rep.firstDeposit">First Deposit</th>
+                            <th class="px-6 py-4 font-semibold tracking-wider text-center w-1/5" data-i18n="rep.commission">Commission</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-xs divide-y divide-white/5 font-mono" id="registrations-table-body">
+                        <!-- Content populated by JS -->
+                    </tbody>
+                </table>
+                <div class="p-4 border-t border-white/5 flex items-center justify-between text-xs">
+                     <div class="flex items-center gap-2">
+                         <span class="text-gray-400" data-i18n="rep.itemsPerPage">Items per page:</span>
+                         <div id="ipp-reg-wrapper" class="custom-select relative">
+                             <button type="button" id="ipp-reg-btn" class="flex items-center gap-1 bg-white/5 border border-white/10 rounded px-2 py-1 text-xs text-white hover:border-white/20 transition">
+                                 <span id="ipp-reg-label">10</span>
+                                 <svg class="w-3 h-3 text-gray-400 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                             </button>
+                             <div id="ipp-reg-dropdown" class="hidden absolute bottom-full mb-1 left-0 w-20 rounded-lg bg-[#1a1a1a] border border-white/10 shadow-xl z-50 overflow-hidden">
+                                 <div id="ipp-reg-options">
+                                     <div class="custom-select-opt px-3 py-1.5 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="10">10</div>
+                                     <div class="custom-select-opt px-3 py-1.5 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="25">25</div>
+                                     <div class="custom-select-opt px-3 py-1.5 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="50">50</div>
+                                 </div>
+                             </div>
+                             <input type="hidden" id="items-per-page-reg" value="10">
+                         </div>
+                     </div>
+                     <div class="flex items-center gap-4 text-gray-400">
+                         <span class="pagination-info-reg">--</span>
+                         <div class="flex gap-1">
+                             <button id="reg-prev" class="p-1 hover:text-white disabled:opacity-50 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+                             <button id="reg-next" class="p-1 hover:text-white disabled:opacity-50 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
+                         </div>
+                     </div>
+                </div>
+            </div>
+        </div>
+
+        </div>
+
+        <!-- Payout Report View -->
+        <div id="view-payouts" class="hidden animate-fade-in-up">
+        <div class="glass-panel rounded-2xl overflow-hidden border border-white/5">
+            <div class="p-6 border-b border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h3 class="text-lg font-bold text-white" data-i18n="rep.payoutReport">Payout Report</h3>
+                    <p class="text-xs text-gray-400 mt-1" data-i18n="rep.payoutHistory">Complete payout history with invoice downloads.</p>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-white/5 text-[10px] uppercase text-gray-500 font-mono">
+                        <tr>
+                            <th class="px-6 py-4 font-semibold tracking-wider text-left" data-i18n="rep.date">Date</th>
+                            <th class="px-6 py-4 font-semibold tracking-wider text-center" data-i18n="rep.amount">Amount</th>
+                            <th class="px-6 py-4 font-semibold tracking-wider text-center" data-i18n="rep.method">Method</th>
+                            <th class="px-6 py-4 font-semibold tracking-wider text-center" data-i18n="rep.status">Status</th>
+                            <th class="px-6 py-4 font-semibold tracking-wider text-center" data-i18n="rep.notes">Notes</th>
+                            <th class="px-6 py-4 font-semibold tracking-wider text-center" data-i18n="rep.invoice">Invoice</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-xs divide-y divide-white/5 font-mono" id="payouts-table-body">
+                    </tbody>
+                </table>
+            </div>
+            <div class="p-4 border-t border-white/5">
+                <p id="payout-report-summary" class="text-xs text-gray-400"></p>
+            </div>
+        </div>
+        </div>
+
+        <!-- Earnings Report View -->
+        <div id="view-earnings" class="animate-fade-in-up">
+        <!-- Earnings Report -->
+        <div class="glass-panel rounded-2xl overflow-hidden border border-white/5">
+             <div class="p-6 border-b border-white/5 flex flex-col gap-4">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-lg font-bold text-white" data-i18n="rep.earningsReport">Earnings Report</h3>
+                        <p class="text-xs text-gray-400 mt-1" data-i18n="rep.detailedComm">Detailed commission breakdown.</p>
+                    </div>
+                     <div class="flex gap-2">
+                         <button class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-gray-400 hover:text-white border border-white/10 rounded hover:bg-white/5 transition" data-i18n="rep.exportCsv">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                            Export CSV
+                         </button>
+                     </div>
+                </div>
+                
+                <!-- Secondary Toolbar -->
+                <div class="flex justify-between items-center bg-black/20 p-2 rounded-lg border border-white/5 flex-wrap gap-2">
+                     <div class="relative w-full sm:max-w-sm">
+                        <input type="text" id="search-earnings" placeholder="Search this report..." data-i18n-ph="rep.searchReport" class="w-full bg-transparent text-white text-xs focus:outline-none pl-8 py-1" oninput="earnCurrentPage=1;renderReports()">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500 absolute left-2 top-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-white/5 text-[10px] uppercase text-gray-500 font-mono">
+                        <tr class="border-b border-white/5">
+                            <th class="px-6 py-4 font-semibold tracking-wider" data-i18n="rep.userId">User ID</th>
+                            <th class="px-6 py-4 font-semibold tracking-wider" data-i18n="rep.created">Created</th>
+                            <th class="px-6 py-4 font-semibold tracking-wider" data-i18n="rep.amount">Amount</th>
+                            <th class="px-6 py-4 font-semibold tracking-wider" data-i18n="rep.commType">Commission Type</th>
+                            <th class="px-6 py-4 font-semibold tracking-wider" data-i18n="rep.id">ID</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-xs divide-y divide-white/5 font-mono" id="earnings-table-body">
+                        <!-- Content populated by JS -->
+                    </tbody>
+                </table>
+                <div class="p-4 border-t border-white/5 flex items-center justify-between text-xs">
+                     <div class="flex items-center gap-2">
+                         <span class="text-gray-400" data-i18n="rep.itemsPerPage">Items per page:</span>
+                         <div id="ipp-earn-wrapper" class="custom-select relative">
+                             <button type="button" id="ipp-earn-btn" class="flex items-center gap-1 bg-white/5 border border-white/10 rounded px-2 py-1 text-xs text-white hover:border-white/20 transition">
+                                 <span id="ipp-earn-label">10</span>
+                                 <svg class="w-3 h-3 text-gray-400 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                             </button>
+                             <div id="ipp-earn-dropdown" class="hidden absolute bottom-full mb-1 left-0 w-20 rounded-lg bg-[#1a1a1a] border border-white/10 shadow-xl z-50 overflow-hidden">
+                                 <div id="ipp-earn-options">
+                                     <div class="custom-select-opt px-3 py-1.5 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="10">10</div>
+                                     <div class="custom-select-opt px-3 py-1.5 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="25">25</div>
+                                     <div class="custom-select-opt px-3 py-1.5 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="50">50</div>
+                                 </div>
+                             </div>
+                             <input type="hidden" id="items-per-page" value="10">
+                         </div>
+                     </div>
+                     <div class="flex items-center gap-4 text-gray-400">
+                         <span class="pagination-info">--</span>
+                         <div class="flex gap-1">
+                             <button id="earn-prev" class="p-1 hover:text-white disabled:opacity-50 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+                             <button id="earn-next" class="p-1 hover:text-white disabled:opacity-50 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
+                         </div>
+                     </div>
+                </div>
+            </div>
+        </div>
+
+        </div>
+    </main>
+    <script src="js/app.js"></script>
+    <script>
+        // ── Save mock data as fallback, then clear for live-first UX ──
+        (function() {
+            if (window.db) {
+                window._mockBackup = {
+                    registrations: [...window.db.registrations],
+                    earnings: [...window.db.earnings],
+                    balance: window.db.user ? window.db.user.balance : 0
+                };
+                window.db.registrations = [];
+                window.db.earnings = [];
+                if (window.db.user) window.db.user.balance = 0;
+            }
+        })();
+    </script>
+    <script>
+        // Global State
+        let datePicker;
+        let regCurrentPage = 1;
+        let earnCurrentPage = 1;
+        const IS_ADMIN = localStorage.getItem("is_admin") === "true";
+
+        // === Custom Dropdown Wiring ===
+        (function() {
+            function initDD(wrapperId, btnId, labelId, ddId, hiddenId, onChange) {
+                const wrapper = document.getElementById(wrapperId);
+                const btn = document.getElementById(btnId);
+                const label = document.getElementById(labelId);
+                const dd = document.getElementById(ddId);
+                const hidden = document.getElementById(hiddenId);
+                if (!btn || !dd) return;
+
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const open = !dd.classList.contains('hidden');
+                    document.querySelectorAll('.custom-select-dd-open').forEach(d => { d.classList.add('hidden'); d.classList.remove('custom-select-dd-open'); });
+                    if (!open) { dd.classList.remove('hidden'); dd.classList.add('custom-select-dd-open'); btn.querySelector('svg').classList.add('rotate-180'); }
+                    else { btn.querySelector('svg').classList.remove('rotate-180'); }
+                });
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('#' + wrapperId)) { dd.classList.add('hidden'); btn.querySelector('svg').classList.remove('rotate-180'); }
+                });
+                dd.querySelectorAll('.custom-select-opt').forEach(opt => {
+                    opt.addEventListener('click', () => {
+                        hidden.value = opt.dataset.value;
+                        label.textContent = opt.textContent;
+                        dd.classList.add('hidden');
+                        btn.querySelector('svg').classList.remove('rotate-180');
+                        dd.querySelectorAll('.custom-select-opt').forEach(o => o.classList.remove('bg-white/5', 'font-medium'));
+                        opt.classList.add('bg-white/5', 'font-medium');
+                        if (onChange) onChange(opt.dataset.value);
+                    });
+                });
+            }
+
+            // Reports timeframe dropdown
+            initDD('rep-timeframe-wrapper', 'rep-timeframe-btn', 'rep-timeframe-label', 'rep-timeframe-dropdown', 'timeframe-select', (val) => {
+                if (typeof setDateRange === 'function') setDateRange(val);
+            });
+
+            // Items per page — registrations
+            initDD('ipp-reg-wrapper', 'ipp-reg-btn', 'ipp-reg-label', 'ipp-reg-dropdown', 'items-per-page-reg', () => {
+                regCurrentPage = 1;
+                if (typeof renderReports === 'function') renderReports();
+            });
+
+            // Items per page — earnings
+            initDD('ipp-earn-wrapper', 'ipp-earn-btn', 'ipp-earn-label', 'ipp-earn-dropdown', 'items-per-page', () => {
+                earnCurrentPage = 1;
+                if (typeof renderReports === 'function') renderReports();
+            });
+        })();
+
+        // Tab Switching
+        function switchTab(tab) {
+            // Hide all views
+            document.getElementById('view-registrations').classList.add('hidden');
+            document.getElementById('view-earnings').classList.add('hidden');
+            document.getElementById('view-payouts').classList.add('hidden');
+            
+            // Remove active state
+            document.getElementById('tab-registrations').classList.remove('active');
+            document.getElementById('tab-earnings').classList.remove('active');
+            document.getElementById('tab-payouts').classList.remove('active');
+
+            // Show selected view
+            document.getElementById('view-' + tab).classList.remove('hidden');
+            document.getElementById('tab-' + tab).classList.add('active');
+
+            // Hide shared sections (KPIs, charts, daily breakdown) on Payout tab
+            const sharedSections = ['reports-kpi-section', 'reports-charts-section', 'daily-breakdown-section'];
+            sharedSections.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (tab === 'payouts') {
+                    el.style.display = 'none';
+                } else {
+                    el.style.display = '';
+                }
+            });
+            
+            // Load payout report if switching to payouts tab
+            if (tab === 'payouts') loadPayoutReport();
+
+            // Re-render to update footer for the correct tab
+            renderReports();
+        }
+
+        // Initialize Flatpickr & Quick Buttons
+        document.addEventListener('DOMContentLoaded', () => {
+            // Auto-switch to payouts tab if redirected from dashboard
+            const savedTab = localStorage.getItem('reports_tab');
+            if (savedTab) { localStorage.removeItem('reports_tab'); setTimeout(() => switchTab(savedTab), 300); }
+
+            // 1. Setup Date Picker
+            datePicker = flatpickr("#date-range", {
+                mode: "range",
+                dateFormat: "Y-m-d",
+                altInput: true,
+                altFormat: "M j, Y",
+                defaultDate: [new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), new Date()],
+                theme: "dark",
+                monthSelectorType: "static",
+                onChange: function(selectedDates, dateStr, instance) {
+                    // Reset dropdown when custom date is picked
+                    const sel = document.getElementById('timeframe-select');
+                    if (sel) sel.value = '';
+                    const lbl = document.getElementById('rep-timeframe-label');
+                    if (lbl) lbl.textContent = 'Custom';
+                    // Clear active state on timeframe options
+                    document.querySelectorAll('#rep-timeframe-options .custom-select-opt').forEach(o => o.classList.remove('bg-white/5', 'font-medium'));
+                    regCurrentPage = 1;
+                    earnCurrentPage = 1;
+                    renderReports();
+                }
+            });
+
+            // 2. Setup Items Per Page Listener (reset page on change)
+            const itemsPerPageSelect = document.getElementById('items-per-page');
+            if(itemsPerPageSelect) {
+                itemsPerPageSelect.addEventListener('change', () => { earnCurrentPage = 1; renderReports(); });
+            }
+            const itemsPerPageRegSelect = document.getElementById('items-per-page-reg');
+            if(itemsPerPageRegSelect) {
+                itemsPerPageRegSelect.addEventListener('change', () => { regCurrentPage = 1; renderReports(); });
+            }
+
+            // 3. Setup Pagination Buttons
+            document.getElementById('reg-prev').addEventListener('click', () => { if(regCurrentPage > 1) { regCurrentPage--; renderReports(); } });
+            document.getElementById('reg-next').addEventListener('click', () => { regCurrentPage++; renderReports(); });
+            document.getElementById('earn-prev').addEventListener('click', () => { if(earnCurrentPage > 1) { earnCurrentPage--; renderReports(); } });
+            document.getElementById('earn-next').addEventListener('click', () => { earnCurrentPage++; renderReports(); });
+
+            // 3b. Admin: inject extra "Affiliate" column into both tables
+            if (IS_ADMIN) {
+              // Earnings table header
+              const earnHead = document.querySelector('#earnings-table-body')?.closest('table')?.querySelector('thead tr');
+              if (earnHead) {
+                const th = document.createElement('th');
+                th.className = 'px-6 py-4 font-semibold tracking-wider';
+                th.textContent = 'AFFILIATE';
+                earnHead.insertBefore(th, earnHead.firstChild);
+              }
+              // Registrations table header
+              const regHead = document.querySelector('#registrations-table-body')?.closest('table')?.querySelector('thead tr');
+              if (regHead) {
+                const th = document.createElement('th');
+                th.className = 'px-6 py-4 font-semibold tracking-wider text-left';
+                th.textContent = 'AFFILIATE';
+                regHead.insertBefore(th, regHead.firstChild);
+              }
+              // Add affiliate filter next to the date picker (shared across both tabs)
+              const timeframeRow = document.querySelector('.flex.flex-col.md\\:flex-row.justify-between');
+              if (timeframeRow) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'flex items-center gap-2 glass-panel px-4 py-2 rounded-lg border-white/10';
+                wrapper.innerHTML = `
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-brand-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                  <input type="text" id="admin-affiliate-filter" placeholder="Filter by ID..." class="bg-transparent text-sm text-white border-none focus:ring-0 w-44 outline-none font-mono" oninput="earnCurrentPage=1;regCurrentPage=1;renderReports()">
+                `;
+                // Insert into the timeframe controls area
+                const controlsRow = timeframeRow.querySelector('.flex.flex-col.sm\\:flex-row');
+                if (controlsRow) {
+                  controlsRow.appendChild(wrapper);
+                } else {
+                  timeframeRow.appendChild(wrapper);
+                }
+              }
+            }
+            
+            // 4. Initial Render
+            setTimeout(renderReports, 100);
+
+            // 5. Handle notification click → highlight event row
+            const highlightData = localStorage.getItem('notif-highlight');
+            if (highlightData) {
+                localStorage.removeItem('notif-highlight');
+                const { userId, type, date } = JSON.parse(highlightData);
+
+                // Set date range wide enough to include the event
+                const eventDate = new Date(date);
+                const rangeStart = new Date(eventDate.getFullYear(), eventDate.getMonth(), 1);
+                const rangeEnd = new Date();
+                datePicker.setDate([rangeStart, rangeEnd]);
+
+                // Switch to appropriate tab
+                const tab = type === 'comm' ? 'earnings' : 'registrations';
+
+                // Increase items-per-page to show all so the row is visible
+                const limitEl = document.getElementById(tab === 'earnings' ? 'items-per-page' : 'items-per-page-reg');
+                if (limitEl) limitEl.value = '50';
+                const ippLabel = document.getElementById(tab === 'earnings' ? 'ipp-earn-label' : 'ipp-reg-label');
+                if (ippLabel) ippLabel.textContent = '50';
+
+                setTimeout(() => {
+                    switchTab(tab);
+
+                    // Find and highlight the matching row
+                    setTimeout(() => {
+                        const tableId = tab === 'earnings' ? 'earnings-table-body' : 'registrations-table-body';
+                        const rows = document.querySelectorAll(`#${tableId} tr[data-userid="${userId}"]`);
+                        if (rows.length > 0) {
+                            const row = rows[0];
+                            row.classList.add('notif-highlight');
+                            row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }, 300);
+                }, 200);
+            }
+        });
+
+        // Quick Date Range Handler
+        function setDateRange(period) {
+            const today = new Date();
+            let start, end = today;
+
+            // Visual Update — sync dropdown
+            const sel = document.getElementById('timeframe-select');
+            if (sel && sel.value !== period) sel.value = period;
+            // Sync label text
+            const matchOpt = document.querySelector(`#rep-timeframe-options .custom-select-opt[data-value="${period}"]`);
+            if (matchOpt) {
+                const lbl = document.getElementById('rep-timeframe-label');
+                if (lbl) lbl.textContent = matchOpt.textContent;
+                document.querySelectorAll('#rep-timeframe-options .custom-select-opt').forEach(o => o.classList.remove('bg-white/5', 'font-medium'));
+                matchOpt.classList.add('bg-white/5', 'font-medium');
+            }
+
+            // Logic
+            switch(period) {
+                case 'today':
+                    start = today;
+                    break;
+                case 'yesterday':
+                    const y = new Date();
+                    y.setDate(today.getDate() - 1);
+                    start = y;
+                    end = y;
+                    break;
+                case 'last7':
+                    const l7 = new Date();
+                    l7.setDate(today.getDate() - 7);
+                    start = l7;
+                    break;
+                case 'mtd':
+                    start = new Date(today.getFullYear(), today.getMonth(), 1);
+                    break;
+            }
+
+            datePicker.setDate([start, end]);
+            regCurrentPage = 1;
+            earnCurrentPage = 1;
+            renderReports();
+        }
+
+        // Main Render Logic
+        window.renderReports = renderReports;
+        function renderReports() {
+            // Establish DB reference safely
+            const database = window.db || (typeof db !== 'undefined' ? db : null);
+            
+            if (!database || !datePicker) return;
+
+            // If no data yet (waiting for live), render empty gracefully
+            if (database.registrations.length === 0 && database.earnings.length === 0) {
+                 // Don't loop — live connector will trigger re-render when data arrives
+                 return;
+            }
+
+            // Get Date Range
+            const dates = datePicker.selectedDates;
+            const startDate = dates[0] || new Date(0);
+            const endDate = dates[1] || new Date();
+            // Ensure end date covers the full day
+            endDate.setHours(23, 59, 59, 999);
+
+            // Determine Active Tab & Limit
+            const isRegTab = document.getElementById('tab-registrations').classList.contains('active');
+            const limitId = isRegTab ? 'items-per-page-reg' : 'items-per-page';
+            const limitEl = document.getElementById(limitId);
+            const limit = limitEl ? parseInt(limitEl.value) : 10;
+            
+            // Sync value to other selector so they stay in sync
+            const otherLimitId = isRegTab ? 'items-per-page' : 'items-per-page-reg';
+            const otherEl = document.getElementById(otherLimitId);
+            if(otherEl && otherEl.value != limit) {
+                otherEl.value = limit;
+                const otherLabel = document.getElementById(isRegTab ? 'ipp-earn-label' : 'ipp-reg-label');
+                if (otherLabel) otherLabel.textContent = limit;
+            }
+
+            // Filter Earnings by date
+            let filteredEarnings = database.earnings.filter(item => {
+                const itemDate = new Date(item.created);
+                return itemDate >= startDate && itemDate <= endDate;
+            });
+
+            // Filter Registrations by date
+            let filteredRegs = database.registrations.filter(item => {
+                const itemDate = new Date(item.date);
+                return itemDate >= startDate && itemDate <= endDate;
+            });
+
+            // --- Text Search Filtering ---
+            const regSearchVal = (document.getElementById('search-registrations')?.value || '').toLowerCase().trim();
+            const earnSearchVal = (document.getElementById('search-earnings')?.value || '').toLowerCase().trim();
+
+            if (regSearchVal) {
+                filteredRegs = filteredRegs.filter(r => {
+                    const haystack = [r.userId, r.country?.name, r.country?.code, new Date(r.date).toLocaleDateString()].join(' ').toLowerCase();
+                    return haystack.includes(regSearchVal);
+                });
+            }
+
+            if (earnSearchVal) {
+                filteredEarnings = filteredEarnings.filter(e => {
+                    const haystack = [e.userId, e.type, e.afp, formatCurrency(e.amount), new Date(e.created).toLocaleDateString()].join(' ').toLowerCase();
+                    return haystack.includes(earnSearchVal);
+                });
+            }
+
+            // --- Admin Affiliate Filter ---
+            if (IS_ADMIN) {
+                const affFilter = (document.getElementById('admin-affiliate-filter')?.value || '').toLowerCase().trim();
+                if (affFilter) {
+                    filteredRegs = filteredRegs.filter(r => (r.affiliate_code || '').toLowerCase().includes(affFilter));
+                    filteredEarnings = filteredEarnings.filter(e => (e.affiliate_code || e.afp || '').toLowerCase().includes(affFilter));
+                }
+            }
+
+            // Clamp pages to valid range
+            const regTotalPages = Math.max(1, Math.ceil(filteredRegs.length / limit));
+            const earnTotalPages = Math.max(1, Math.ceil(filteredEarnings.length / limit));
+            if(regCurrentPage > regTotalPages) regCurrentPage = regTotalPages;
+            if(earnCurrentPage > earnTotalPages) earnCurrentPage = earnTotalPages;
+
+            // Apply Pagination Slice
+            const regStart = (regCurrentPage - 1) * limit;
+            const earnStart = (earnCurrentPage - 1) * limit;
+            const pagedRegs = filteredRegs.slice(regStart, regStart + limit);
+            const pagedEarnings = filteredEarnings.slice(earnStart, earnStart + limit);
+
+            renderEarningsTable(pagedEarnings);
+            renderRegistrationsTable(pagedRegs);
+
+            // Update KPI summary cards
+            updateReportKPIs(filteredRegs, filteredEarnings);
+
+            // Update charts
+            updateReportCharts(filteredRegs, filteredEarnings, startDate, endDate);
+
+            // Update both footers (always keep both in sync)
+            updatePaginationFooter('.pagination-info-reg', filteredRegs.length, limit, regCurrentPage, 'reg');
+            updatePaginationFooter('.pagination-info', filteredEarnings.length, limit, earnCurrentPage, 'earn');
+        }
+
+        function updatePaginationFooter(selector, total, limit, page, prefix) {
+             const totalPages = Math.max(1, Math.ceil(total / limit));
+             const rangeStart = total === 0 ? 0 : (page - 1) * limit + 1;
+             const rangeEnd = Math.min(page * limit, total);
+             
+             const infoEl = document.querySelector(selector);
+             if(infoEl) {
+                 infoEl.textContent = `${rangeStart} - ${rangeEnd} of ${total} items`;
+             }
+
+             // Enable/disable arrow buttons
+             const prevBtn = document.getElementById(prefix + '-prev');
+             const nextBtn = document.getElementById(prefix + '-next');
+             if(prevBtn) {
+                 prevBtn.disabled = (page <= 1);
+                 prevBtn.style.opacity = (page <= 1) ? '0.3' : '1';
+                 prevBtn.style.cursor = (page <= 1) ? 'default' : 'pointer';
+             }
+             if(nextBtn) {
+                 nextBtn.disabled = (page >= totalPages);
+                 nextBtn.style.opacity = (page >= totalPages) ? '0.3' : '1';
+                 nextBtn.style.cursor = (page >= totalPages) ? 'default' : 'pointer';
+             }
+        }
+
+        // ── Report KPI Summary ──────────────────────────────────
+        function updateReportKPIs(regs, earnings) {
+            const totalRegs = regs.length;
+            const ftds = regs.filter(r => r.firstDeposit > 0).length;
+            const qcpa = regs.filter(r => r.firstDeposit > 200).length;
+            const totalComm = earnings.reduce((s, e) => s + e.amount, 0);
+
+            const el = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+            el('report-total-regs', totalRegs);
+            el('report-total-ftd', ftds);
+            el('report-total-qcpa', qcpa);
+            el('report-total-commission', '$' + totalComm.toFixed(2));
+        }
+
+        // ── Report Charts (Chart.js) ─────────────────────────────
+        let earningsChartInstance = null;
+        let regsChartInstance = null;
+
+        function updateReportCharts(regs, earnings, startDate, endDate) {
+            // Build daily buckets
+            const dayMap = {};
+            const d = new Date(startDate);
+            while (d <= endDate) {
+                const key = d.toISOString().substring(0, 10);
+                dayMap[key] = { regs: 0, ftd: 0, commission: 0 };
+                d.setDate(d.getDate() + 1);
+            }
+
+            regs.forEach(r => {
+                const key = new Date(r.date).toISOString().substring(0, 10);
+                if (dayMap[key]) { dayMap[key].regs++; if (r.firstDeposit > 0) dayMap[key].ftd++; }
+            });
+            earnings.forEach(e => {
+                const key = new Date(e.created).toISOString().substring(0, 10);
+                if (dayMap[key]) dayMap[key].commission += e.amount;
+            });
+
+            const labels = Object.keys(dayMap).sort();
+            const commData = labels.map(k => dayMap[k].commission);
+            const regData = labels.map(k => dayMap[k].regs);
+            const shortLabels = labels.map(l => { const p = l.split('-'); return p[1] + '/' + p[2]; });
+
+            const isLight = document.documentElement.classList.contains('light-theme');
+            const gridColor = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.03)';
+            const gridColorY = isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.05)';
+            const tickColor = isLight ? '#6b7280' : '#71717a';
+            const chartOpts = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 9, family: 'JetBrains Mono' } } },
+                    y: { grid: { color: gridColorY }, ticks: { color: tickColor, font: { size: 9 } }, beginAtZero: true }
+                }
+            };
+
+            // Earnings chart — gradient bars
+            const earningsCtx = document.getElementById('report-earnings-chart');
+            if (earningsCtx) {
+                if (earningsChartInstance) earningsChartInstance.destroy();
+                const ctx2d = earningsCtx.getContext('2d');
+                const gradient = ctx2d.createLinearGradient(0, 0, 0, 220);
+                gradient.addColorStop(0, 'rgba(239, 68, 68, 0.85)');
+                gradient.addColorStop(0.5, 'rgba(239, 68, 68, 0.45)');
+                gradient.addColorStop(1, 'rgba(239, 68, 68, 0.1)');
+                earningsChartInstance = new Chart(earningsCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: shortLabels,
+                        datasets: [{
+                            data: commData,
+                            backgroundColor: gradient,
+                            borderColor: '#ef4444',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            barPercentage: 0.7
+                        }]
+                    },
+                    options: { ...chartOpts, scales: { ...chartOpts.scales, y: { ...chartOpts.scales.y, ticks: { ...chartOpts.scales.y.ticks, callback: v => '$' + v } } } }
+                });
+            }
+
+            // Registrations chart
+            const regsCtx = document.getElementById('report-regs-chart');
+            if (regsCtx) {
+                if (regsChartInstance) regsChartInstance.destroy();
+                regsChartInstance = new Chart(regsCtx, {
+                    type: 'line',
+                    data: {
+                        labels: shortLabels,
+                        datasets: [{
+                            data: regData,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 3,
+                            pointBackgroundColor: '#3b82f6'
+                        }]
+                    },
+                    options: chartOpts
+                });
+            }
+
+            // Show daily breakdown if reports.js populates it (but NOT on payout tab)
+            const dailySection = document.getElementById('daily-breakdown-section');
+            const isPayoutTab = document.getElementById('tab-payouts')?.classList.contains('active');
+            if (dailySection) {
+                const tbody = document.getElementById('reports_daily_tbody');
+                if (!isPayoutTab && tbody && labels.length > 0 && labels.length <= 31) {
+                    dailySection.style.display = '';
+                    tbody.innerHTML = labels.reverse().map(k => {
+                        const day = dayMap[k];
+                        return `<tr class="border-b border-white/5 hover:bg-white/[0.02] transition">
+                            <td class="py-3 px-6 text-xs font-mono text-gray-300">${k}</td>
+                            <td class="py-3 px-6 text-xs text-center text-gray-300">${day.regs}</td>
+                            <td class="py-3 px-6 text-xs text-center text-gray-300">${day.ftd}</td>
+                            <td class="py-3 px-6 text-xs text-center text-gray-300">0</td>
+                            <td class="py-3 px-6 text-xs font-mono font-bold text-white text-right">$${day.commission.toFixed(2)}</td>
+                        </tr>`;
+                    }).join('');
+                }
+            }
+        }
+
+        function renderEarningsTable(data) {
+            const tbody = document.getElementById('earnings-table-body');
+            tbody.innerHTML = '';
+            
+            let total = 0;
+
+            data.forEach(row => {
+                total += row.amount;
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-white/5 transition-colors';
+                tr.dataset.userid = row.userId;
+                const affCell = IS_ADMIN ? `<td class="px-6 py-4 font-mono text-brand-500">${row.affiliate_code || row.afp || '—'}</td>` : '';
+                tr.innerHTML = `
+                    ${affCell}
+                    <td class="px-6 py-4 text-white font-medium">${row.userId}</td>
+                    <td class="px-6 py-4 text-gray-400">${formatDate(row.created)}</td>
+                    <td class="px-6 py-4 text-white">${formatCurrency(row.amount)}</td>
+                    <td class="px-6 py-4 text-gray-300"><span class="bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20">${row.type}</span></td>
+                    <td class="px-6 py-4 text-gray-500">${row.afp}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Total Row
+            const colSpan = IS_ADMIN ? 3 : 2;
+            const totalRow = document.createElement('tr');
+            totalRow.className = 'bg-white/5 font-bold';
+            totalRow.innerHTML = `
+                <td class="px-6 py-4 text-white" colspan="${colSpan}">Total</td>
+                <td class="px-6 py-4 text-brand-500">${formatCurrency(total)}</td>
+                <td class="px-6 py-4"></td>
+                <td class="px-6 py-4"></td>
+            `;
+            tbody.appendChild(totalRow);
+        }
+
+        function renderRegistrationsTable(data) {
+            const tbody = document.getElementById('registrations-table-body');
+            tbody.innerHTML = '';
+            
+            let totalDeposits = 0;
+            let totalCommissions = 0;
+
+            data.forEach(row => {
+                totalDeposits += row.firstDeposit || 0;
+                totalCommissions += row.commission || 0;
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-white/5 transition-colors';
+                tr.dataset.userid = row.userId;
+                const affCell = IS_ADMIN ? `<td class="px-6 py-4 font-mono text-brand-500">${row.affiliate_code || '—'}</td>` : '';
+                tr.innerHTML = `
+                    ${affCell}
+                    <td class="px-6 py-4 text-left">
+                        <div class="flex items-center gap-2">
+                            <span class="text-white">${row.country.name}</span> 
+                            <span class="text-[10px] text-gray-500">${row.country.code}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-gray-300 text-center">${row.userId}</td>
+                    <td class="px-6 py-4 text-gray-400 text-center text-[10px] uppercase font-mono">${new Date(row.date).toLocaleDateString()}</td>
+                    <td class="px-6 py-4 text-white text-center">${row.firstDeposit > 0 ? formatCurrency(row.firstDeposit) : '-'}</td>
+                    <td class="px-6 py-4 text-brand-500 font-bold text-center">${row.commission > 0 ? formatCurrency(row.commission) : '-'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Total Row
+            const colSpan = IS_ADMIN ? 4 : 3;
+            const totalRow = document.createElement('tr');
+            totalRow.className = 'bg-white/5 font-bold border-t border-white/10 sticky bottom-0 backdrop-blur-sm';
+            totalRow.innerHTML = `
+                <td class="px-6 py-4 text-white text-left uppercase tracking-wider text-[10px] text-gray-400" colspan="${colSpan}">Total</td>
+                <td class="px-6 py-4 text-white text-center">${formatCurrency(totalDeposits)}</td>
+                <td class="px-6 py-4 text-brand-500 text-center">${formatCurrency(totalCommissions)}</td>
+            `;
+            tbody.appendChild(totalRow);
+        }
+
+        /* Bind Run Report Button */
+        document.querySelector('button.btn-gradient').addEventListener('click', () => {
+             renderReports();
+             showToast("Report updated successfully", "success");
+        });
+
+        /* Bind Export Buttons */
+        // Functional CSV Export
+        function exportTableToCSV(filename, headers, rows) {
+            const csvContent = [
+                headers.join(','),
+                ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+            showToast(`${filename} downloaded!`, 'success');
+        }
+
+        document.querySelectorAll('button').forEach(btn => {
+            if(btn.textContent.includes('Export CSV')) {
+                btn.addEventListener('click', () => {
+                    const database = window.db || db;
+                    const dates = datePicker.selectedDates;
+                    const startDate = dates[0] || new Date(0);
+                    const endDate = dates[1] || new Date();
+                    endDate.setHours(23, 59, 59, 999);
+
+                    const isRegTab = document.getElementById('tab-registrations').classList.contains('active');
+                    const isPayTab = document.getElementById('tab-payouts').classList.contains('active');
+                    
+                    if (isPayTab) {
+                        const payouts = window._payoutReportData || [];
+                        if (!payouts.length) { showToast('No payout data to export', 'warn'); return; }
+                        const CRYPTO = { 'USDT-TRC20': 'USDT TRC-20', 'USDT-BEP20': 'USDT BEP-20', 'USDT-ERC20': 'USDT ERC-20', 'BTC-Native': 'BTC', 'ETH-ERC20': 'ETH', 'LTC-Native': 'LTC' };
+                        const headers = ['Date', 'Amount', 'Method', 'Wallet', 'Status', 'Notes'];
+                        const rows = payouts.map(p => [
+                            (p.payout_date || p.requested_at || '').split('T')[0],
+                            parseFloat(p.amount || 0).toFixed(2),
+                            CRYPTO[p.payment_method] || p.payment_method || '',
+                            p.wallet_address || '',
+                            p.status || '',
+                            p.notes || ''
+                        ]);
+                        exportTableToCSV('payouts_report.csv', headers, rows);
+                    } else if (isRegTab) {
+                        const filtered = database.registrations.filter(r => {
+                            const d = new Date(r.date);
+                            return d >= startDate && d <= endDate;
+                        });
+                        const headers = IS_ADMIN
+                            ? ['Affiliate', 'Country', 'Country Code', 'User ID', 'Created', 'First Deposit', 'Commission', 'Status']
+                            : ['Country', 'Country Code', 'User ID', 'Created', 'First Deposit', 'Commission', 'Status'];
+                        const rows = filtered.map(r => IS_ADMIN
+                            ? [r.affiliate_code || '', r.country.name, r.country.code, r.userId, r.date, r.firstDeposit, r.commission, r.status]
+                            : [r.country.name, r.country.code, r.userId, r.date, r.firstDeposit, r.commission, r.status]);
+                        exportTableToCSV('registrations_report.csv', headers, rows);
+                    } else {
+                        const filtered = database.earnings.filter(e => {
+                            const d = new Date(e.created);
+                            return d >= startDate && d <= endDate;
+                        });
+                        const headers = IS_ADMIN
+                            ? ['Affiliate', 'User ID', 'Created', 'Amount', 'Type', 'ID']
+                            : ['User ID', 'Created', 'Amount', 'Type', 'ID'];
+                        const rows = filtered.map(e => IS_ADMIN
+                            ? [e.affiliate_code || e.afp || '', e.userId, e.created, e.amount, e.type, e.afp]
+                            : [e.userId, e.created, e.amount, e.type, e.afp]);
+                        exportTableToCSV('earnings_report.csv', headers, rows);
+                    }
+                });
+            }
+            if(btn.textContent.includes('Download PDF')) {
+                btn.addEventListener('click', () => {
+                    exportReportPDF();
+                });
+            } 
+        });
+
+        function exportReportPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+            const database = window.db || db;
+            const dates = datePicker.selectedDates;
+            const startDate = dates[0] || new Date(0);
+            const endDate = dates[1] || new Date();
+            endDate.setHours(23, 59, 59, 999);
+
+            const dateLabel = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                + ' — ' + endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+            const isRegTab = document.getElementById('tab-registrations').classList.contains('active');
+            const isPayTab = document.getElementById('tab-payouts').classList.contains('active');
+
+            const reportTitle = isPayTab ? 'Payout Report' : isRegTab ? 'Registration Report' : 'Earnings Report';
+
+            // Header — white professional background
+            doc.setFillColor(255, 255, 255);
+            doc.rect(0, 0, 297, 210, 'F');
+
+            // Top red accent bar
+            doc.setFillColor(220, 38, 38);
+            doc.rect(0, 0, 297, 4, 'F');
+
+            doc.setTextColor(220, 38, 38);
+            doc.setFontSize(18);
+            doc.setFont('helvetica', 'bold');
+            doc.text('TFXS AFFILIATES', 14, 18);
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            doc.text(reportTitle, 14, 25);
+            doc.setTextColor(60, 60, 60);
+            doc.text(isPayTab ? 'All Payouts' : dateLabel, 14, 31);
+            doc.setDrawColor(230, 230, 230);
+            doc.setLineWidth(0.5);
+            doc.line(14, 35, 283, 35);
+
+            if (isPayTab) {
+                const payouts = window._payoutReportData || [];
+                if (!payouts.length) { showToast('No payout data to export', 'warn'); return; }
+                let totalPaid = 0, totalPending = 0;
+                const CRYPTO = { 'USDT-TRC20': 'USDT TRC-20', 'USDT-BEP20': 'USDT BEP-20', 'USDT-ERC20': 'USDT ERC-20', 'BTC-Native': 'BTC', 'ETH-ERC20': 'ETH', 'LTC-Native': 'LTC' };
+                const head = [['Date', 'Amount', 'Method', 'Wallet', 'Status', 'Notes']];
+                const body = payouts.map(p => {
+                    const amt = parseFloat(p.amount || 0);
+                    if (p.status === 'paid') totalPaid += amt;
+                    if (p.status === 'pending' || p.status === 'approved') totalPending += amt;
+                    const dateSource = p.payout_date || p.requested_at;
+                    return [
+                        new Date(dateSource).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
+                        '$' + amt.toFixed(2),
+                        CRYPTO[p.payment_method] || p.payment_method || '—',
+                        p.wallet_address ? (p.wallet_address.length > 30 ? p.wallet_address.substring(0, 14) + '...' + p.wallet_address.slice(-10) : p.wallet_address) : '—',
+                        (p.status || 'pending').toUpperCase(),
+                        p.notes || '—'
+                    ];
+                });
+                body.push(['TOTAL', '$' + (totalPaid + totalPending).toFixed(2), '', '', 'Paid: $' + totalPaid.toFixed(2), 'Pending: $' + totalPending.toFixed(2)]);
+                doc.autoTable({
+                    startY: 39,
+                    head: head,
+                    body: body,
+                    theme: 'grid',
+                    styles: { fillColor: [255, 255, 255], textColor: [50, 50, 50], fontSize: 8, cellPadding: 3, lineColor: [220, 220, 220], lineWidth: 0.2 },
+                    headStyles: { fillColor: [245, 245, 245], textColor: [30, 30, 30], fontStyle: 'bold', fontSize: 7 },
+                    alternateRowStyles: { fillColor: [250, 250, 250] },
+                    didParseCell: function(data) {
+                        if (data.row.index === body.length - 1) {
+                            data.cell.styles.fillColor = [255, 240, 240];
+                            data.cell.styles.textColor = [220, 38, 38];
+                            data.cell.styles.fontStyle = 'bold';
+                        }
+                    }
+                });
+                doc.save('TFXS_Payout_Report.pdf');
+            } else if (isRegTab) {
+                const filtered = database.registrations.filter(r => {
+                    const d = new Date(r.date);
+                    return d >= startDate && d <= endDate;
+                });
+                const totalDep = filtered.reduce((s, r) => s + (r.firstDeposit || 0), 0);
+                const totalComm = filtered.reduce((s, r) => s + (r.commission || 0), 0);
+
+                const head = IS_ADMIN
+                    ? [['Affiliate', 'Country', 'Code', 'User ID', 'Created', 'First Deposit', 'Commission', 'Status']]
+                    : [['Country', 'Code', 'User ID', 'Created', 'First Deposit', 'Commission', 'Status']];
+                const body = filtered.map(r => IS_ADMIN
+                    ? [r.affiliate_code || '', r.country.name, r.country.code, r.userId, new Date(r.date).toLocaleDateString(), r.firstDeposit > 0 ? '$' + r.firstDeposit.toFixed(2) : '-', r.commission > 0 ? '$' + r.commission.toFixed(2) : '-', r.status]
+                    : [r.country.name, r.country.code, r.userId, new Date(r.date).toLocaleDateString(), r.firstDeposit > 0 ? '$' + r.firstDeposit.toFixed(2) : '-', r.commission > 0 ? '$' + r.commission.toFixed(2) : '-', r.status]
+                );
+                const totalRow = IS_ADMIN
+                    ? ['TOTAL', '', '', filtered.length + ' regs', '', '$' + totalDep.toFixed(2), '$' + totalComm.toFixed(2), '']
+                    : ['TOTAL', '', filtered.length + ' regs', '', '$' + totalDep.toFixed(2), '$' + totalComm.toFixed(2), ''];
+                body.push(totalRow);
+
+                doc.autoTable({
+                    startY: 39,
+                    head: head,
+                    body: body,
+                    theme: 'grid',
+                    styles: { fillColor: [255, 255, 255], textColor: [50, 50, 50], fontSize: 8, cellPadding: 3, lineColor: [220, 220, 220], lineWidth: 0.2 },
+                    headStyles: { fillColor: [245, 245, 245], textColor: [30, 30, 30], fontStyle: 'bold', fontSize: 7 },
+                    alternateRowStyles: { fillColor: [250, 250, 250] },
+                    footStyles: { fillColor: [255, 240, 240], textColor: [220, 38, 38], fontStyle: 'bold' },
+                    didParseCell: function(data) {
+                        if (data.row.index === body.length - 1) {
+                            data.cell.styles.fillColor = [255, 240, 240];
+                            data.cell.styles.textColor = [220, 38, 38];
+                            data.cell.styles.fontStyle = 'bold';
+                        }
+                    }
+                });
+
+                doc.save('TFXS_Registration_Report.pdf');
+            } else {
+                const filtered = database.earnings.filter(e => {
+                    const d = new Date(e.created);
+                    return d >= startDate && d <= endDate;
+                });
+                const totalAmt = filtered.reduce((s, e) => s + e.amount, 0);
+
+                const head = IS_ADMIN
+                    ? [['Affiliate', 'User ID', 'Created', 'Amount', 'Commission Type', 'ID']]
+                    : [['User ID', 'Created', 'Amount', 'Commission Type', 'ID']];
+                const body = filtered.map(e => IS_ADMIN
+                    ? [e.affiliate_code || e.afp || '', e.userId, new Date(e.created).toLocaleDateString(), '$' + e.amount.toFixed(2), e.type, e.afp]
+                    : [e.userId, new Date(e.created).toLocaleDateString(), '$' + e.amount.toFixed(2), e.type, e.afp]
+                );
+                const totalRow = IS_ADMIN
+                    ? ['TOTAL', filtered.length + ' txns', '', '$' + totalAmt.toFixed(2), '', '']
+                    : ['TOTAL', filtered.length + ' txns', '$' + totalAmt.toFixed(2), '', ''];
+                body.push(totalRow);
+
+                doc.autoTable({
+                    startY: 39,
+                    head: head,
+                    body: body,
+                    theme: 'grid',
+                    styles: { fillColor: [255, 255, 255], textColor: [50, 50, 50], fontSize: 8, cellPadding: 3, lineColor: [220, 220, 220], lineWidth: 0.2 },
+                    headStyles: { fillColor: [245, 245, 245], textColor: [30, 30, 30], fontStyle: 'bold', fontSize: 7 },
+                    alternateRowStyles: { fillColor: [250, 250, 250] },
+                    didParseCell: function(data) {
+                        if (data.row.index === body.length - 1) {
+                            data.cell.styles.fillColor = [255, 240, 240];
+                            data.cell.styles.textColor = [220, 38, 38];
+                            data.cell.styles.fontStyle = 'bold';
+                        }
+                    }
+                });
+
+                doc.save('TFXS_Earnings_Report.pdf');
+            }
+
+            showToast('PDF downloaded!', 'success');
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+             renderReports();
+        });
+
+        // Server Time Clock
+        function updateServerTime() {
+            const timeElement = document.getElementById("server-time");
+            if (!timeElement) return;
+
+            const now = new Date();
+            
+            // Format time: HH:MM:SS
+            const timeString = now.toLocaleTimeString("en-US", { 
+                hour12: false, 
+                hour: "2-digit", 
+                minute: "2-digit", 
+                second: "2-digit" 
+            });
+
+            // Get Timezone offset (e.g. UTC+1)
+            const offset = -now.getTimezoneOffset() / 60;
+            const sign = offset >= 0 ? "+" : "-";
+            const absOffset = Math.abs(offset);
+            const timezoneString = `UTC${sign}${absOffset}`;
+
+            timeElement.textContent = `${timeString} ${timezoneString}`;
+        }
+
+        // Update immediately and then every second
+        updateServerTime();
+        setInterval(updateServerTime, 1000);
+    </script>
+
+    <script>
+    // ── Payout Report Logic ──
+    const CRYPTO_LABELS = { 'USDT-TRC20': 'USDT TRC-20', 'USDT-BEP20': 'USDT BEP-20', 'USDT-ERC20': 'USDT ERC-20', 'BTC-Native': 'BTC', 'ETH-ERC20': 'ETH', 'LTC-Native': 'LTC' };
+    window._payoutReportData = [];
+
+    async function loadPayoutReport() {
+        const tbody = document.getElementById('payouts-table-body');
+        const summary = document.getElementById('payout-report-summary');
+        if (!tbody) return;
+        tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-12 text-center text-gray-600">Loading payouts...</td></tr>';
+        try {
+            const API = window.TFXS_API;
+            if (!API) return;
+            const affiliateId = API.getAffiliateId();
+            const res = await API.fetchPayoutHistory(affiliateId);
+            if (!res.ok || !res.data || !res.data.length) {
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-12 text-center text-gray-600">No payouts found</td></tr>';
+                if (summary) summary.textContent = '';
+                return;
+            }
+            const payouts = res.data;
+            window._payoutReportData = payouts;
+            let totalPaid = 0, totalPending = 0;
+            tbody.innerHTML = payouts.map(p => {
+                const dateSource = p.payout_date || p.requested_at;
+                const date = new Date(dateSource).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                const amount = parseFloat(p.amount || 0);
+                if (p.status === 'paid') totalPaid += amount;
+                if (p.status === 'pending' || p.status === 'approved') totalPending += amount;
+                const method = CRYPTO_LABELS[p.payment_method] || p.payment_method || '—';
+                const statusColors = {
+                    pending: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20',
+                    approved: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
+                    paid: 'text-green-400 bg-green-500/10 border-green-500/20',
+                    rejected: 'text-red-400 bg-red-500/10 border-red-500/20'
+                };
+                const sc = statusColors[p.status] || statusColors.pending;
+                return `<tr class="border-b border-white/5 hover:bg-white/[0.02] transition">
+                    <td class="px-6 py-3 text-xs text-gray-300">${date}</td>
+                    <td class="px-6 py-3 text-xs text-center font-mono font-bold text-white">$${amount.toFixed(2)}</td>
+                    <td class="px-6 py-3 text-xs text-center text-gray-400">${method}</td>
+                    <td class="px-6 py-3 text-center"><span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full border ${sc}">${p.status}</span></td>
+                    <td class="px-6 py-3 text-xs text-center text-gray-500">${p.notes || '—'}</td>
+                    <td class="px-6 py-3 text-center">
+                        <button onclick='downloadPayoutInvoicePDF(${JSON.stringify(p).replace(/'/g, "&#39;")})' class="text-brand-500 hover:text-brand-400 transition text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-1 mx-auto">
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            PDF
+                        </button>
+                    </td>
+                </tr>`;
+            }).join('');
+            if (summary) summary.textContent = `Total Paid: $${totalPaid.toFixed(2)}  |  Pending: $${totalPending.toFixed(2)}  |  ${payouts.length} payout(s)`;
+        } catch (err) {
+            console.warn('[TFXS Reports] Payout load failed:', err);
+            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-12 text-center text-red-400">Failed to load payouts</td></tr>';
+        }
+    }
+
+    function downloadPayoutInvoicePDF(p) {
+        if (typeof jspdf === 'undefined' && typeof window.jspdf === 'undefined') { alert('PDF library not loaded'); return; }
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+        const W = 210, H = 297;
+
+        // ── White professional background ──
+        doc.setFillColor(255, 255, 255);
+        doc.rect(0, 0, W, H, 'F');
+
+        // ── Top red accent bar ──
+        doc.setFillColor(220, 38, 38);
+        doc.rect(0, 0, W, 4, 'F');
+
+        // ── Header section ──
+        doc.setFontSize(22);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(220, 38, 38);
+        doc.text('TFXS AFFILIATES', 20, 28);
+
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(120, 120, 120);
+        doc.text('Affiliate Performance Marketing', 20, 34);
+
+        // ── Invoice title (right side) ──
+        doc.setFontSize(28);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(40, 40, 40);
+        doc.text('INVOICE', W - 20, 28, { align: 'right' });
+
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(120, 120, 120);
+        const invoiceNum = (p.id || 'N/A').substring(0, 8).toUpperCase();
+        doc.text('#INV-' + invoiceNum, W - 20, 35, { align: 'right' });
+
+        // ── Divider line ──
+        doc.setDrawColor(230, 230, 230);
+        doc.setLineWidth(0.5);
+        doc.line(20, 42, W - 20, 42);
+
+        // ── Bill To / Invoice Info columns ──
+        const colLeft = 20, colRight = 120;
+        let y = 54;
+
+        // Left column — Bill To
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(120, 120, 120);
+        doc.text('BILLED TO', colLeft, y);
+        y += 7;
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(30, 30, 30);
+        const affiliateId = (typeof window.TFXS_API !== 'undefined' && window.TFXS_API.getAffiliateId) ? window.TFXS_API.getAffiliateId() : 'Affiliate';
+        const settings = JSON.parse(localStorage.getItem('tfxs_settings') || '{}');
+        const billName = settings.displayName || affiliateId;
+        doc.text(billName, colLeft, y);
+        y += 5;
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(100, 100, 100);
+        doc.text('ID: ' + affiliateId, colLeft, y);
+        y += 5;
+        if (settings.email) { doc.text(settings.email, colLeft, y); y += 5; }
+        if (settings.phone) { doc.text(settings.phone, colLeft, y); y += 5; }
+        // Structured address
+        const addrParts = [settings.address_street, [settings.address_city, settings.address_state].filter(Boolean).join(', '), settings.address_zip, settings.address_country].filter(Boolean);
+        if (addrParts.length) {
+            addrParts.forEach(part => { doc.text(part, colLeft, y); y += 4.5; });
+        }
+
+        // Right column — Invoice Details
+        let ry = 54;
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(120, 120, 120);
+        doc.text('INVOICE DETAILS', colRight, ry);
+        ry += 7;
+
+        const detailLabels = ['Invoice Date:', 'Payout Date:', 'Payment Date:', 'Status:'];
+        const invoiceDate = new Date(p.requested_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        const payoutDate = p.payout_date ? new Date(p.payout_date + 'T00:00:00').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : invoiceDate;
+        const paymentDate = p.paid_at ? new Date(p.paid_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '—';
+        const detailValues = [invoiceDate, payoutDate, paymentDate, (p.status || 'pending').toUpperCase()];
+
+        detailLabels.forEach((label, i) => {
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(100, 100, 100);
+            doc.text(label, colRight, ry);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(30, 30, 30);
+            doc.text(detailValues[i], colRight + 35, ry);
+            ry += 7;
+        });
+
+        // ── Payment Details Box ──
+        let boxY = Math.max(y, ry) + 10;
+
+        // Table header
+        doc.setFillColor(245, 245, 245);
+        doc.roundedRect(20, boxY, W - 40, 12, 2, 2, 'F');
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(80, 80, 80);
+        doc.text('DESCRIPTION', 25, boxY + 8);
+        doc.text('METHOD', 95, boxY + 8);
+        doc.text('AMOUNT', W - 25, boxY + 8, { align: 'right' });
+
+        // Table row
+        boxY += 16;
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(40, 40, 40);
+        doc.text('Affiliate Commission Payout', 25, boxY);
+        const method = CRYPTO_LABELS[p.payment_method] || p.payment_method || '—';
+        doc.text(method, 95, boxY);
+        doc.setFont('helvetica', 'bold');
+        doc.text('$' + parseFloat(p.amount).toFixed(2), W - 25, boxY, { align: 'right' });
+
+        // Separator line
+        boxY += 6;
+        doc.setDrawColor(230, 230, 230);
+        doc.line(20, boxY, W - 20, boxY);
+
+        // Total row
+        boxY += 10;
+        doc.setFillColor(220, 38, 38);
+        doc.roundedRect(W - 90, boxY - 6, 70, 14, 2, 2, 'F');
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(255, 255, 255);
+        doc.text('TOTAL:  $' + parseFloat(p.amount).toFixed(2), W - 55, boxY + 2, { align: 'center' });
+
+        // ── Wallet Info ──
+        boxY += 22;
+        doc.setFillColor(250, 250, 250);
+        doc.roundedRect(20, boxY, W - 40, 22, 3, 3, 'F');
+        doc.setDrawColor(230, 230, 230);
+        doc.roundedRect(20, boxY, W - 40, 22, 3, 3, 'S');
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(120, 120, 120);
+        doc.text('WALLET ADDRESS', 25, boxY + 8);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(40, 40, 40);
+        const wallet = p.wallet_address || '—';
+        const walletTrunc = wallet.length > 60 ? wallet.substring(0, 30) + '...' + wallet.substring(wallet.length - 20) : wallet;
+        doc.text(walletTrunc, 25, boxY + 16);
+
+        // ── Notes (if any) ──
+        if (p.notes) {
+            boxY += 30;
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(120, 120, 120);
+            doc.text('NOTES', 20, boxY);
+            boxY += 6;
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(80, 80, 80);
+            const noteLines = doc.splitTextToSize(p.notes, W - 40);
+            noteLines.forEach(line => { doc.text(line, 20, boxY); boxY += 5; });
+        }
+
+        // ── Footer ──
+        // Bottom accent bar
+        doc.setFillColor(220, 38, 38);
+        doc.rect(0, H - 20, W, 20, 'F');
+
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(255, 255, 255);
+        doc.text('TFXS AFFILIATES', 20, H - 10);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7);
+        doc.text('This is a computer-generated invoice. No signature required.', W - 20, H - 10, { align: 'right' });
+
+        // Subtle watermark line above footer
+        doc.setDrawColor(230, 230, 230);
+        doc.line(20, H - 25, W - 20, H - 25);
+        doc.setFontSize(7);
+        doc.setTextColor(180, 180, 180);
+        doc.text('Generated on ' + new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) + ' — TFXS Affiliates Platform', W / 2, H - 28, { align: 'center' });
+
+        doc.save('TFXS-Invoice-' + invoiceNum + '.pdf');
+    }
+    </script>
+
+    <!-- Live Data Connectors -->
+    <script src="js/theme.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/settings-loader.js"></script>
+    <script src="js/reports.js"></script>
+</body>
+</html>

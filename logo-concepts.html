@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TFXS — Logo Concepts</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #050505;
+            color: #d4d4d8;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .halo-bg {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(ellipse 140% 70% at 50% -5%, rgba(220,38,38,0.14) 0%, rgba(220,38,38,0.04) 38%, rgba(220,38,38,0) 100%);
+            z-index: -1; pointer-events: none;
+        }
+        header {
+            text-align: center;
+            padding: 60px 20px 20px;
+        }
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.02em;
+        }
+        header p {
+            color: #71717a;
+            font-size: 0.85rem;
+            margin-top: 8px;
+            font-weight: 300;
+        }
+        .grid {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 32px;
+        }
+        .card {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .card:hover {
+            border-color: rgba(220,38,38,0.3);
+            box-shadow: 0 0 40px rgba(220,38,38,0.08);
+            transform: translateY(-4px);
+        }
+        .card h3 {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #ef4444;
+            margin-bottom: 8px;
+        }
+        .card .subtitle {
+            font-size: 0.65rem;
+            color: #52525b;
+            margin-bottom: 30px;
+        }
+        .logo-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+        }
+        .card .notes {
+            margin-top: 24px;
+            font-size: 0.7rem;
+            color: #71717a;
+            line-height: 1.6;
+            text-align: left;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 16px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.55rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .badge-current { background: rgba(255,255,255,0.08); color: #71717a; }
+        .badge-new { background: rgba(220,38,38,0.15); color: #ef4444; }
+
+        /* ─── Animations for logos ─── */
+        @keyframes glow-pulse {
+            0%, 100% { filter: drop-shadow(0 0 12px rgba(220,38,38,0.4)); }
+            50% { filter: drop-shadow(0 0 25px rgba(220,38,38,0.7)); }
+        }
+        @keyframes ring-rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes dash-spin {
+            to { stroke-dashoffset: 0; }
+        }
+        @keyframes shimmer-sweep {
+            0% { transform: translateX(-150%) skewX(12deg); }
+            100% { transform: translateX(250%) skewX(12deg); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        .full-width .logo-wrap {
+            min-height: 280px;
+            gap: 60px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="halo-bg"></div>
+
+    <header>
+        <h1>TFXS Logo Concepts</h1>
+        <p>Redesigned to match the TFXS Affiliates premium dashboard aesthetic</p>
+    </header>
+
+    <div class="grid">
+
+        <!-- ═══ CONCEPT 1 — Current Logo (reference) ═══ -->
+        <div class="card">
+            <h3><span class="badge badge-current">Current</span> &nbsp; Logo Actuel</h3>
+            <p class="subtitle">Le logo SVG actuellement utilisé sur le site</p>
+            <div class="logo-wrap">
+                <img src="assets/logo.svg" alt="Current Logo" style="width: 120px; height: 120px;">
+            </div>
+            <div class="notes">
+                Triangle rouge + jaune, texte TFXS. Simple et fonctionnel mais manque de profondeur et d'impact.
+            </div>
+        </div>
+
+        <!-- ═══ CONCEPT 2 — Neon Triangle ═══ -->
+        <div class="card">
+            <h3><span class="badge badge-new">Concept A</span> &nbsp; Neon Triangle</h3>
+            <p class="subtitle">Triangle néon avec glow animé — écho à l'image originale</p>
+            <div class="logo-wrap">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="180" height="180" style="animation: glow-pulse 3s ease-in-out infinite;">
+                    <defs>
+                        <linearGradient id="neon-red" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#ff4444"/>
+                            <stop offset="100%" stop-color="#dc2626"/>
+                        </linearGradient>
+                        <linearGradient id="neon-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#fbbf24"/>
+                            <stop offset="50%" stop-color="#f59e0b"/>
+                            <stop offset="100%" stop-color="#d97706"/>
+                        </linearGradient>
+                        <filter id="glow-a">
+                            <feGaussianBlur stdDeviation="3" result="blur"/>
+                            <feMerge>
+                                <feMergeNode in="blur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                        <filter id="heavy-glow">
+                            <feGaussianBlur stdDeviation="8" result="blur"/>
+                            <feMerge>
+                                <feMergeNode in="blur"/>
+                                <feMergeNode in="blur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    <!-- Dark background -->
+                    <rect width="200" height="200" rx="32" fill="#0a0a0a"/>
+                    <!-- Subtle red ring behind -->
+                    <circle cx="100" cy="95" r="70" fill="none" stroke="rgba(220,38,38,0.08)" stroke-width="1"/>
+                    <circle cx="100" cy="95" r="55" fill="none" stroke="rgba(220,38,38,0.05)" stroke-width="0.5"/>
+                    <!-- Outer triangle — red glow -->
+                    <path d="M100 28 L165 135 H35 Z" fill="none" stroke="url(#neon-red)" stroke-width="3" stroke-linejoin="round" filter="url(#glow-a)"/>
+                    <!-- Inner triangle — gold -->
+                    <path d="M100 50 L148 120 H52 Z" fill="none" stroke="url(#neon-gold)" stroke-width="2.5" stroke-linejoin="round" filter="url(#glow-a)"/>
+                    <!-- Filled inner core -->
+                    <path d="M100 60 L138 115 H62 Z" fill="url(#neon-red)" opacity="0.12"/>
+                    <!-- TFXS text -->
+                    <text x="100" y="170" text-anchor="middle" fill="white" font-family="Inter,Arial,sans-serif" font-size="26" font-weight="900" letter-spacing="4">TFXS</text>
+                    <!-- Subtle corner accents -->
+                    <path d="M8 40 V8 H40" fill="none" stroke="rgba(220,38,38,0.2)" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M192 40 V8 H160" fill="none" stroke="rgba(220,38,38,0.2)" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M8 160 V192 H40" fill="none" stroke="rgba(220,38,38,0.2)" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M192 160 V192 H160" fill="none" stroke="rgba(220,38,38,0.2)" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="notes">
+                Triangles néon imbriqués (rouge + or) comme l'image originale, mais épuré et flat. Effet glow animé subtil. Coins tech avec accents rouges.
+            </div>
+        </div>
+
+        <!-- ═══ CONCEPT 3 — Minimal Shield ═══ -->
+        <div class="card">
+            <h3><span class="badge badge-new">Concept B</span> &nbsp; Glass Shield</h3>
+            <p class="subtitle">Bouclier premium glassmorphism — confiance & sécurité</p>
+            <div class="logo-wrap">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="180" height="180" style="animation: float 4s ease-in-out infinite;">
+                    <defs>
+                        <linearGradient id="shield-red" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#ef4444"/>
+                            <stop offset="100%" stop-color="#991b1b"/>
+                        </linearGradient>
+                        <linearGradient id="shield-glass" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="rgba(255,255,255,0.15)"/>
+                            <stop offset="100%" stop-color="rgba(255,255,255,0.02)"/>
+                        </linearGradient>
+                        <filter id="glow-b">
+                            <feGaussianBlur stdDeviation="4" result="blur"/>
+                            <feMerge>
+                                <feMergeNode in="blur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    <rect width="200" height="200" rx="32" fill="#0a0a0a"/>
+                    <!-- Glow behind shield -->
+                    <ellipse cx="100" cy="95" rx="50" ry="55" fill="rgba(220,38,38,0.06)"/>
+                    <!-- Shield shape -->
+                    <path d="M100 25 L155 55 V110 C155 140 130 160 100 175 C70 160 45 140 45 110 V55 Z" fill="url(#shield-red)" opacity="0.9" filter="url(#glow-b)"/>
+                    <!-- Glass overlay on shield -->
+                    <path d="M100 30 L150 57 V110 C150 137 127 155 100 170 C73 155 50 137 50 110 V57 Z" fill="url(#shield-glass)"/>
+                    <!-- Inner triangle -->
+                    <path d="M100 60 L130 110 H70 Z" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linejoin="round" opacity="0.9"/>
+                    <path d="M100 70 L122 105 H78 Z" fill="rgba(251,191,36,0.1)"/>
+                    <!-- TFXS text inside shield -->
+                    <text x="100" y="145" text-anchor="middle" fill="white" font-family="Inter,Arial,sans-serif" font-size="16" font-weight="800" letter-spacing="3" opacity="0.9">TFXS</text>
+                    <!-- Brand text below -->
+                    <text x="100" y="192" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-family="Inter,Arial,sans-serif" font-size="8" font-weight="600" letter-spacing="5">AFFILIATES</text>
+                </svg>
+            </div>
+            <div class="notes">
+                Bouclier = confiance, protection des commissions. Triangle or à l'intérieur garde le DNA TFXS. Style glassmorphism cohérent avec les panels du dashboard.
+            </div>
+        </div>
+
+        <!-- ═══ CONCEPT 4 — Circuit Triangle ═══ -->
+        <div class="card">
+            <h3><span class="badge badge-new">Concept C</span> &nbsp; Tech Circuit</h3>
+            <p class="subtitle">Triangle avec circuits tech — fintech & innovation</p>
+            <div class="logo-wrap">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="180" height="180">
+                    <defs>
+                        <linearGradient id="circuit-red" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#ff3333"/>
+                            <stop offset="100%" stop-color="#dc2626"/>
+                        </linearGradient>
+                        <linearGradient id="circuit-gold" x1="0%" y1="100%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#f59e0b"/>
+                            <stop offset="100%" stop-color="#fbbf24"/>
+                        </linearGradient>
+                        <filter id="glow-c">
+                            <feGaussianBlur stdDeviation="2.5" result="blur"/>
+                            <feMerge>
+                                <feMergeNode in="blur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    <rect width="200" height="200" rx="32" fill="#0a0a0a"/>
+                    <!-- Rotating ring -->
+                    <g style="transform-origin: 100px 90px; animation: ring-rotate 20s linear infinite;">
+                        <circle cx="100" cy="90" r="78" fill="none" stroke="rgba(220,38,38,0.1)" stroke-width="0.5" stroke-dasharray="4 8"/>
+                    </g>
+                    <g style="transform-origin: 100px 90px; animation: ring-rotate 30s linear infinite reverse;">
+                        <circle cx="100" cy="90" r="68" fill="none" stroke="rgba(220,38,38,0.06)" stroke-width="0.5" stroke-dasharray="2 12"/>
+                    </g>
+                    <!-- Main triangle -->
+                    <path d="M100 22 L170 140 H30 Z" fill="rgba(220,38,38,0.08)" stroke="url(#circuit-red)" stroke-width="2" stroke-linejoin="round" filter="url(#glow-c)"/>
+                    <!-- Circuit lines from triangle -->
+                    <line x1="100" y1="22" x2="100" y2="8" stroke="rgba(220,38,38,0.3)" stroke-width="1"/>
+                    <circle cx="100" cy="7" r="2" fill="#ef4444"/>
+                    <line x1="170" y1="140" x2="184" y2="140" stroke="rgba(220,38,38,0.3)" stroke-width="1"/>
+                    <circle cx="185" cy="140" r="2" fill="#ef4444"/>
+                    <line x1="30" y1="140" x2="16" y2="140" stroke="rgba(220,38,38,0.3)" stroke-width="1"/>
+                    <circle cx="15" cy="140" r="2" fill="#ef4444"/>
+                    <!-- Inner gold triangle -->
+                    <path d="M100 52 L145 125 H55 Z" fill="none" stroke="url(#circuit-gold)" stroke-width="2" stroke-linejoin="round" filter="url(#glow-c)"/>
+                    <!-- Core dot -->
+                    <circle cx="100" cy="90" r="4" fill="#fbbf24" filter="url(#glow-c)"/>
+                    <circle cx="100" cy="90" r="8" fill="none" stroke="rgba(251,191,36,0.3)" stroke-width="0.5"/>
+                    <!-- TFXS text -->
+                    <text x="100" y="170" text-anchor="middle" fill="white" font-family="Inter,Arial,sans-serif" font-size="24" font-weight="900" letter-spacing="5">TFXS</text>
+                    <!-- Subtle tagline -->
+                    <text x="100" y="185" text-anchor="middle" fill="rgba(255,255,255,0.15)" font-family="Inter,Arial,sans-serif" font-size="6" font-weight="500" letter-spacing="4">ELITE AFFILIATES</text>
+                </svg>
+            </div>
+            <div class="notes">
+                Reprend l'esthétique 3D/tech de l'image originale en version flat. Anneaux rotatifs = données en temps réel. Nodes circuit = réseau d'affiliés. Triangle double = CPA tiers.
+            </div>
+        </div>
+
+        <!-- ═══ CONCEPT 5 — Monogram Mark ═══ -->
+        <div class="card">
+            <h3><span class="badge badge-new">Concept D</span> &nbsp; Premium Monogram</h3>
+            <p class="subtitle">Mark minimaliste — scalable pour favicon & branding</p>
+            <div class="logo-wrap">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="180" height="180">
+                    <defs>
+                        <linearGradient id="mono-red" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#ef4444"/>
+                            <stop offset="50%" stop-color="#dc2626"/>
+                            <stop offset="100%" stop-color="#b91c1c"/>
+                        </linearGradient>
+                        <linearGradient id="mono-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#fde68a"/>
+                            <stop offset="50%" stop-color="#fbbf24"/>
+                            <stop offset="100%" stop-color="#d97706"/>
+                        </linearGradient>
+                        <filter id="glow-d">
+                            <feGaussianBlur stdDeviation="3" result="blur"/>
+                            <feMerge>
+                                <feMergeNode in="blur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    <rect width="200" height="200" rx="32" fill="#0a0a0a"/>
+                    <!-- Outer border glow -->
+                    <rect x="6" y="6" width="188" height="188" rx="28" fill="none" stroke="url(#mono-red)" stroke-width="1.5" opacity="0.25"/>
+                    <!-- Background subtle gradient -->
+                    <rect x="12" y="12" width="176" height="176" rx="24" fill="rgba(220,38,38,0.03)"/>
+                    <!-- Large stylized T with triangle crossbar -->
+                    <g filter="url(#glow-d)">
+                        <!-- T vertical stroke -->
+                        <rect x="90" y="50" width="20" height="80" rx="3" fill="url(#mono-red)"/>
+                        <!-- T horizontal stroke -->
+                        <rect x="52" y="42" width="96" height="16" rx="3" fill="url(#mono-red)"/>
+                        <!-- Triangle accent replacing bottom of T -->
+                        <path d="M100 100 L120 130 H80 Z" fill="url(#mono-gold)" opacity="0.9"/>
+                    </g>
+                    <!-- Decorative dots -->
+                    <circle cx="52" cy="50" r="2" fill="rgba(251,191,36,0.5)"/>
+                    <circle cx="148" cy="50" r="2" fill="rgba(251,191,36,0.5)"/>
+                    <!-- TFXS text -->
+                    <text x="100" y="167" text-anchor="middle" fill="white" font-family="Inter,Arial,sans-serif" font-size="20" font-weight="900" letter-spacing="6">TFXS</text>
+                    <!-- Underline accent -->
+                    <line x1="65" y1="175" x2="135" y2="175" stroke="url(#mono-red)" stroke-width="1.5" opacity="0.4"/>
+                </svg>
+            </div>
+            <div class="notes">
+                Le T stylisé fusionne avec un triangle or descendant. Ultra clean, scale parfaitement en 16px favicon. La lettre T = Trade, le triangle = croissance/tiers.
+            </div>
+        </div>
+
+        <!-- ═══ CONCEPT 6 — Hexagonal Badge ═══ -->
+        <div class="card">
+            <h3><span class="badge badge-new">Concept E</span> &nbsp; Hex Badge</h3>
+            <p class="subtitle">Badge hexagonal — premium club membership feel</p>
+            <div class="logo-wrap">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="180" height="180" style="animation: float 5s ease-in-out infinite;">
+                    <defs>
+                        <linearGradient id="hex-red" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#ef4444"/>
+                            <stop offset="100%" stop-color="#7f1d1d"/>
+                        </linearGradient>
+                        <linearGradient id="hex-shine" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="rgba(255,255,255,0.2)"/>
+                            <stop offset="50%" stop-color="rgba(255,255,255,0.05)"/>
+                            <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+                        </linearGradient>
+                        <filter id="glow-e">
+                            <feGaussianBlur stdDeviation="5" result="blur"/>
+                            <feMerge>
+                                <feMergeNode in="blur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                        <clipPath id="hex-clip">
+                            <path d="M100 15 L170 50 V130 L100 165 L30 130 V50 Z"/>
+                        </clipPath>
+                    </defs>
+                    <rect width="200" height="200" rx="32" fill="#0a0a0a"/>
+                    <!-- Hex glow -->
+                    <path d="M100 20 L165 52 V128 L100 160 L35 128 V52 Z" fill="rgba(220,38,38,0.06)" filter="url(#glow-e)"/>
+                    <!-- Hex border -->
+                    <path d="M100 20 L165 52 V128 L100 160 L35 128 V52 Z" fill="none" stroke="url(#hex-red)" stroke-width="2" stroke-linejoin="round"/>
+                    <!-- Inner hex fill -->
+                    <path d="M100 28 L158 56 V124 L100 152 L42 124 V56 Z" fill="rgba(220,38,38,0.05)"/>
+                    <!-- Glass highlight -->
+                    <path d="M100 28 L158 56 V90 L100 90 L42 90 V56 Z" fill="url(#hex-shine)" clip-path="url(#hex-clip)"/>
+                    <!-- Central triangle -->
+                    <path d="M100 50 L135 110 H65 Z" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linejoin="round" opacity="0.8"/>
+                    <path d="M100 62 L127 105 H73 Z" fill="rgba(251,191,36,0.08)"/>
+                    <!-- Center dot cluster -->
+                    <circle cx="100" cy="85" r="3" fill="#fbbf24" opacity="0.6"/>
+                    <!-- Text -->
+                    <text x="100" y="140" text-anchor="middle" fill="white" font-family="Inter,Arial,sans-serif" font-size="14" font-weight="800" letter-spacing="4">TFXS</text>
+                    <!-- Bottom label -->
+                    <text x="100" y="188" text-anchor="middle" fill="rgba(255,255,255,0.2)" font-family="Inter,Arial,sans-serif" font-size="7" font-weight="600" letter-spacing="6">AFFILIATES</text>
+                </svg>
+            </div>
+            <div class="notes">
+                Hexagone = badge élite, membership exclusif. Reflet glass en haut = premium feel. Triangle or centré garde le lien avec l'identité TFXS.
+            </div>
+        </div>
+
+        <!-- ═══ FULL WIDTH — All variants side by side ═══ -->
+        <div class="card full-width">
+            <h3>Comparaison — Navbar Scale (40×40px)</h3>
+            <p class="subtitle">Comment chaque concept render en petite taille dans la barre de navigation</p>
+            <div class="logo-wrap" style="gap: 40px; padding: 20px 0;">
+                <!-- Current -->
+                <div style="text-align:center">
+                    <img src="assets/logo.svg" alt="Current" style="width:40px; height:40px; border-radius:8px;">
+                    <div style="font-size:9px; color:#52525b; margin-top:8px;">Actuel</div>
+                </div>
+                <!-- Concept A -->
+                <div style="text-align:center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="40" height="40">
+                        <defs>
+                            <linearGradient id="sm-a1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff4444"/><stop offset="100%" stop-color="#dc2626"/></linearGradient>
+                            <linearGradient id="sm-a2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#d97706"/></linearGradient>
+                        </defs>
+                        <rect width="200" height="200" rx="32" fill="#0a0a0a"/>
+                        <path d="M100 28 L165 135 H35 Z" fill="none" stroke="url(#sm-a1)" stroke-width="5" stroke-linejoin="round"/>
+                        <path d="M100 50 L148 120 H52 Z" fill="none" stroke="url(#sm-a2)" stroke-width="4" stroke-linejoin="round"/>
+                        <text x="100" y="173" text-anchor="middle" fill="white" font-family="Inter,sans-serif" font-size="28" font-weight="900" letter-spacing="4">TFXS</text>
+                    </svg>
+                    <div style="font-size:9px; color:#ef4444; margin-top:8px;">A</div>
+                </div>
+                <!-- Concept B -->
+                <div style="text-align:center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="40" height="40">
+                        <defs>
+                            <linearGradient id="sm-b1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ef4444"/><stop offset="100%" stop-color="#991b1b"/></linearGradient>
+                        </defs>
+                        <rect width="200" height="200" rx="32" fill="#0a0a0a"/>
+                        <path d="M100 25 L155 55 V110 C155 140 130 160 100 175 C70 160 45 140 45 110 V55 Z" fill="url(#sm-b1)" opacity="0.9"/>
+                        <path d="M100 60 L130 110 H70 Z" fill="none" stroke="#fbbf24" stroke-width="4" stroke-linejoin="round"/>
+                        <text x="100" y="148" text-anchor="middle" fill="white" font-family="Inter,sans-serif" font-size="20" font-weight="800" letter-spacing="3">TFXS</text>
+                    </svg>
+                    <div style="font-size:9px; color:#ef4444; margin-top:8px;">B</div>
+                </div>
+                <!-- Concept C -->
+                <div style="text-align:center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="40" height="40">
+                        <defs>
+                            <linearGradient id="sm-c1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff3333"/><stop offset="100%" stop-color="#dc2626"/></linearGradient>
+                            <linearGradient id="sm-c2" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient>
+                        </defs>
+                        <rect width="200" height="200" rx="32" fill="#0a0a0a"/>
+                        <path d="M100 22 L170 140 H30 Z" fill="rgba(220,38,38,0.1)" stroke="url(#sm-c1)" stroke-width="4" stroke-linejoin="round"/>
+                        <path d="M100 52 L145 125 H55 Z" fill="none" stroke="url(#sm-c2)" stroke-width="3" stroke-linejoin="round"/>
+                        <circle cx="100" cy="90" r="5" fill="#fbbf24"/>
+                        <text x="100" y="173" text-anchor="middle" fill="white" font-family="Inter,sans-serif" font-size="26" font-weight="900" letter-spacing="5">TFXS</text>
+                    </svg>
+                    <div style="font-size:9px; color:#ef4444; margin-top:8px;">C</div>
+                </div>
+                <!-- Concept D -->
+                <div style="text-align:center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="40" height="40">
+                        <defs>
+                            <linearGradient id="sm-d1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ef4444"/><stop offset="100%" stop-color="#b91c1c"/></linearGradient>
+                            <linearGradient id="sm-d2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fde68a"/><stop offset="100%" stop-color="#d97706"/></linearGradient>
+                        </defs>
+                        <rect width="200" height="200" rx="32" fill="#0a0a0a"/>
+                        <rect x="6" y="6" width="188" height="188" rx="28" fill="none" stroke="url(#sm-d1)" stroke-width="2" opacity="0.3"/>
+                        <rect x="90" y="50" width="20" height="80" rx="3" fill="url(#sm-d1)"/>
+                        <rect x="52" y="42" width="96" height="16" rx="3" fill="url(#sm-d1)"/>
+                        <path d="M100 100 L120 130 H80 Z" fill="url(#sm-d2)"/>
+                        <text x="100" y="170" text-anchor="middle" fill="white" font-family="Inter,sans-serif" font-size="22" font-weight="900" letter-spacing="6">TFXS</text>
+                    </svg>
+                    <div style="font-size:9px; color:#ef4444; margin-top:8px;">D</div>
+                </div>
+                <!-- Concept E -->
+                <div style="text-align:center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="40" height="40">
+                        <defs>
+                            <linearGradient id="sm-e1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ef4444"/><stop offset="100%" stop-color="#7f1d1d"/></linearGradient>
+                        </defs>
+                        <rect width="200" height="200" rx="32" fill="#0a0a0a"/>
+                        <path d="M100 20 L165 52 V128 L100 160 L35 128 V52 Z" fill="rgba(220,38,38,0.06)" stroke="url(#sm-e1)" stroke-width="3" stroke-linejoin="round"/>
+                        <path d="M100 50 L135 110 H65 Z" fill="none" stroke="#fbbf24" stroke-width="3" stroke-linejoin="round"/>
+                        <text x="100" y="143" text-anchor="middle" fill="white" font-family="Inter,sans-serif" font-size="16" font-weight="800" letter-spacing="4">TFXS</text>
+                    </svg>
+                    <div style="font-size:9px; color:#ef4444; margin-top:8px;">E</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer style="text-align:center; padding: 40px 20px 60px; color:#3f3f46; font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase;">
+        TFXS Affiliates — Logo Concept Sheet — Internal Use Only
+    </footer>
+</body>
+</html>

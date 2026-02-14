@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TFXS — Chart Preview (Busy Month)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.highcharts.com/11/highcharts.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { background: #050505; font-family: 'Inter', system-ui, sans-serif; margin: 0; min-height: 100vh; }
+        .glass-panel { background: rgba(255,255,255,0.03); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); border: 1px solid rgba(255,255,255,0.06); }
+        .halo-bg { position: fixed; top: -40%; left: 50%; transform: translateX(-50%); width: 900px; height: 900px; background: radial-gradient(circle, rgba(220,38,38,0.08) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+    </style>
+</head>
+<body class="text-white">
+    <div class="halo-bg"></div>
+
+    <div class="relative z-10 max-w-[1400px] mx-auto px-6 py-10">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-2xl font-bold tracking-tight">📊 Chart Preview — Busy Month Simulation</h1>
+            <p class="text-sm text-gray-500 font-mono mt-1">January 2026 • $50,000+ Commission • Daily registrations & deposits</p>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex flex-wrap items-center gap-4 mb-6">
+            <button onclick="generate('normal')" class="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg bg-red-600 hover:bg-red-500 text-white transition">🔄 Regenerate Data</button>
+            <button onclick="generate('spike')" class="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg bg-white/10 hover:bg-white/15 text-white transition border border-white/10">📈 With Spikes</button>
+            <button onclick="generate('ramp')" class="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg bg-white/10 hover:bg-white/15 text-white transition border border-white/10">🚀 Ramp Up</button>
+            <div class="ml-auto flex items-center gap-3 text-xs text-gray-400 font-mono">
+                <span id="stats-comm">—</span>
+                <span class="text-white/20">|</span>
+                <span id="stats-reg">—</span>
+                <span class="text-white/20">|</span>
+                <span id="stats-ftd">—</span>
+            </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="glass-panel rounded-2xl p-5 border border-white/5">
+            <div class="flex justify-between items-center mb-3">
+                <div>
+                    <h3 class="text-lg font-bold text-white">Revenue Analytics</h3>
+                    <p class="text-[10px] text-gray-500 font-mono uppercase mt-0.5">Simulated Data — January 2026</p>
+                </div>
+                <div class="flex items-center gap-5">
+                    <button onclick="toggleSeries(0)" class="legend-btn flex items-center gap-1.5 cursor-pointer opacity-100 transition" data-idx="0">
+                        <span class="w-2.5 h-2.5 rounded-full" style="background:#E53935"></span>
+                        <span class="text-[11px] text-gray-400 font-medium tracking-wide">Commission</span>
+                    </button>
+                    <button onclick="toggleSeries(1)" class="legend-btn flex items-center gap-1.5 cursor-pointer opacity-100 transition" data-idx="1">
+                        <span class="w-2.5 h-2.5 rounded-full" style="background:#FBC02D"></span>
+                        <span class="text-[11px] text-gray-400 font-medium tracking-wide">Registrations</span>
+                    </button>
+                </div>
+            </div>
+            <div style="height: 480px;" id="chartContainer"></div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mt-6" id="summary-cards"></div>
+    </div>
+
+    <script>
+        let chart;
+
+        function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+        function randFloat(min, max) { return Math.random() * (max - min) + min; }
+
+        function generateData(mode) {
+            const days = 31;
+            const labels = [];
+            const commData = [];
+            const regData = [];
+
+            let totalComm = 0;
+            let totalReg = 0;
+            let totalFTD = 0;
+
+            for (let i = 1; i <= days; i++) {
+                const label = `Jan ${String(i).padStart(2, '0')}`;
+                labels.push(label);
+
+                let comm, regs;
+
+                if (mode === 'spike') {
+                    // Base + random spikes
+                    comm = randFloat(800, 1800);
+                    regs = rand(3, 12);
+                    // Spike days
+                    if (i === 5 || i === 12 || i === 20 || i === 28) {
+                        comm = randFloat(4000, 7000);
+                        regs = rand(20, 35);
+                    }
+                    if (i === 15) { comm = randFloat(6000, 9000); regs = rand(30, 50); }
+                } else if (mode === 'ramp') {
+                    // Gradual ramp up through the month
+                    const progress = i / days;
+                    const base = 400 + progress * 2500;
+                    comm = randFloat(base * 0.7, base * 1.3);
+                    regs = rand(Math.floor(2 + progress * 15), Math.ceil(5 + progress * 25));
+                } else {
+                    // Normal busy month
+                    comm = randFloat(1000, 2800);
+                    regs = rand(5, 18);
+                    // Weekends slightly lower
+                    const dow = new Date(2026, 0, i).getDay();
+                    if (dow === 0 || dow === 6) {
+                        comm *= 0.5;
+                        regs = Math.max(1, Math.floor(regs * 0.4));
+                    }
+                }
+
+                commData.push(Math.round(comm));
+                regData.push(regs);
+                totalComm += comm;
+                totalReg += regs;
+                totalFTD += Math.floor(regs * randFloat(0.2, 0.5));
+            }
+
+            return { labels, commData, regData, totalComm: Math.round(totalComm), totalReg, totalFTD };
+        }
+
+        function smartRegTick(maxReg) {
+            if (maxReg <= 0) return { interval: 1, max: 2 };
+            if (maxReg <= 5) return { interval: 1, max: maxReg + 1 };
+            if (maxReg <= 10) return { interval: 1, max: maxReg + 1 };
+            if (maxReg <= 20) return { interval: 2, max: Math.ceil(maxReg / 2) * 2 + 2 };
+            if (maxReg <= 50) return { interval: 5, max: Math.ceil(maxReg / 5) * 5 + 5 };
+            if (maxReg <= 100) return { interval: 10, max: Math.ceil(maxReg / 10) * 10 + 10 };
+            const mag = Math.pow(10, Math.floor(Math.log10(maxReg)));
+            const interval = Math.ceil(maxReg / mag) > 5 ? mag : mag / 2;
+            return { interval, max: Math.ceil(maxReg / interval) * interval + interval };
+        }
+
+        function updateStats(data) {
+            document.getElementById('stats-comm').textContent = `Commission: $${data.totalComm.toLocaleString()}`;
+            document.getElementById('stats-reg').textContent = `Registrations: ${data.totalReg}`;
+            document.getElementById('stats-ftd').textContent = `FTDs: ${data.totalFTD}`;
+
+            const avgComm = Math.round(data.totalComm / 31);
+            const avgReg = (data.totalReg / 31).toFixed(1);
+            const convRate = data.totalReg > 0 ? ((data.totalFTD / data.totalReg) * 100).toFixed(1) : 0;
+            const bestDay = Math.max(...data.commData);
+            const bestDayIdx = data.commData.indexOf(bestDay);
+
+            document.getElementById('summary-cards').innerHTML = `
+                <div class="glass-panel rounded-xl p-4 border border-white/5">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-wider font-mono">Total Commission</p>
+                    <p class="text-xl font-bold text-white mt-1">$${data.totalComm.toLocaleString()}</p>
+                </div>
+                <div class="glass-panel rounded-xl p-4 border border-white/5">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-wider font-mono">Daily Average</p>
+                    <p class="text-xl font-bold text-white mt-1">$${avgComm.toLocaleString()}</p>
+                </div>
+                <div class="glass-panel rounded-xl p-4 border border-white/5">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-wider font-mono">Best Day</p>
+                    <p class="text-xl font-bold text-green-400 mt-1">$${bestDay.toLocaleString()}</p>
+                    <p class="text-[10px] text-gray-600 font-mono mt-0.5">${data.labels[bestDayIdx]}</p>
+                </div>
+                <div class="glass-panel rounded-xl p-4 border border-white/5">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-wider font-mono">Registrations</p>
+                    <p class="text-xl font-bold text-yellow-400 mt-1">${data.totalReg}</p>
+                    <p class="text-[10px] text-gray-600 font-mono mt-0.5">${avgReg}/day avg</p>
+                </div>
+                <div class="glass-panel rounded-xl p-4 border border-white/5">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-wider font-mono">Conversion Rate</p>
+                    <p class="text-xl font-bold text-blue-400 mt-1">${convRate}%</p>
+                    <p class="text-[10px] text-gray-600 font-mono mt-0.5">${data.totalFTD} FTDs</p>
+                </div>
+            `;
+        }
+
+        function generate(mode) {
+            const data = generateData(mode || 'normal');
+            const maxReg = Math.max(...data.regData, 0);
+            const regTick = smartRegTick(maxReg);
+
+            if (chart) {
+                chart.xAxis[0].setCategories(data.labels, false);
+                chart.series[0].setData(data.commData, false);
+                chart.series[1].setData(data.regData, false);
+                chart.yAxis[1].update({ tickInterval: regTick.interval, max: regTick.max }, false);
+                chart.redraw(true);
+            } else {
+                initChart(data, regTick);
+            }
+            updateStats(data);
+        }
+
+        function initChart(data, regTick) {
+            Highcharts.setOptions({
+                chart: { style: { fontFamily: 'JetBrains Mono, Inter, system-ui, sans-serif' } },
+                credits: { enabled: false },
+                exporting: { enabled: false }
+            });
+
+            chart = Highcharts.chart('chartContainer', {
+                chart: {
+                    type: 'areaspline',
+                    backgroundColor: 'transparent',
+                    spacing: [12, 8, 8, 8],
+                    animation: { duration: 400, easing: 'easeOutQuart' },
+                    zooming: { type: 'x' },
+                    resetZoomButton: {
+                        theme: {
+                            fill: 'rgba(255,255,255,0.08)',
+                            stroke: 'rgba(255,255,255,0.15)',
+                            style: { color: '#a1a1aa', fontSize: '10px', fontFamily: 'JetBrains Mono, monospace' },
+                            r: 6,
+                            states: { hover: { fill: 'rgba(255,255,255,0.15)' } }
+                        },
+                        position: { align: 'right', y: -4 }
+                    }
+                },
+                title: { text: null },
+                legend: { enabled: false },
+                xAxis: {
+                    categories: data.labels,
+                    crosshair: {
+                        width: 1,
+                        color: 'rgba(255,255,255,0.15)',
+                        dashStyle: 'ShortDash'
+                    },
+                    labels: {
+                        style: { color: '#71717a', fontSize: '10px', fontFamily: 'JetBrains Mono, monospace' },
+                        rotation: 0,
+                        step: 0,
+                        overflow: 'justify'
+                    },
+                    lineColor: 'rgba(255,255,255,0.06)',
+                    lineWidth: 1,
+                    tickLength: 0,
+                    gridLineWidth: 0
+                },
+                yAxis: [
+                    {
+                        title: {
+                            text: 'Commission ($)',
+                            style: { color: 'rgba(229,57,53,0.7)', fontSize: '10px', fontWeight: '600', fontFamily: 'JetBrains Mono, monospace' }
+                        },
+                        labels: {
+                            style: { color: 'rgba(229,57,53,0.65)', fontSize: '10px', fontFamily: 'JetBrains Mono, monospace' },
+                            formatter: function() {
+                                if (this.value >= 1000) return '$' + (this.value / 1000).toFixed(1) + 'K';
+                                return '$' + Math.round(this.value);
+                            }
+                        },
+                        min: 0,
+                        gridLineColor: 'rgba(255,255,255,0.04)',
+                        gridLineDashStyle: 'Dot',
+                        gridLineWidth: 1,
+                        lineWidth: 0,
+                        tickWidth: 0,
+                        opposite: false
+                    },
+                    {
+                        title: {
+                            text: 'Registrations',
+                            style: { color: 'rgba(251,192,45,0.7)', fontSize: '10px', fontWeight: '600', fontFamily: 'JetBrains Mono, monospace' }
+                        },
+                        labels: {
+                            style: { color: 'rgba(251,192,45,0.65)', fontSize: '10px', fontFamily: 'JetBrains Mono, monospace' },
+                            formatter: function() { return Math.round(this.value); }
+                        },
+                        min: 0,
+                        max: regTick.max,
+                        allowDecimals: false,
+                        tickInterval: regTick.interval,
+                        gridLineWidth: 0,
+                        lineWidth: 0,
+                        tickWidth: 0,
+                        opposite: true
+                    }
+                ],
+                tooltip: {
+                    shared: true,
+                    useHTML: true,
+                    backgroundColor: 'rgba(15,15,20,0.94)',
+                    borderColor: 'rgba(255,255,255,0.08)',
+                    borderRadius: 8,
+                    borderWidth: 1,
+                    shadow: { color: 'rgba(0,0,0,0.4)', offsetX: 0, offsetY: 4, width: 12 },
+                    style: { color: '#e4e4e7', fontSize: '11px', fontFamily: 'JetBrains Mono, monospace' },
+                    headerFormat: '<span style="font-size:10px;color:#a1a1aa;font-weight:500;">{point.key}</span><br/>',
+                    pointFormatter: function() {
+                        const dot = '<span style="color:' + this.series.color + ';">●</span> ';
+                        if (this.series.index === 0) {
+                            return dot + '<span style="color:#a1a1aa;">Commission</span>  <b style="color:#fff;">$' + Number(this.y).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + '</b><br/>';
+                        }
+                        return dot + '<span style="color:#a1a1aa;">Registrations</span>  <b style="color:#fff;">' + Math.round(this.y) + '</b><br/>';
+                    }
+                },
+                plotOptions: {
+                    areaspline: {
+                        lineWidth: 2,
+                        marker: { enabled: false, symbol: 'circle', radius: 3, states: { hover: { enabled: true, radius: 4, lineWidth: 2, lineColor: '#fff' } } },
+                        states: { hover: { lineWidthPlus: 0 }, inactive: { opacity: 0.5 } },
+                        threshold: null
+                    },
+                    series: {
+                        animation: { duration: 400 },
+                        turboThreshold: 5000
+                    }
+                },
+                series: [
+                    {
+                        name: 'Commission',
+                        data: data.commData,
+                        yAxis: 0,
+                        zIndex: 2,
+                        color: '#E53935',
+                        fillColor: {
+                            linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                            stops: [
+                                [0, 'rgba(229,57,53,0.25)'],
+                                [0.7, 'rgba(229,57,53,0.06)'],
+                                [1, 'rgba(229,57,53,0.0)']
+                            ]
+                        }
+                    },
+                    {
+                        name: 'Registrations',
+                        data: data.regData,
+                        yAxis: 1,
+                        zIndex: 1,
+                        color: '#FBC02D',
+                        fillColor: {
+                            linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                            stops: [
+                                [0, 'rgba(251,192,45,0.25)'],
+                                [0.7, 'rgba(251,192,45,0.06)'],
+                                [1, 'rgba(251,192,45,0.0)']
+                            ]
+                        }
+                    }
+                ]
+            });
+        }
+
+        function toggleSeries(idx) {
+            if (!chart || !chart.series[idx]) return;
+            const s = chart.series[idx];
+            if (s.visible) s.hide(); else s.show();
+            const btn = document.querySelector(`.legend-btn[data-idx="${idx}"]`);
+            if (btn) { btn.classList.toggle('opacity-40', !s.visible); btn.classList.toggle('opacity-100', s.visible); }
+        }
+
+        // Init on load
+        generate('normal');
+    </script>
+</body>
+</html>

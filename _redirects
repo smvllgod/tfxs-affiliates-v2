@@ -1,0 +1,10 @@
+# Clean URLs — remove .html extension
+/                /index.html     200
+/index          /index.html     200
+/dashboard      /index.html     200
+/reports        /reports.html   200
+/deals          /deals.html     200
+/assets         /assets.html    200
+/settings       /settings.html  200
+/admin-settings /admin-settings.html 200
+/login          /login.html     200

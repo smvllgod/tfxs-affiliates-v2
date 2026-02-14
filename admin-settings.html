@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>((t)=>{if(t==="light")document.documentElement.classList.add("light-theme")})(localStorage.getItem("tfxs_theme")||"light")</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TFXS Affiliate | Control Center</title>
+    <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#DC2626">
+    <meta name="theme-color" content="#dc2626">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://code.highcharts.com/11/highcharts.js"></script>
+    <link rel="stylesheet" href="css/shared.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter','sans-serif'], mono: ['JetBrains Mono','monospace'] },
+                    colors: { brand: { 50:'#fff1f2',100:'#ffe4e6',500:'#ef4444',600:'#dc2626',900:'#7f1d1d',neon:'#ff3333',yellow:'#fbbf24',dark:'#050505',panel:'#0A0A0A' } },
+                    animation: { 'fade-in-up': 'fadeInUp 0.5s ease-out forwards' },
+                    keyframes: { fadeInUp: { '0%': { opacity:'0', transform:'translateY(10px)' }, '100%': { opacity:'1', transform:'translateY(0)' } } }
+                }
+            }
+        }
+    </script>
+    <style>
+        html { max-width: 100vw; }
+        body { max-width: 100vw; overflow-x: hidden; }
+        body { background:#050505; color:#d4d4d8; }
+        .halo-bg { position:fixed; top:0; left:0; width:100vw; height:100vh; background:radial-gradient(circle at 50% 0%, rgba(220,38,38,0.15), transparent 70%); z-index:-1; pointer-events:none; }
+        .glass-panel { background:rgba(20,20,20,0.6); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.08); box-shadow:0 4px 6px -1px rgba(0,0,0,0.1); }
+        .form-input { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:white; transition:all 0.3s; }
+        .form-input:focus { outline:none; border-color:#ef4444; box-shadow:0 0 0 2px rgba(239,68,68,0.2); }
+        .form-input::placeholder { color:#52525b; }
+        .btn-gradient { background:linear-gradient(135deg,#dc2626,#991b1b); position:relative; overflow:hidden; }
+        .btn-gradient::after { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent); transition:0.6s; }
+        .btn-gradient:hover::after { left:100%; }
+        .admin-tab { transition:all 0.3s; cursor:pointer; white-space:nowrap; }
+        .admin-tab.active { color:#ef4444; background:rgba(255,255,255,0.1); box-shadow:0 1px 3px rgba(0,0,0,0.3); }
+        .admin-tab:not(.active) { color:#71717a; }
+        .admin-tab:not(.active):hover { color:#d4d4d8; }
+        .toast { animation: slideIn 0.3s ease, fadeOut 0.5s ease 3.5s forwards; }
+        @keyframes slideIn { from { transform:translateX(100%); opacity:0; } to { transform:translateX(0); opacity:1; } }
+        @keyframes fadeOut { to { opacity:0; transform:translateY(-10px); } }
+        table { border-collapse:separate; border-spacing:0; }
+        th { position:sticky; top:0; z-index:2; }
+        ::-webkit-scrollbar { width:5px; } ::-webkit-scrollbar-track { background:#050505; } ::-webkit-scrollbar-thumb { background:#333; border-radius:4px; }
+        .modal-overlay { background:rgba(0,0,0,0.7); backdrop-filter:blur(4px); }
+        .afp-dropdown { scrollbar-width:thin; }
+        .afp-dropdown::-webkit-scrollbar { width:3px; }
+        .afp-dropdown::-webkit-scrollbar-thumb { background:#444; border-radius:2px; }
+        input[type="checkbox"] { accent-color:#ef4444; }
+        /* Flatpickr dark theme */
+        .flatpickr-calendar { background:rgba(20,20,20,0.95)!important; border:1px solid rgba(255,255,255,0.1)!important; backdrop-filter:blur(20px)!important; box-shadow:0 10px 30px rgba(0,0,0,0.5)!important; font-family:'Inter',sans-serif!important; border-radius:16px!important; }
+        .flatpickr-calendar.arrowTop:before,.flatpickr-calendar.arrowTop:after { border-bottom-color:rgba(255,255,255,0.1)!important; }
+        .flatpickr-months .flatpickr-month { background:transparent!important; color:#fff!important; fill:#fff!important; }
+        .flatpickr-current-month .flatpickr-monthDropdown-months,.flatpickr-current-month input.cur-year { color:#fff!important; font-weight:700!important; }
+        .flatpickr-weekdays { background:transparent!important; }
+        .flatpickr-weekday { color:#71717a!important; font-weight:600!important; }
+        .flatpickr-day { color:#d4d4d8!important; border-radius:8px!important; }
+        .flatpickr-day:hover { background:rgba(239,68,68,0.2)!important; border-color:transparent!important; }
+        .flatpickr-day.selected,.flatpickr-day.startRange,.flatpickr-day.endRange,.flatpickr-day.focus { background:#dc2626!important; border-color:#dc2626!important; color:white!important; box-shadow:0 0 15px rgba(220,38,38,0.4)!important; }
+        .flatpickr-day.inRange { background:rgba(239,68,68,0.1)!important; border-color:transparent!important; box-shadow:-5px 0 0 rgba(239,68,68,0.1),5px 0 0 rgba(239,68,68,0.1)!important; }
+        .flatpickr-next-month,.flatpickr-prev-month { fill:#ef4444!important; color:#ef4444!important; }
+        .flatpickr-next-month:hover svg,.flatpickr-prev-month:hover svg { fill:#fff!important; }
+        .flatpickr-day.flatpickr-disabled,.flatpickr-day.prevMonthDay,.flatpickr-day.nextMonthDay { color:#3f3f46!important; }
+        .stat-card { transition:all 0.3s; }
+        .stat-card:hover { border-color:rgba(239,68,68,0.3); transform:translateY(-2px); }
+
+        /* ── Mobile table fixes: prevent cells from overlapping ── */
+        @media (max-width: 768px) {
+            /* Tables must scroll horizontally, not compress columns */
+            .overflow-x-auto { -webkit-overflow-scrolling: touch; }
+            .overflow-x-auto table { min-width: 800px; }
+            table th, table td { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-left: 8px !important; padding-right: 8px !important; font-size: 0.65rem !important; }
+            /* Bulk action bars: dock to bottom full-width on mobile */
+            #conv-bulk-bar, #pay-bulk-bar { bottom: 0 !important; left: 0 !important; right: 0 !important; transform: none !important; border-radius: 16px 16px 0 0 !important; padding: 12px 16px !important; justify-content: center; flex-wrap: wrap; gap: 8px !important; }
+        }
+    </style>
+</head>
+<body class="antialiased font-sans min-h-screen relative overflow-x-hidden selection:bg-brand-500 selection:text-white pb-20">
+
+    <div class="halo-bg"></div>
+
+    <!-- Toast container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-[99999] flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 w-full glass-panel border-b-0 border-white/5 py-3 sm:py-4">
+        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 flex items-center justify-between gap-3 sm:gap-4 relative">
+            <div class="flex items-center gap-4 sm:gap-10">
+                <a href="/" class="flex items-center gap-2 group cursor-pointer no-underline">
+                    <img src="assets/logo.svg" alt="TFXS Logo" class="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow-[0_0_15px_rgba(220,38,38,0.5)]">
+                    <span class="hidden sm:inline text-lg sm:text-xl font-bold tracking-tight text-white group-hover:text-brand-500 transition-colors">TFXS<span class="opacity-50 font-light"> AFFILIATES</span></span>
+                </a>
+
+                <div id="nav-links" class="hidden md:flex items-center gap-1 bg-white/5 p-1 rounded-lg border border-white/5">
+                    <a href="/" data-i18n="nav.dashboard" class="px-4 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition rounded-md hover:bg-white/5">Dashboard</a>
+                    <a href="/reports" data-i18n="nav.reports" class="px-4 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition rounded-md hover:bg-white/5">Reports</a>
+                    <a href="/deals" data-i18n="nav.deals" class="px-4 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition rounded-md hover:bg-white/5">Deals</a>
+                    <a href="/assets" data-i18n="nav.assets" class="px-4 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition rounded-md hover:bg-white/5">Assets</a>
+                    <a href="/admin-settings" data-i18n="nav.admin" class="px-4 py-1.5 text-xs font-semibold text-brand-500 bg-white/10 rounded-md shadow-sm">Admin</a>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 sm:gap-6">
+                <div class="hidden lg:flex flex-col items-end">
+                    <span class="text-[10px] text-gray-500 font-mono uppercase tracking-wider">Server Time</span>
+                    <span id="server-time" class="text-xs font-mono font-bold text-white">--:--:--</span>
+                </div>
+                <div class="h-8 w-[1px] bg-white/10 hidden lg:block"></div>
+                <div id="lang-selector-anchor"></div>
+                <div id="theme-toggle-anchor"></div>
+
+                <!-- Notification Bell -->
+                <button class="relative p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/5 notification-bell-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                    <span id="notif-badge" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-brand-500 text-white text-[9px] font-bold shadow-[0_0_8px_#ef4444]" style="display:none;">0</span>
+                </button>
+
+                <!-- Mobile Menu Toggle -->
+                <button id="mobile-menu-toggle" class="md:hidden p-2 text-gray-400 hover:text-white transition rounded-lg hover:bg-white/5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+
+                <a id="nav-avatar-link" href="/admin-settings" class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-sm font-bold text-white leading-none">Admin</p>
+                        <p class="text-[10px] text-brand-500 font-mono mt-1">TFXS-ADMIN</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-b from-red-900 to-black border border-brand-500/30 relative overflow-hidden ring-2 ring-brand-500/30 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 mt-6 sm:mt-8 animate-fade-in-up">
+
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-3">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Control Center</h1>
+                <p class="text-gray-400 mt-1 font-light text-sm hidden sm:block">Full CRUD management for affiliates, deals, conversions, payouts, roles &amp; audit.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <!-- Pending notifications bell -->
+                <button id="admin-notif-bell" onclick="showPendingTab()" class="relative text-gray-500 hover:text-white transition p-2 rounded-lg border border-white/10 hover:border-white/20 hidden">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                    <span id="admin-notif-badge" class="absolute -top-1 -right-1 bg-brand-500 text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold hidden">0</span>
+                </button>
+                <button id="admin-refresh-btn" class="text-[10px] font-bold text-gray-500 hover:text-white transition uppercase tracking-wider border border-white/10 rounded-lg px-3 py-1.5 hover:border-white/20 flex items-center gap-1.5"><svg id="admin-refresh-icon" class="w-3 h-3 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Refresh</button>
+                <div class="flex items-center gap-2" id="admin-status-indicator">
+                    <div id="admin-status-dot" class="w-2 h-2 rounded-full bg-gray-500"></div>
+                    <span id="admin-status-text" class="text-[10px] font-mono text-gray-500 uppercase tracking-wider">Connecting</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI Stats Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-5 lg:grid-cols-10 gap-3 mb-8">
+            <div class="stat-card glass-panel rounded-xl p-4 text-center border border-transparent"><p class="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Affiliates</p><p id="stat-affiliates" class="text-xl font-bold text-white font-mono">—</p></div>
+            <div class="stat-card glass-panel rounded-xl p-4 text-center border border-transparent"><p class="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Registrations</p><p id="stat-regs" class="text-xl font-bold text-blue-400 font-mono">—</p></div>
+            <div class="stat-card glass-panel rounded-xl p-4 text-center border border-transparent"><p class="text-[10px] text-gray-500 uppercase tracking-wider mb-1">FTDs</p><p id="stat-ftds" class="text-xl font-bold text-green-400 font-mono">—</p></div>
+            <div class="stat-card glass-panel rounded-xl p-4 text-center border border-transparent"><p class="text-[10px] text-gray-500 uppercase tracking-wider mb-1">QFTDs</p><p id="stat-qftds" class="text-xl font-bold text-cyan-400 font-mono">—</p></div>
+            <div class="stat-card glass-panel rounded-xl p-4 text-center border border-transparent"><p class="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Pending</p><p id="stat-pending" class="text-xl font-bold text-amber-400 font-mono">—</p></div>
+            <div class="stat-card glass-panel rounded-xl p-4 text-center border border-transparent"><p class="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Commission</p><p id="stat-commission" class="text-xl font-bold text-green-400 font-mono">—</p></div>
+            <div class="stat-card glass-panel rounded-xl p-4 text-center border border-transparent"><p class="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Total Deposits</p><p id="stat-deposits" class="text-xl font-bold text-yellow-400 font-mono">—</p></div>
+            <div class="stat-card glass-panel rounded-xl p-4 text-center border border-transparent"><p class="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Unpaid</p><p id="stat-unpaid" class="text-xl font-bold text-red-400 font-mono">—</p></div>
+            <div class="stat-card glass-panel rounded-xl p-4 text-center border border-transparent"><p class="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Paid Out</p><p id="stat-paid" class="text-xl font-bold text-brand-500 font-mono">—</p></div>
+            <div class="stat-card glass-panel rounded-xl p-4 text-center border border-transparent"><p class="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Admins</p><p id="stat-admins" class="text-xl font-bold text-purple-400 font-mono">—</p></div>
+        </div>
+
+        <!-- KPI Timeseries Chart -->
+        <div class="glass-panel rounded-xl p-5 mb-6">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xs font-bold text-white uppercase tracking-wider">Activity Overview</h3>
+                <div class="flex items-center gap-2">
+                    <button onclick="setChartDays(7)" class="chart-range text-[9px] font-bold text-gray-500 hover:text-white uppercase px-2 py-1 rounded transition" data-days="7">7D</button>
+                    <button onclick="setChartDays(14)" class="chart-range text-[9px] font-bold text-gray-500 hover:text-white uppercase px-2 py-1 rounded transition" data-days="14">14D</button>
+                    <button onclick="setChartDays(30)" class="chart-range active text-[9px] font-bold text-brand-500 bg-white/10 uppercase px-2 py-1 rounded transition" data-days="30">30D</button>
+                    <button onclick="setChartDays(60)" class="chart-range text-[9px] font-bold text-gray-500 hover:text-white uppercase px-2 py-1 rounded transition" data-days="60">60D</button>
+                </div>
+            </div>
+            <div id="kpi-chart" style="min-height:220px;"></div>
+        </div>
+
+        <!-- Top Affiliates Card -->
+        <div class="glass-panel rounded-xl p-5 mb-6">
+            <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-3">Top Affiliates by Commission</h3>
+            <div id="top-affiliates" class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                <p class="text-xs text-gray-600 col-span-full text-center py-4">Loading...</p>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex overflow-x-auto bg-white/[0.03] rounded-xl p-1 mb-6 border border-white/5 gap-1.5 no-scrollbar">
+            <button class="admin-tab active flex-1 min-w-[90px] py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg" data-tab="affiliates">Affiliates</button>
+            <button class="admin-tab flex-1 min-w-[120px] py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg" data-tab="deals">Deals &amp; Brokers</button>
+            <button class="admin-tab flex-1 min-w-[105px] py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg" data-tab="conversions">Conversions</button>
+            <button class="admin-tab flex-1 min-w-[90px] py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg" data-tab="payouts">Payouts</button>
+            <button class="admin-tab flex-1 min-w-[100px] py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg relative" data-tab="kyc">KYC <span id="kyc-tab-badge" class="hidden absolute -top-1 -right-1 bg-amber-500 text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span></button>
+            <button class="admin-tab flex-1 min-w-[100px] py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg" data-tab="users">Users &amp; Roles</button>
+            <button class="admin-tab flex-1 min-w-[100px] py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg" data-tab="audit">Audit Log</button>
+        </div>
+
+        <!-- ═══════ AFFILIATES TAB ═══════ -->
+        <div id="tab-affiliates" class="tab-content">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <div class="relative flex-1 sm:flex-none sm:w-56">
+                        <input type="text" id="aff-search" placeholder="Search by ID, email, name..." class="form-input text-xs px-3 py-2 pr-8 rounded-lg w-full" onkeydown="if(event.key==='Enter')loadAffiliates()">
+                        <button onclick="loadAffiliates()" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-brand-500 transition" aria-label="Search">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        </button>
+                    </div>
+                    <div class="custom-select relative flex-shrink-0" data-onchange="loadAffiliates()">
+                        <button type="button" data-cs-btn class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-xs bg-white/5 border border-white/10 text-white hover:border-white/20 transition">
+                            <span data-cs-label>All Statuses</span>
+                            <svg class="w-3 h-3 text-gray-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div data-cs-dd class="hidden absolute left-0 right-0 mt-1 rounded-xl bg-[#1a1a1a] border border-white/10 shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
+                            <div data-cs-opts>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="">All Statuses</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="pending">Pending</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="approved">Approved</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="rejected">Rejected</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="aff-status-filter" value="">
+                    </div>
+                </div>
+                <button onclick="openAffModal()" class="btn-gradient px-4 py-2 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider w-full sm:w-auto">+ New Affiliate</button>
+            </div>
+            <div class="glass-panel rounded-xl overflow-hidden">
+                <div class="overflow-x-auto max-h-[55vh] overflow-y-auto">
+                    <table class="w-full text-xs">
+                        <thead><tr class="bg-white/[0.03]">
+                            <th class="text-left px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">ID Code</th>
+                            <th class="text-left px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Name</th>
+                            <th class="text-left px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Email</th>
+                            <th class="text-left px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Status</th>
+                            <th class="text-left px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">KYC</th>
+                            <th class="text-left px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Role</th>
+                            <th class="text-left px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Joined</th>
+                            <th class="text-right px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Actions</th>
+                        </tr></thead>
+                        <tbody id="aff-tbody"><tr><td colspan="8" class="px-4 py-12 text-center text-gray-600">Loading...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="aff-pagination" class="mt-3"></div>
+        </div>
+
+        <!-- ═══════ DEALS TAB ═══════ -->
+        <div id="tab-deals" class="tab-content hidden">
+            <div class="flex flex-wrap items-center justify-between mb-4 gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="custom-select relative">
+                        <button type="button" data-cs-btn class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-xs bg-white/5 border border-white/10 text-white hover:border-white/20 transition">
+                            <span data-cs-label>All Brokers</span>
+                            <svg class="w-3 h-3 text-gray-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div data-cs-dd class="hidden absolute left-0 right-0 mt-1 rounded-xl bg-[#1a1a1a] border border-white/10 shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
+                            <div data-cs-opts>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="">All Brokers</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="deal-broker-filter" value="">
+                    </div>
+                    <div class="custom-select relative">
+                        <button type="button" data-cs-btn class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-xs bg-white/5 border border-white/10 text-white hover:border-white/20 transition">
+                            <span data-cs-label>All</span>
+                            <svg class="w-3 h-3 text-gray-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div data-cs-dd class="hidden absolute left-0 right-0 mt-1 rounded-xl bg-[#1a1a1a] border border-white/10 shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
+                            <div data-cs-opts>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="">All</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="true">Active</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="false">Inactive</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="deal-active" value="">
+                    </div>
+                    <button onclick="loadDeals()" class="text-[10px] font-bold text-brand-500 hover:text-white transition uppercase tracking-wider">Filter</button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="openBrokerModal()" class="px-4 py-2 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-wider border border-white/10 hover:bg-white/5 transition">+ Broker</button>
+                    <button onclick="openDealModal()" class="btn-gradient px-4 py-2 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider">+ Add Deal</button>
+                </div>
+            </div>
+            <div class="glass-panel rounded-xl overflow-hidden">
+                <div class="overflow-x-auto max-h-[55vh] overflow-y-auto">
+                    <table class="w-full text-xs">
+                        <thead><tr class="bg-white/[0.03]">
+                            <th class="text-left px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Broker</th>
+                            <th class="text-left px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Type</th>
+                            <th class="text-left px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Tiers</th>
+                            <th class="text-left px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Status</th>
+                            <th class="text-left px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Affiliates</th>
+                            <th class="text-right px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Actions</th>
+                        </tr></thead>
+                        <tbody id="deal-tbody"><tr><td colspan="6" class="px-4 py-12 text-center text-gray-600">Loading...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="deal-pagination" class="mt-3"></div>
+
+            <!-- ═══ BROKER MANAGEMENT SECTION ═══ -->
+            <div class="mt-8 pt-6 border-t border-white/5">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-sm font-bold text-white uppercase tracking-wider">Brokers</h3>
+                        <p class="text-[10px] text-gray-600 mt-0.5">Manage broker profiles — logo, color, contact info</p>
+                    </div>
+                    <button onclick="openBrokerModal()" class="btn-gradient px-4 py-2 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider">+ New Broker</button>
+                </div>
+                <div id="broker-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div class="text-center py-8 col-span-full text-gray-600 text-xs">Loading brokers...</div>
+                </div>
+            </div>
+
+            <!-- ═══ ROI CALCULATION SETTINGS ═══ -->
+            <div class="mt-8 pt-6 border-t border-white/5">
+                <div class="flex items-center gap-3 mb-4">
+                    <svg class="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                    <div>
+                        <h3 class="text-sm font-bold text-white uppercase tracking-wider">ROI Calculation</h3>
+                        <p class="text-[10px] text-gray-600 mt-0.5">Define how ROI is calculated for affiliates — set a global formula and override per affiliate.</p>
+                    </div>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <!-- System Default Formula -->
+                    <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-2">Global Default Formula</p>
+                        <div class="flex gap-2">
+                            <div class="custom-select relative flex-1">
+                                <button type="button" data-cs-btn class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg text-sm bg-white/5 border border-white/10 text-white hover:border-white/20 transition">
+                                    <span data-cs-label>Total Deposit ÷ Commission</span>
+                                    <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                </button>
+                                <div data-cs-dd class="hidden absolute left-0 right-0 mt-1 rounded-xl bg-[#1a1a1a] border border-white/10 shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
+                                    <div data-cs-opts>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="deposit_div_commission">Total Deposit ÷ Commission</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="net_deposit_div_commission">Net Deposit ÷ Commission</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="commission_div_deposit">Commission ÷ Total Deposit</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="commission_div_deposit_pct">Commission ÷ Total Deposit × 100%</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="profit_margin">(Deposit − Commission) ÷ Deposit × 100%</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="fixed_ratio">Fixed Ratio (manual)</div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="roi-formula-system" value="deposit_div_commission">
+                            </div>
+                            <button onclick="saveRoiFormula('_system_')" class="btn-gradient px-4 py-2.5 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider">Save</button>
+                        </div>
+                        <p class="text-[9px] text-gray-600 mt-1.5">Applies to all affiliates unless overridden below.</p>
+                        <div class="mt-3 p-3 rounded-lg bg-white/[0.02] border border-white/5">
+                            <p class="text-[9px] text-gray-500 uppercase tracking-wider mb-1">Formula Preview</p>
+                            <p id="roi-formula-preview" class="text-xs text-purple-400 font-mono">ROI = Total Deposit ÷ Commission</p>
+                        </div>
+                    </div>
+                    <!-- Per-Affiliate Override -->
+                    <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5">
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="text-[10px] text-gray-500 uppercase tracking-widest">Per-Affiliate Override</p>
+                            <span id="roi-override-count" class="text-[9px] font-mono text-gray-600 bg-white/5 px-1.5 py-0.5 rounded">0</span>
+                        </div>
+                        <div class="flex gap-2 mb-2">
+                            <div class="afp-search-wrap relative flex-1">
+                                <input type="text" id="roi-afp-input" placeholder="Search affiliate..." class="form-input text-xs px-3 py-2.5 rounded-lg w-full" autocomplete="off">
+                                <div id="roi-afp-dropdown" class="afp-dropdown absolute top-full left-0 w-full mt-1 glass-panel rounded-lg max-h-40 overflow-y-auto hidden z-50"></div>
+                                <input type="hidden" id="roi-afp-value">
+                            </div>
+                            <div class="custom-select relative w-48">
+                                <button type="button" data-cs-btn class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg text-sm bg-white/5 border border-white/10 text-white hover:border-white/20 transition">
+                                    <span data-cs-label>Deposit ÷ Comm</span>
+                                    <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                </button>
+                                <div data-cs-dd class="hidden absolute left-0 right-0 mt-1 rounded-xl bg-[#1a1a1a] border border-white/10 shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
+                                    <div data-cs-opts>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="deposit_div_commission">Deposit ÷ Comm</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="net_deposit_div_commission">Net Dep ÷ Comm</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="commission_div_deposit">Comm ÷ Deposit</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="commission_div_deposit_pct">Comm ÷ Dep × 100%</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="profit_margin">Profit Margin %</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="fixed_ratio">Fixed Ratio</div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="roi-formula-affiliate" value="deposit_div_commission">
+                            </div>
+                            <button onclick="saveAffiliateRoiFormula()" class="btn-gradient px-4 py-2.5 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider">Set</button>
+                        </div>
+                        <input type="text" id="roi-override-filter" placeholder="Filter overrides..." class="form-input text-[10px] px-2.5 py-1.5 rounded-lg w-full mb-2 hidden" oninput="filterRoiOverrides(this.value)">
+                        <div id="roi-overrides-list" class="space-y-1 max-h-48 overflow-y-auto"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════ CONVERSIONS TAB ═══════ -->
+        <div id="tab-conversions" class="tab-content hidden">
+            <div class="flex flex-wrap items-center gap-3 mb-4">
+                <div class="afp-search-wrap relative">
+                    <input type="text" id="conv-filter-afp-input" placeholder="Affiliate ID..." class="form-input text-xs px-3 py-2 rounded-lg w-40" autocomplete="off">
+                    <div id="conv-filter-afp-dropdown" class="afp-dropdown absolute top-full left-0 w-56 mt-1 glass-panel rounded-lg max-h-40 overflow-y-auto hidden z-50"></div>
+                    <input type="hidden" id="conv-filter-afp-value">
+                </div>
+                <div class="custom-select relative">
+                    <button type="button" data-cs-btn class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-xs bg-white/5 border border-white/10 text-white hover:border-white/20 transition">
+                        <span data-cs-label>All Status</span>
+                        <svg class="w-3 h-3 text-gray-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div data-cs-dd class="hidden absolute left-0 right-0 mt-1 rounded-xl bg-[#1a1a1a] border border-white/10 shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
+                        <div data-cs-opts>
+                            <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="">All Status</div>
+                            <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="pending">Pending</div>
+                            <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="approved">Approved</div>
+                            <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="rejected">Rejected</div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="conv-status" value="">
+                </div>
+                <div class="custom-select relative">
+                    <button type="button" data-cs-btn class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-xs bg-white/5 border border-white/10 text-white hover:border-white/20 transition">
+                        <span data-cs-label>All Types</span>
+                        <svg class="w-3 h-3 text-gray-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div data-cs-dd class="hidden absolute left-0 right-0 mt-1 rounded-xl bg-[#1a1a1a] border border-white/10 shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
+                        <div data-cs-opts>
+                            <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="">All Types</div>
+                            <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="registration">Registration</div>
+                            <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="ftd">FTD</div>
+                            <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="qualified_cpa">Qualified CPA</div>
+                            <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="commission">Commission</div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="conv-type" value="">
+                </div>
+                <input type="text" id="conv-from" class="form-input text-xs px-3 py-2 rounded-lg w-28" placeholder="From..." autocomplete="off">
+                <input type="text" id="conv-to" class="form-input text-xs px-3 py-2 rounded-lg w-28" placeholder="To..." autocomplete="off">
+                <button onclick="loadConversions()" class="text-[10px] font-bold text-brand-500 hover:text-white transition uppercase tracking-wider">Filter</button>
+                <div class="flex-1"></div>
+                <button onclick="openConvModal()" class="btn-gradient px-4 py-2 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider">+ Add Conversion</button>
+            </div>
+            <div class="glass-panel rounded-xl overflow-hidden">
+                <div class="overflow-x-auto max-h-[55vh] overflow-y-auto">
+                    <table class="w-full text-xs">
+                        <thead><tr class="bg-white/[0.03]">
+                            <th class="px-2 py-3 w-8"><input type="checkbox" id="conv-check-all" onchange="toggleAllConv(this.checked)" class="cursor-pointer"></th>
+                            <th class="text-left px-3 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Date</th>
+                            <th class="text-left px-3 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">ID</th>
+                            <th class="text-left px-3 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Type</th>
+                            <th class="text-left px-3 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">User</th>
+                            <th class="text-left px-3 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Country</th>
+                            <th class="text-right px-3 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Deposit</th>
+                            <th class="text-right px-3 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Commission</th>
+                            <th class="text-center px-3 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Status</th>
+                            <th class="text-right px-3 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Actions</th>
+                        </tr></thead>
+                        <tbody id="conv-tbody"><tr><td colspan="10" class="px-3 py-12 text-center text-gray-600">Loading...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="conv-pagination" class="mt-3"></div>
+        </div>
+
+        <!-- Bulk action bar (conversions) -->
+        <div id="conv-bulk-bar" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 glass-panel rounded-xl px-6 py-3 flex items-center gap-4 z-50 border border-brand-500/20 shadow-2xl">
+            <span class="text-xs text-gray-400"><strong id="conv-sel-count" class="text-white font-mono">0</strong> selected</span>
+            <div class="h-4 w-[1px] bg-white/10"></div>
+            <button onclick="bulkConvAction('approve')" class="text-[10px] font-bold text-green-400 hover:text-green-300 uppercase tracking-wider">✓ Approve</button>
+            <button onclick="bulkConvAction('reject')" class="text-[10px] font-bold text-red-400 hover:text-red-300 uppercase tracking-wider">✗ Reject</button>
+            <button onclick="bulkConvAction('delete')" class="text-[10px] font-bold text-orange-400 hover:text-orange-300 uppercase tracking-wider flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg> Delete</button>
+            <div class="h-4 w-[1px] bg-white/10"></div>
+            <button onclick="clearConvSelection()" class="text-[10px] font-bold text-gray-500 hover:text-white uppercase tracking-wider">✕ Clear</button>
+        </div>
+
+        <!-- ═══════ PAYOUTS TAB ═══════ -->
+        <div id="tab-payouts" class="tab-content hidden">
+            <!-- Admin Contact Info -->
+            <div class="glass-panel rounded-xl p-5 mb-6 border border-white/5">
+                <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    Contact Info
+                </h3>
+                <p class="text-[9px] text-gray-600 mb-4">Affiliates will see a "Contact Affiliate Manager" button on their dashboard with these links.</p>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5">
+                        <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-2">Email Address</label>
+                        <input type="email" id="contact-email-input" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" placeholder="admin@example.com">
+                    </div>
+                    <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5">
+                        <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-2">Telegram Handle</label>
+                        <div class="flex items-center gap-1">
+                            <span class="text-sm text-gray-500">@</span>
+                            <input type="text" id="contact-telegram-input" class="form-input flex-1 px-3 py-2.5 rounded-lg text-sm" placeholder="username">
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-end mt-4">
+                    <button onclick="saveContactSettings()" class="btn-gradient px-6 py-2.5 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider">Save Contact Info</button>
+                </div>
+            </div>
+
+            <!-- Payout Schedule Settings -->
+            <div class="glass-panel rounded-xl p-5 mb-6 border border-white/5" style="position:relative;z-index:100;overflow:visible;">
+                <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    Payout Schedule
+                </h3>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <!-- System Default -->
+                    <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5" style="overflow:visible;">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-2">System Default</p>
+                        <div class="flex gap-2">
+                            <div class="custom-select relative flex-1">
+                                <button type="button" data-cs-btn class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg text-sm bg-white/5 border border-white/10 text-white hover:border-white/20 transition">
+                                    <span data-cs-label>1st &amp; 15th of each month</span>
+                                    <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                </button>
+                                <div data-cs-dd class="hidden absolute left-0 right-0 mt-1 rounded-xl bg-[#1a1a1a] border border-white/10 shadow-xl z-[9999] overflow-hidden max-h-72 overflow-y-auto">
+                                    <div data-cs-opts>
+                                        <div class="px-3 py-1.5 text-[9px] font-bold text-gray-500 uppercase tracking-widest bg-white/[0.03] border-b border-white/5 select-none">Following Month</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="1,15">1st &amp; 15th of each month</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="1">1st of each month</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="15">15th of each month</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="weekly">Weekly (every Monday)</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="end_of_month_26">End of month (26th)</div>
+                                        <div class="px-3 py-1.5 text-[9px] font-bold text-gray-500 uppercase tracking-widest bg-white/[0.03] border-y border-white/5 select-none mt-1">Same Month</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="sm_daily">Daily</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="sm_weekly">Weekly (every Monday)</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="sm_biweekly">Biweekly (1st &amp; 15th)</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="sm_1,15">1st &amp; 15th</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="sm_1">1st of each month</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="sm_15">15th of each month</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="sm_end_of_month_26">End of month (26th)</div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="payout-schedule-system" value="1,15">
+                            </div>
+                            <button onclick="savePayoutSchedule('_system_')" class="btn-gradient px-4 py-2.5 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider">Save</button>
+                        </div>
+                        <p class="text-[9px] text-gray-600 mt-1.5">Applies to all affiliates unless overridden below.</p>
+                    </div>
+                    <!-- Per-Affiliate Override -->
+                    <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5" style="overflow:visible;">
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="text-[10px] text-gray-500 uppercase tracking-widest">Per-Affiliate Override</p>
+                            <span id="payout-override-count" class="text-[9px] font-mono text-gray-600 bg-white/5 px-1.5 py-0.5 rounded">0</span>
+                        </div>
+                        <div class="flex gap-2 mb-2">
+                            <div class="afp-search-wrap relative flex-1">
+                                <input type="text" id="payout-sched-afp-input" placeholder="Search affiliate..." class="form-input text-xs px-3 py-2.5 rounded-lg w-full" autocomplete="off">
+                                <div id="payout-sched-afp-dropdown" class="afp-dropdown absolute top-full left-0 w-full mt-1 glass-panel rounded-lg max-h-40 overflow-y-auto hidden z-50"></div>
+                                <input type="hidden" id="payout-sched-afp-value">
+                            </div>
+                            <div class="custom-select relative w-48">
+                                <button type="button" data-cs-btn class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg text-sm bg-white/5 border border-white/10 text-white hover:border-white/20 transition">
+                                    <span data-cs-label>1st &amp; 15th</span>
+                                    <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                </button>
+                                <div data-cs-dd class="hidden absolute left-0 right-0 mt-1 rounded-xl bg-[#1a1a1a] border border-white/10 shadow-xl z-[9999] overflow-hidden max-h-72 overflow-y-auto">
+                                    <div data-cs-opts>
+                                        <div class="px-3 py-1.5 text-[9px] font-bold text-gray-500 uppercase tracking-widest bg-white/[0.03] border-b border-white/5 select-none">Following Month</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="1,15">1st &amp; 15th</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="1">1st of month</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="15">15th of month</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="weekly">Weekly</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="end_of_month_26">End of month (26th)</div>
+                                        <div class="px-3 py-1.5 text-[9px] font-bold text-gray-500 uppercase tracking-widest bg-white/[0.03] border-y border-white/5 select-none mt-1">Same Month</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="sm_daily">Daily</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="sm_weekly">Weekly</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="sm_biweekly">Biweekly</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="sm_1,15">1st &amp; 15th</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="sm_1">1st of month</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="sm_15">15th of month</div>
+                                        <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="sm_end_of_month_26">End of month (26th)</div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="payout-schedule-affiliate" value="1,15">
+                            </div>
+                            <button onclick="saveAffiliatePayoutSchedule()" class="btn-gradient px-4 py-2.5 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider">Set</button>
+                        </div>
+                        <input type="text" id="payout-override-filter" placeholder="Filter overrides..." class="form-input text-[10px] px-2.5 py-1.5 rounded-lg w-full mb-2 hidden" oninput="filterScheduleOverrides(this.value)">
+                        <div id="payout-schedule-overrides" class="space-y-1 max-h-48 overflow-y-auto"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between mb-4 gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="afp-search-wrap relative">
+                        <input type="text" id="pay-filter-afp-input" placeholder="Affiliate ID..." class="form-input text-xs px-3 py-2 rounded-lg w-40" autocomplete="off">
+                        <div id="pay-filter-afp-dropdown" class="afp-dropdown absolute top-full left-0 w-56 mt-1 glass-panel rounded-lg max-h-40 overflow-y-auto hidden z-50"></div>
+                        <input type="hidden" id="pay-filter-afp-value">
+                    </div>
+                    <div class="custom-select relative">
+                        <button type="button" data-cs-btn class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-xs bg-white/5 border border-white/10 text-white hover:border-white/20 transition">
+                            <span data-cs-label>All Status</span>
+                            <svg class="w-3 h-3 text-gray-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div data-cs-dd class="hidden absolute left-0 right-0 mt-1 rounded-xl bg-[#1a1a1a] border border-white/10 shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
+                            <div data-cs-opts>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="">All Status</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="pending">Pending</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="approved">Approved</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="paid">Paid</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="rejected">Cancelled</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="pay-status" value="">
+                    </div>
+                    <button onclick="loadPayouts()" class="text-[10px] font-bold text-brand-500 hover:text-white transition uppercase tracking-wider">Filter</button>
+                </div>
+                <button onclick="openPayoutModal()" class="btn-gradient px-4 py-2 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider">+ Create Payout</button>
+            </div>
+            <div class="glass-panel rounded-xl overflow-hidden">
+                <div class="overflow-x-auto max-h-[55vh] overflow-y-auto">
+                    <table class="w-full text-xs">
+                        <thead><tr class="bg-white/[0.03]">
+                            <th class="px-2 py-3 w-8"><input type="checkbox" id="pay-check-all" onchange="toggleAllPay(this.checked)" class="cursor-pointer"></th>
+                            <th class="text-left px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Date</th>
+                            <th class="text-left px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">ID</th>
+                            <th class="text-right px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Amount</th>
+                            <th class="text-left px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Method</th>
+                            <th class="text-left px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Wallet</th>
+                            <th class="text-center px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Status</th>
+                            <th class="text-left px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Notes</th>
+                            <th class="text-right px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Actions</th>
+                        </tr></thead>
+                        <tbody id="pay-tbody"><tr><td colspan="9" class="px-4 py-12 text-center text-gray-600">Loading...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="pay-pagination" class="mt-3"></div>
+        </div>
+
+        <!-- Bulk action bar (payouts) -->
+        <div id="pay-bulk-bar" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 glass-panel rounded-xl px-6 py-3 flex items-center gap-4 z-50 border border-brand-500/20 shadow-2xl">
+            <span class="text-xs text-gray-400"><strong id="pay-sel-count" class="text-white font-mono">0</strong> selected</span>
+            <div class="h-4 w-[1px] bg-white/10"></div>
+            <button onclick="bulkPayAction('mark-paid')" class="text-[10px] font-bold text-green-400 hover:text-green-300 uppercase tracking-wider flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> Mark Paid</button>
+            <button onclick="bulkPayAction('cancel')" class="text-[10px] font-bold text-red-400 hover:text-red-300 uppercase tracking-wider">✗ Cancel</button>
+            <div class="h-4 w-[1px] bg-white/10"></div>
+            <button onclick="clearPaySelection()" class="text-[10px] font-bold text-gray-500 hover:text-white uppercase tracking-wider">✕ Clear</button>
+        </div>
+
+        <!-- ═══════ KYC REVIEW TAB ═══════ -->
+        <div id="tab-kyc" class="tab-content hidden">
+            <div class="flex flex-wrap items-center justify-between mb-4 gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="custom-select relative" data-onchange="loadKycSubmissions()">
+                        <button type="button" data-cs-btn class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-xs bg-white/5 border border-white/10 text-white hover:border-white/20 transition">
+                            <span data-cs-label>Pending Review</span>
+                            <svg class="w-3 h-3 text-gray-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div data-cs-dd class="hidden absolute left-0 right-0 mt-1 rounded-xl bg-[#1a1a1a] border border-white/10 shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
+                            <div data-cs-opts>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="">All</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="pending">Pending Review</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="approved">Approved</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="rejected">Rejected</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="kyc-status-filter" value="pending">
+                    </div>
+                    <button onclick="loadKycSubmissions()" class="text-[10px] font-bold text-brand-500 hover:text-white transition uppercase tracking-wider">Refresh</button>
+                </div>
+            </div>
+            <div id="kyc-list" class="space-y-4">
+                <p class="text-xs text-gray-600 text-center py-8">Loading KYC submissions...</p>
+            </div>
+        </div>
+
+        <!-- ═══════ USERS & ROLES TAB ═══════ -->
+        <div id="tab-users" class="tab-content hidden">
+            <div class="grid lg:grid-cols-2 gap-6 overflow-x-auto max-w-full">
+                <!-- Promote affiliate to admin -->
+                <div>
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Promote Affiliate to Admin</h3>
+                    <div class="glass-panel rounded-xl p-5">
+                        <div class="afp-search-wrap relative mb-4">
+                            <input type="text" id="user-search-input" placeholder="Search affiliate by ID, name or email..." class="form-input text-xs px-3 py-2.5 rounded-lg w-full" autocomplete="off">
+                            <div id="user-search-dropdown" class="afp-dropdown absolute top-full left-0 w-full mt-1 glass-panel rounded-lg max-h-48 overflow-y-auto hidden z-50"></div>
+                        </div>
+                        <div id="user-search-result" class="hidden glass-panel rounded-lg p-4 border border-white/5 mb-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs font-bold text-white" id="user-result-name">—</p>
+                                    <p class="text-[10px] text-gray-500 font-mono" id="user-result-afp">—</p>
+                                    <p class="text-[10px] text-gray-500" id="user-result-email">—</p>
+                                </div>
+                                <button onclick="promoteUser()" class="btn-gradient px-4 py-2 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider">Promote to Admin</button>
+                            </div>
+                        </div>
+                        <input type="hidden" id="user-promote-id">
+                    </div>
+                </div>
+                <!-- Current admins -->
+                <div>
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Current Admin Users</h3>
+                    <div class="glass-panel rounded-xl overflow-hidden">
+                        <div class="overflow-x-auto overflow-y-auto max-h-[50vh]">
+                            <table class="w-full text-xs min-w-[400px]">
+                                <thead><tr class="bg-white/[0.03]">
+                                    <th class="text-left px-3 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">ID</th>
+                                    <th class="text-left px-3 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Name</th>
+                                    <th class="text-left px-3 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Email</th>
+                                    <th class="text-right px-3 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Actions</th>
+                                </tr></thead>
+                                <tbody id="users-tbody"><tr><td colspan="4" class="px-4 py-12 text-center text-gray-600">Loading...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════ AUDIT TAB ═══════ -->
+        <div id="tab-audit" class="tab-content hidden">
+            <div class="flex flex-wrap items-center gap-3 mb-4">
+                <div class="custom-select relative">
+                    <button type="button" data-cs-btn class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-xs bg-white/5 border border-white/10 text-white hover:border-white/20 transition">
+                        <span data-cs-label>All Entities</span>
+                        <svg class="w-3 h-3 text-gray-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div data-cs-dd class="hidden absolute left-0 right-0 mt-1 rounded-xl bg-[#1a1a1a] border border-white/10 shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
+                        <div data-cs-opts>
+                            <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="">All Entities</div>
+                            <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="affiliate">Affiliate</div>
+                            <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="deal">Deal</div>
+                            <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="conversion">Conversion</div>
+                            <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="payout">Payout</div>
+                            <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="user">User</div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="audit-entity" value="">
+                </div>
+                <input type="text" id="audit-from" class="form-input text-xs px-3 py-2 rounded-lg w-28" placeholder="From..." autocomplete="off">
+                <input type="text" id="audit-to" class="form-input text-xs px-3 py-2 rounded-lg w-28" placeholder="To..." autocomplete="off">
+                <button onclick="loadAudit()" class="text-[10px] font-bold text-brand-500 hover:text-white transition uppercase tracking-wider">Filter</button>
+            </div>
+            <div class="glass-panel rounded-xl overflow-hidden">
+                <div class="overflow-x-auto max-h-[55vh] overflow-y-auto">
+                    <table class="w-full text-xs">
+                        <thead><tr class="bg-white/[0.03]">
+                            <th class="text-left px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Time</th>
+                            <th class="text-left px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Action</th>
+                            <th class="text-left px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Entity</th>
+                            <th class="text-left px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">ID</th>
+                            <th class="text-left px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Payload</th>
+                        </tr></thead>
+                        <tbody id="audit-tbody"><tr><td colspan="5" class="px-4 py-12 text-center text-gray-600">Loading...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="audit-pagination" class="mt-3"></div>
+        </div>
+
+    </main>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- MODALS -->
+    <!-- ═══════════════════════════════════════════════════ -->
+
+    <!-- Confirm / Prompt Modal (reusable) -->
+    <div id="confirm-modal" class="modal-overlay fixed inset-0 z-[99999] hidden flex items-center justify-center">
+        <div class="glass-panel rounded-2xl p-6 w-full max-w-sm mx-4">
+            <div class="flex items-center gap-3 mb-4">
+                <div id="confirm-icon" class="w-10 h-10 rounded-xl flex items-center justify-center bg-green-500/10 border border-green-500/20">
+                    <svg class="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                </div>
+                <h3 id="confirm-title" class="text-sm font-bold text-white uppercase tracking-wider">Confirm</h3>
+            </div>
+            <p id="confirm-message" class="text-xs text-gray-400 mb-4 leading-relaxed"></p>
+            <div id="confirm-input-wrap" class="hidden mb-4">
+                <label id="confirm-input-label" class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Reason</label>
+                <input type="text" id="confirm-input" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" placeholder="">
+            </div>
+            <div class="flex gap-3">
+                <button id="confirm-ok-btn" class="btn-gradient flex-1 py-2.5 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider">Confirm</button>
+                <button id="confirm-cancel-btn" class="flex-1 py-2.5 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-wider border border-white/10 hover:bg-white/5 transition">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- KYC Image Lightbox -->
+    <div id="kyc-lightbox" class="fixed inset-0 z-[999999] hidden items-center justify-center" style="background:rgba(0,0,0,0.92)" onclick="if(event.target===this){this.classList.add('hidden');this.classList.remove('flex')}">
+        <button onclick="document.getElementById('kyc-lightbox').classList.add('hidden');document.getElementById('kyc-lightbox').classList.remove('flex')" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white text-xl transition z-10">&times;</button>
+        <img id="kyc-lightbox-img" src="" alt="KYC Document" class="max-w-[90vw] max-h-[90vh] rounded-xl shadow-2xl border border-white/10 object-contain">
+    </div>
+
+    <!-- Affiliate Modal (Create/Edit) -->
+    <div id="affiliate-modal" class="modal-overlay fixed inset-0 z-[9999] hidden flex items-center justify-center p-4">
+        <div class="glass-panel rounded-2xl p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+            <h3 id="aff-modal-title" class="text-sm font-bold text-white uppercase tracking-wider mb-5">Create Affiliate</h3>
+            <input type="hidden" id="aff-edit-id">
+            <div class="space-y-4">
+                <div><label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Affiliate ID <span class="text-gray-700">(auto-generated if blank)</span></label><input type="text" id="aff-form-afp" class="form-input w-full px-3 py-2.5 rounded-lg text-sm font-mono" placeholder="TFXS-XXXXXX"></div>
+                <div><label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Display Name</label><input type="text" id="aff-form-name" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" placeholder="John Doe"></div>
+                <div><label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Email</label><input type="email" id="aff-form-email" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" placeholder="john@example.com"></div>
+                <div id="aff-password-row"><label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Password <span class="text-gray-700">(create only)</span></label><input type="text" id="aff-form-password" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" placeholder="Min 8 characters"></div>
+                <div id="aff-deals-row" class="hidden">
+                    <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Assigned Deals</label>
+                    <div id="aff-deal-chips" class="flex flex-wrap gap-1.5 mb-2 min-h-[8px]"></div>
+                    <div class="custom-select relative w-full" data-onchange="addDealToAffiliate()">
+                        <button type="button" data-cs-btn class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg text-sm bg-white/5 border border-white/10 text-white hover:border-white/20 transition">
+                            <span data-cs-label>+ Assign a deal...</span>
+                            <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div data-cs-dd class="hidden absolute left-0 right-0 mt-1 rounded-xl bg-[#1a1a1a] border border-white/10 shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
+                            <div data-cs-opts>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="">+ Assign a deal...</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="aff-deal-select" value="">
+                    </div>
+                </div>
+                <div id="aff-autopayout-row" class="hidden">
+                    <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-2">Auto-Payout Control</label>
+                    <button id="aff-autopayout-lock-btn" onclick="toggleAffAutoPayoutLock()" class="flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border">
+                        <svg id="aff-ap-lock-icon" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"></svg>
+                        <span id="aff-ap-lock-label">Loading...</span>
+                    </button>
+                    <p class="text-[9px] text-gray-600 mt-1.5">When locked, the affiliate cannot toggle auto-payout or request manual payouts.</p>
+                </div>
+                <!-- Payment Method (admin-editable) -->
+                <div id="aff-payment-row" class="hidden border-t border-white/5 pt-4">
+                    <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-2">Payment Method</label>
+                    <div class="custom-select relative w-full mb-3">
+                        <button type="button" data-cs-btn class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg text-sm bg-white/5 border border-white/10 text-white hover:border-white/20 transition">
+                            <span data-cs-label>— Not set —</span>
+                            <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div data-cs-dd class="hidden absolute left-0 right-0 mt-1 rounded-xl bg-[#1a1a1a] border border-white/10 shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
+                            <div data-cs-opts>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="">— Not set —</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="trc20">USDT — TRC-20</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="bep20">USDT — BEP-20</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="btc">BTC — Native</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="aff-payment-method" value="">
+                    </div>
+                    <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Wallet Address</label>
+                    <input type="text" id="aff-wallet-address" class="form-input w-full px-3 py-2.5 rounded-lg text-sm font-mono" placeholder="0x... / T... / bc1...">
+                    <p class="text-[9px] text-gray-600 mt-1.5">Override the affiliate's payment method and wallet if they need assistance.</p>
+                </div>
+                <!-- Phone & Address (read-only from affiliate settings) -->
+                <div id="aff-contact-row" class="hidden border-t border-white/5 pt-4">
+                    <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-2">Phone Number</label>
+                    <input type="tel" id="aff-phone" class="form-input w-full px-3 py-2.5 rounded-lg text-sm mb-3 opacity-70" readonly>
+                    <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-2">Address</label>
+                    <div class="grid grid-cols-2 gap-2 mb-1">
+                        <input type="text" id="aff-street" class="form-input w-full px-3 py-2 rounded-lg text-[11px] opacity-70 col-span-2" readonly placeholder="Street">
+                        <input type="text" id="aff-city" class="form-input w-full px-3 py-2 rounded-lg text-[11px] opacity-70" readonly placeholder="City">
+                        <input type="text" id="aff-state" class="form-input w-full px-3 py-2 rounded-lg text-[11px] opacity-70" readonly placeholder="State">
+                        <input type="text" id="aff-zip" class="form-input w-full px-3 py-2 rounded-lg text-[11px] opacity-70" readonly placeholder="ZIP">
+                        <input type="text" id="aff-country" class="form-input w-full px-3 py-2 rounded-lg text-[11px] opacity-70" readonly placeholder="Country">
+                    </div>
+                    <p class="text-[9px] text-gray-600 mt-1.5">Contact info is set by the affiliate in their settings.</p>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button onclick="submitAffiliate()" class="btn-gradient flex-1 py-2.5 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider">Save</button>
+                <button onclick="closeModal('affiliate-modal')" class="flex-1 py-2.5 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-wider border border-white/10 hover:bg-white/5 transition">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deal Modal (Create/Edit) -->
+    <div id="deal-modal" class="modal-overlay fixed inset-0 z-[9999] hidden flex items-center justify-center">
+        <div class="glass-panel rounded-2xl p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+            <h3 id="deal-modal-title" class="text-sm font-bold text-white uppercase tracking-wider mb-5">Add Deal</h3>
+            <input type="hidden" id="deal-edit-id">
+            <div class="space-y-4">
+                <div>
+                    <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Broker</label>
+                    <div class="custom-select relative w-full">
+                        <button type="button" data-cs-btn class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg text-sm bg-white/5 border border-white/10 text-white hover:border-white/20 transition">
+                            <span data-cs-label>Select a broker...</span>
+                            <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div data-cs-dd class="hidden absolute left-0 right-0 mt-1 rounded-xl bg-[#1a1a1a] border border-white/10 shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
+                            <div data-cs-opts>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="">Select a broker...</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="deal-broker" value="">
+                    </div>
+                    <p class="text-[9px] text-gray-600 mt-1">Manage brokers in the Deals tab toolbar.</p>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Title <span class="text-gray-700">(optional)</span></label><input type="text" id="deal-title" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" placeholder="e.g. Premium CPA"></div>
+                    <div><label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Type</label>
+                        <div class="custom-select relative w-full">
+                            <button type="button" data-cs-btn class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg text-sm bg-white/5 border border-white/10 text-white hover:border-white/20 transition">
+                                <span data-cs-label>CPA</span>
+                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </button>
+                            <div data-cs-dd class="hidden absolute left-0 right-0 mt-1 rounded-xl bg-[#1a1a1a] border border-white/10 shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
+                                <div data-cs-opts>
+                                    <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="CPA">CPA</div>
+                                    <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="RevShare">RevShare</div>
+                                    <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="Hybrid">Hybrid</div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="deal-type" value="CPA">
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Logo URL <span class="text-gray-700">(optional)</span></label><input type="text" id="deal-logo" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" placeholder="https://..."></div>
+                    <div><label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Broker Link <span class="text-gray-700">(optional)</span></label><input type="text" id="deal-broker-link" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" placeholder="https://broker.com/ref/..."></div>
+                </div>
+                <div><label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Description</label><textarea id="deal-description" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" rows="2" placeholder="Optional deal description..."></textarea></div>
+
+                <!-- Commission Tiers -->
+                <div class="border-t border-white/5 pt-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <label class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Commission Tiers</label>
+                        <button type="button" onclick="addTierRow()" class="text-[10px] font-bold text-brand-500 hover:text-brand-400 transition uppercase">+ Add Tier</button>
+                    </div>
+                    <p class="text-[9px] text-gray-600 mb-3">Define commission tiers with amount ranges, triggers and payouts.</p>
+                    <div id="deal-tiers-list" class="space-y-2"></div>
+                </div>
+
+                <div>
+                    <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Assign to Affiliates <span class="text-gray-700">(optional — leave empty for general deal)</span></label>
+                    <div class="afp-search-wrap relative">
+                        <input type="text" id="deal-afp-input" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" placeholder="Search affiliate to add..." autocomplete="off">
+                        <div id="deal-afp-dropdown" class="afp-dropdown absolute top-full left-0 w-full mt-1 glass-panel rounded-lg max-h-36 overflow-y-auto hidden z-50"></div>
+                    </div>
+                    <div id="deal-afp-chips" class="flex flex-wrap gap-1.5 mt-2 min-h-[8px]"></div>
+                </div>
+                <div><label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Notes</label><textarea id="deal-notes" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" rows="2" placeholder="Optional notes..."></textarea></div>
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button onclick="submitDeal()" class="btn-gradient flex-1 py-2.5 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider">Save</button>
+                <button onclick="closeModal('deal-modal')" class="flex-1 py-2.5 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-wider border border-white/10 hover:bg-white/5 transition">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conversion Modal (Create/Edit) -->
+    <div id="conv-modal" class="modal-overlay fixed inset-0 z-[9999] hidden flex items-center justify-center">
+        <div class="glass-panel rounded-2xl p-6 w-full max-w-lg mx-4">
+            <h3 id="conv-modal-title" class="text-sm font-bold text-white uppercase tracking-wider mb-5">Add Conversion</h3>
+            <input type="hidden" id="conv-edit-id">
+            <div class="space-y-4">
+                <!-- Affiliate (always shown) -->
+                <div>
+                    <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Affiliate</label>
+                    <div class="afp-search-wrap relative">
+                        <input type="text" id="conv-afp-input" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" placeholder="Search affiliate..." autocomplete="off">
+                        <div id="conv-afp-dropdown" class="afp-dropdown absolute top-full left-0 w-full mt-1 glass-panel rounded-lg max-h-36 overflow-y-auto hidden z-50"></div>
+                        <input type="hidden" id="conv-afp-value">
+                    </div>
+                </div>
+                <!-- Event Type + Status row (always shown) -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Event Type</label>
+                        <div class="custom-select relative w-full" data-onchange="onConvTypeChange()">
+                            <button type="button" data-cs-btn class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg text-sm bg-white/5 border border-white/10 text-white hover:border-white/20 transition">
+                                <span data-cs-label>Registration</span>
+                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </button>
+                            <div data-cs-dd class="hidden absolute left-0 right-0 mt-1 rounded-xl bg-[#1a1a1a] border border-white/10 shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
+                                <div data-cs-opts>
+                                    <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="registration">Registration</div>
+                                    <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="ftd">FTD</div>
+                                    <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="qualified_cpa">Qualified CPA</div>
+                                    <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="commission">Commission</div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="conv-event-type" value="registration">
+                        </div>
+                    </div>
+                    <div><label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Status</label>
+                        <div class="custom-select relative w-full">
+                            <button type="button" data-cs-btn class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg text-sm bg-white/5 border border-white/10 text-white hover:border-white/20 transition">
+                                <span data-cs-label>Pending</span>
+                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </button>
+                            <div data-cs-dd class="hidden absolute left-0 right-0 mt-1 rounded-xl bg-[#1a1a1a] border border-white/10 shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
+                                <div data-cs-opts>
+                                    <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="pending">Pending</div>
+                                    <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="approved">Approved</div>
+                                    <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="rejected">Rejected</div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="conv-form-status" value="pending">
+                        </div>
+                    </div>
+                </div>
+                <!-- User ID: free text for Registration, search for others -->
+                <div id="conv-uid-row">
+                    <div id="conv-uid-free">
+                        <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">User ID</label>
+                        <input type="text" id="conv-user-id" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" placeholder="user-12345">
+                    </div>
+                    <div id="conv-uid-search" class="hidden">
+                        <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Search Existing User ID <span id="conv-uid-prereq" class="text-brand-500"></span></label>
+                        <div class="relative">
+                            <input type="text" id="conv-user-search" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" placeholder="Search user ID..." autocomplete="off">
+                            <div id="conv-user-dropdown" class="absolute top-full left-0 w-full mt-1 glass-panel rounded-lg max-h-40 overflow-y-auto hidden z-50 border border-white/10"></div>
+                        </div>
+                        <p id="conv-uid-info" class="text-[10px] text-gray-600 mt-1 hidden"></p>
+                    </div>
+                </div>
+                <!-- Country (registration + ftd) -->
+                <div id="conv-country-row" class="grid grid-cols-2 gap-3">
+                    <div><label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Country (ISO)</label><input type="text" id="conv-country" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" placeholder="FR" maxlength="2"></div>
+                    <div id="conv-broker-row"><label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Broker</label><input type="text" id="conv-broker" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" placeholder="e.g. CelXpert"></div>
+                </div>
+                <!-- Date (always shown) -->
+                <div>
+                    <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Date (occurred at)</label>
+                    <input type="datetime-local" id="conv-date" class="form-input w-full px-3 py-2.5 rounded-lg text-sm">
+                </div>
+                <!-- Deposit (ftd only) -->
+                <div id="conv-deposit-row" class="hidden">
+                    <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Deposit Amount $</label>
+                    <input type="number" id="conv-deposit" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" step="0.01" placeholder="0.00">
+                </div>
+                <!-- Commission (commission only) -->
+                <div id="conv-commission-row" class="hidden">
+                    <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Commission Amount $ <span class="text-gray-600">(CPA)</span></label>
+                    <input type="number" id="conv-commission" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" step="0.01" placeholder="0.00">
+                </div>
+                <!-- Validation message -->
+                <div id="conv-validation-msg" class="hidden text-[10px] text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2"></div>
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button onclick="submitConversion()" class="btn-gradient flex-1 py-2.5 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider">Save</button>
+                <button onclick="closeModal('conv-modal')" class="flex-1 py-2.5 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-wider border border-white/10 hover:bg-white/5 transition">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payout Modal (Create/Edit) -->
+    <div id="payout-modal" class="modal-overlay fixed inset-0 z-[9999] hidden flex items-center justify-center">
+        <div class="glass-panel rounded-2xl p-6 w-full max-w-md mx-4">
+            <h3 id="payout-modal-title" class="text-sm font-bold text-white uppercase tracking-wider mb-5">Create Payout</h3>
+            <input type="hidden" id="payout-edit-id">
+            <div class="space-y-4">
+                <div>
+                    <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Affiliate</label>
+                    <div class="afp-search-wrap relative">
+                        <input type="text" id="payout-afp-input" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" placeholder="Search affiliate..." autocomplete="off">
+                        <div id="payout-afp-dropdown" class="afp-dropdown absolute top-full left-0 w-full mt-1 glass-panel rounded-lg max-h-36 overflow-y-auto hidden z-50"></div>
+                        <input type="hidden" id="payout-afp-value">
+                    </div>
+                </div>
+                <div><label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Amount</label><input type="number" id="payout-amount" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" step="0.01" placeholder="500"></div>
+                <div>
+                    <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Crypto / Network</label>
+                    <div class="custom-select relative w-full">
+                        <button type="button" data-cs-btn class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg text-sm bg-white/5 border border-white/10 text-white hover:border-white/20 transition">
+                            <span data-cs-label>USDT — TRC-20</span>
+                            <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div data-cs-dd class="hidden absolute left-0 right-0 mt-1 rounded-xl bg-[#1a1a1a] border border-white/10 shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
+                            <div data-cs-opts>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="USDT-TRC20">USDT — TRC-20</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="USDT-BEP20">USDT — BEP-20</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="USDT-ERC20">USDT — ERC-20</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="BTC-Native">BTC — Native</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="ETH-ERC20">ETH — ERC-20</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="LTC-Native">LTC — Native</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="payout-currency" value="USDT-TRC20">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Wallet Address</label>
+                    <input type="text" id="payout-wallet-admin" class="form-input w-full px-3 py-2.5 rounded-lg text-sm font-mono" placeholder="Paste wallet address...">
+                    <p class="text-[9px] text-brand-500/60 mt-1 flex items-center gap-1">
+                        <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        Verify the network carefully. Wrong network = permanent loss.
+                    </p>
+                </div>
+                <div><label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Note</label><textarea id="payout-note" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" rows="2" placeholder="Optional note..."></textarea></div>
+                <div>
+                    <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Payout Date <span class="text-gray-600">(optional — defaults to today)</span></label>
+                    <input type="text" id="payout-date" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" placeholder="Select date..." autocomplete="off">
+                </div>
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button onclick="submitPayout()" class="btn-gradient flex-1 py-2.5 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider">Save</button>
+                <button onclick="closeModal('payout-modal')" class="flex-1 py-2.5 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-wider border border-white/10 hover:bg-white/5 transition">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Override Commission Modal -->
+    <div id="override-modal" class="modal-overlay fixed inset-0 z-[9999] hidden flex items-center justify-center">
+        <div class="glass-panel rounded-2xl p-6 w-full max-w-sm mx-4">
+            <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-5">Override Commission</h3>
+            <input type="hidden" id="override-id">
+            <div class="space-y-4">
+                <div><label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">New Commission $</label><input type="number" id="override-amount" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" step="0.01"></div>
+                <div><label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Admin Note</label><textarea id="override-note" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" rows="2"></textarea></div>
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button onclick="submitOverride()" class="btn-gradient flex-1 py-2.5 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider">Save</button>
+                <button onclick="closeModal('override-modal')" class="flex-1 py-2.5 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-wider border border-white/10 hover:bg-white/5 transition">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Broker Management Modal -->
+    <div id="broker-modal" class="modal-overlay fixed inset-0 z-[9999] hidden flex items-center justify-center">
+        <div class="glass-panel rounded-2xl p-6 w-full max-w-lg mx-4 max-h-[85vh] overflow-y-auto">
+            <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-5">Manage Brokers</h3>
+            <!-- Add Broker Form -->
+            <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5 mb-4 space-y-3">
+                <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Add New Broker</p>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-[9px] text-gray-600 block mb-1">Broker Name *</label>
+                        <input type="text" id="broker-name-input" class="form-input w-full px-3 py-2 rounded-lg text-sm" placeholder="e.g. AxiTrader">
+                    </div>
+                    <div>
+                        <label class="text-[9px] text-gray-600 block mb-1">Logo</label>
+                        <div class="flex gap-2 items-center">
+                            <label class="flex-1 cursor-pointer">
+                                <input type="file" id="broker-logo-file" accept="image/png,image/jpeg,image/webp,image/svg+xml,image/gif" class="hidden" onchange="handleBrokerLogoFile(this)">
+                                <div id="broker-logo-drop" class="form-input w-full px-3 py-2 rounded-lg text-[11px] text-gray-500 text-center border-dashed hover:border-brand-500/40 hover:text-gray-300 transition truncate">
+                                    <span id="broker-logo-label"><svg class="w-3.5 h-3.5 inline mr-1 -mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload image</span>
+                                </div>
+                            </label>
+                            <div id="broker-logo-preview" class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden hidden">
+                                <img id="broker-logo-preview-img" class="w-full h-full object-contain">
+                            </div>
+                        </div>
+                        <input type="hidden" id="broker-logo-data">
+                        <p class="text-[8px] text-gray-700 mt-0.5">PNG, JPG, WebP · Max 500 KB · Resized to 128×128</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-[9px] text-gray-600 block mb-1">Theme Color</label>
+                        <div class="flex gap-2 items-center">
+                            <input type="color" id="broker-color-input" value="#dc2626" class="w-8 h-8 rounded cursor-pointer border-0 bg-transparent [&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:rounded-lg [&::-webkit-color-swatch]:border-white/20 [&::-webkit-color-swatch]:border">
+                            <input type="text" id="broker-color-text" class="form-input flex-1 px-3 py-2 rounded-lg text-[11px] font-mono" value="#dc2626" placeholder="#dc2626">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-[9px] text-gray-600 block mb-1">Contact <span class="text-gray-700">(optional)</span></label>
+                        <input type="text" id="broker-contact-input" class="form-input w-full px-3 py-2 rounded-lg text-sm" placeholder="email or telegram">
+                    </div>
+                </div>
+                <button onclick="addBroker()" class="btn-gradient w-full py-2.5 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider">Add Broker</button>
+            </div>
+            <!-- Broker List -->
+            <div id="broker-list" class="space-y-1.5 max-h-60 overflow-y-auto"></div>
+            <div class="mt-5">
+                <button onclick="closeModal('broker-modal')" class="w-full py-2.5 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-wider border border-white/10 hover:bg-white/5 transition">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Server time clock -->
+    <script>
+        setInterval(() => {
+            const el = document.getElementById('server-time');
+            if (el) el.textContent = new Date().toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+        }, 1000);
+    </script>
+
+    <script src="js/app.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script>
+    /* ── Custom Select Dropdown System ─────────────────────── */
+    (function(){
+        function _esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+        window.initCustomSelects=function(){
+            document.querySelectorAll('.custom-select').forEach(function(wrap){
+                if(wrap._csInit)return;wrap._csInit=true;
+                var btn=wrap.querySelector('[data-cs-btn]'),dd=wrap.querySelector('[data-cs-dd]'),
+                    label=wrap.querySelector('[data-cs-label]'),hidden=wrap.querySelector('input[type="hidden"]');
+                if(!btn||!dd||!label||!hidden)return;
+                btn.addEventListener('click',function(e){
+                    e.stopPropagation();
+                    document.querySelectorAll('.custom-select').forEach(function(w){
+                        if(w!==wrap){var d2=w.querySelector('[data-cs-dd]');if(d2)d2.classList.add('hidden');
+                        var sv=w.querySelector('[data-cs-btn] svg');if(sv)sv.style.transform='';}
+                    });
+                    dd.classList.toggle('hidden');
+                    var ch=btn.querySelector('svg');if(ch)ch.style.transform=dd.classList.contains('hidden')?'':'rotate(180deg)';
+                });
+                wrap.addEventListener('click',function(e){
+                    var opt=e.target.closest('.custom-select-opt');if(!opt)return;
+                    label.textContent=opt.textContent.trim();hidden.value=opt.dataset.value;
+                    hidden.dataset.selectedLabel=opt.dataset.label||opt.textContent.trim();
+                    wrap.querySelectorAll('.custom-select-opt').forEach(function(o){
+                        if(o===opt){o.classList.add('bg-white/5','font-medium');}else{o.classList.remove('bg-white/5','font-medium');}
+                    });
+                    dd.classList.add('hidden');var ch=btn.querySelector('svg');if(ch)ch.style.transform='';
+                    hidden.dispatchEvent(new Event('change'));
+                    var onCh=wrap.dataset.onchange;if(onCh){try{(new Function(onCh))();}catch(ex){}}
+                });
+            });
+        };
+        window.setCustomSelectValue=function(id,value){
+            var hidden=document.getElementById(id);if(!hidden)return;hidden.value=value;
+            var wrap=hidden.closest('.custom-select');if(!wrap)return;
+            var label=wrap.querySelector('[data-cs-label]'),opts=wrap.querySelectorAll('.custom-select-opt'),found=false;
+            opts.forEach(function(o){var m=o.dataset.value===String(value);
+                if(m){o.classList.add('bg-white/5','font-medium');}else{o.classList.remove('bg-white/5','font-medium');}
+                if(m&&!found){label.textContent=o.textContent.trim();hidden.dataset.selectedLabel=o.dataset.label||o.textContent.trim();found=true;}
+            });
+            if(!found&&opts.length)label.textContent=opts[0].textContent.trim();
+        };
+        window.rebuildCustomSelectOptions=function(id,options,currentValue){
+            var hidden=document.getElementById(id);if(!hidden)return;
+            var wrap=hidden.closest('.custom-select');if(!wrap)return;
+            var oc=wrap.querySelector('[data-cs-opts]'),label=wrap.querySelector('[data-cs-label]');if(!oc)return;
+            oc.innerHTML=options.map(function(o){var s=String(o.value)===String(currentValue);
+                return '<div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300'+(s?' bg-white/5 font-medium':'')+'" data-value="'+_esc(String(o.value))+'"'+(o.dataLabel?' data-label="'+_esc(o.dataLabel)+'"':'')+'>'+_esc(o.label)+'</div>';
+            }).join('');
+            hidden.value=currentValue;
+            var match=options.find(function(o){return String(o.value)===String(currentValue);});
+            if(match)label.textContent=match.label;
+            else if(options.length){label.textContent=options[0].label;hidden.value=options[0].value;}
+        };
+        document.addEventListener('click',function(e){
+            if(!e.target.closest('.custom-select')){
+                document.querySelectorAll('.custom-select [data-cs-dd]').forEach(function(d){d.classList.add('hidden');});
+                document.querySelectorAll('.custom-select [data-cs-btn] svg').forEach(function(s){s.style.transform='';});
+            }
+        });
+        document.addEventListener('DOMContentLoaded',window.initCustomSelects);
+    })();
+    </script>
+    <script src="js/admin-settings.js"></script>
+</body>
+</html>

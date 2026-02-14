@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>((t)=>{if(t==="light")document.documentElement.classList.add("light-theme")})(localStorage.getItem("tfxs_theme")||"light")</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TFXS Affiliate | Login</title>
+    <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#DC2626">
+    <meta name="theme-color" content="#dc2626">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fff1f2', 100: '#ffe4e6',
+                            500: '#ef4444', 600: '#dc2626', 900: '#7f1d1d',
+                            neon: '#ff3333', yellow: '#fbbf24',
+                            dark: '#050505', panel: '#0A0A0A'
+                        }
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
+                        'pulse-ring': 'pulseRing 2s ease-out infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        pulseRing: {
+                            '0%': { transform: 'scale(0.9)', opacity: '1' },
+                            '100%': { transform: 'scale(2)', opacity: '0' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: #050505; color: #d4d4d8; }
+
+        .halo-bg {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(ellipse at 50% -20%, rgba(220,38,38,0.18) 0%, transparent 65%);
+            z-index: -1; pointer-events: none;
+        }
+
+        .glass-panel {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.6);
+        }
+
+        .form-input {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: white; transition: all 0.3s;
+        }
+        .form-input:focus {
+            outline: none; border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .form-input::placeholder { color: #52525b; }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            position: relative; overflow: hidden;
+        }
+        .btn-gradient::after {
+            content: ''; position: absolute; top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            transition: 0.6s;
+        }
+        .btn-gradient:hover::after { left: 100%; }
+
+        .logo-glow {
+            filter: drop-shadow(0 0 25px rgba(220,38,38,0.5));
+            animation: logoFloat 6s ease-in-out infinite;
+        }
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        /* Password strength indicator */
+        .strength-bar { height: 3px; border-radius: 2px; transition: all 0.4s; }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+
+        /* ── Light Theme Overrides ── */
+        .light-theme body,
+        html.light-theme body { background: #f5f5f7 !important; color: #1d1d1f !important; }
+
+        .light-theme .halo-bg {
+            background: radial-gradient(ellipse at 50% -20%, rgba(220,38,38,0.10) 0%, transparent 65%);
+        }
+
+        .light-theme .glass-panel {
+            background: rgba(255, 255, 255, 0.8) !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.12) !important;
+        }
+
+        .light-theme .form-input {
+            background: rgba(0, 0, 0, 0.03) !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+            color: #1d1d1f !important;
+        }
+        .light-theme .form-input:focus {
+            background: rgba(0, 0, 0, 0.02) !important;
+            border-color: #ef4444 !important;
+        }
+        .light-theme .form-input::placeholder { color: #9ca3af !important; }
+
+        /* Fix browser autofill styling */
+        .light-theme input:-webkit-autofill,
+        .light-theme input:-webkit-autofill:hover,
+        .light-theme input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 30px #f9fafb inset !important;
+            -webkit-text-fill-color: #1d1d1f !important;
+            border-color: rgba(0,0,0,0.1) !important;
+        }
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 30px #0a0a0a inset !important;
+            -webkit-text-fill-color: #fff !important;
+            border-color: rgba(255,255,255,0.08) !important;
+        }
+
+        .light-theme h1.text-white { color: #1d1d1f !important; }
+        .light-theme h1 span { opacity: 0.5 !important; }
+        .light-theme .text-gray-600 { color: #6b7280 !important; }
+        .light-theme .text-gray-500 { color: #6b7280 !important; }
+        .light-theme .text-gray-400 { color: #9ca3af !important; }
+        .light-theme .text-gray-700 { color: #374151 !important; }
+
+        /* Tabs */
+        .light-theme .bg-white\/\[0\.03\] {
+            background: rgba(0, 0, 0, 0.04) !important;
+            border-color: rgba(0, 0, 0, 0.06) !important;
+        }
+        .light-theme .bg-white\/10 { background: rgba(0, 0, 0, 0.06) !important; }
+
+        /* Strength bar */
+        .light-theme .strength-bar { background: rgba(0,0,0,0.06); }
+
+        /* Icons */
+        .light-theme svg.text-gray-600 { color: #9ca3af !important; }
+        .light-theme button.text-gray-600 { color: #9ca3af !important; }
+        .light-theme button.text-gray-600:hover { color: #1d1d1f !important; }
+
+        /* Pending & AFP panels in light */
+        .light-theme h3.text-white { color: #1d1d1f !important; }
+
+        /* Scrollbar light */
+        .light-theme ::-webkit-scrollbar-track { background: #f5f5f7 !important; }
+        .light-theme ::-webkit-scrollbar-thumb { background: #d1d5db !important; }
+    </style>
+</head>
+<body class="antialiased font-sans min-h-screen flex items-center justify-center selection:bg-brand-500 selection:text-white p-4">
+
+    <div class="halo-bg"></div>
+
+    <div class="w-full max-w-md animate-fade-in-up">
+        <div class="glass-panel p-8 sm:p-10 rounded-3xl">
+
+            <!-- Logo -->
+            <div class="text-center mb-8">
+                <div class="relative inline-block">
+                    <img src="assets/logo.svg" alt="TFXS" class="w-16 h-16 mx-auto mb-5 logo-glow">
+                    <div class="absolute inset-0 rounded-full bg-brand-500/20 animate-pulse-ring"></div>
+                </div>
+                <h1 class="text-2xl font-bold text-white tracking-tight">TFXS <span class="opacity-40 font-light">AFFILIATES</span></h1>
+                <p class="text-gray-600 text-[10px] font-mono mt-2 uppercase tracking-[0.2em]">Elite Dashboard Pro</p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex bg-white/[0.03] rounded-xl p-1 mb-8 border border-white/5">
+                <button id="tab-login" onclick="switchTab('login')" class="flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all duration-300 text-brand-500 bg-white/10 shadow-sm">Login</button>
+                <button id="tab-signup" onclick="switchTab('signup')" class="flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all duration-300 text-gray-500 hover:text-gray-300">Sign Up</button>
+            </div>
+
+            <!-- ════════ LOGIN FORM ════════ -->
+            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-5">
+                <div>
+                    <label class="text-[10px] font-mono text-gray-500 mb-1.5 block uppercase tracking-widest">Email or ID</label>
+                    <div class="relative">
+                        <input type="text" id="login-id" required class="w-full form-input pl-10 pr-4 py-3.5 rounded-xl text-sm" placeholder="you@email.com or TFXS-XXXXXX" autocomplete="email">
+                        <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[10px] font-mono text-gray-500 mb-1.5 block uppercase tracking-widest">Password</label>
+                    <div class="relative">
+                        <input type="password" id="login-pw" required class="w-full form-input pl-10 pr-12 py-3.5 rounded-xl text-sm" placeholder="••••••••" autocomplete="current-password">
+                        <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        <button type="button" onclick="togglePw('login-pw', this)" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-600 hover:text-white transition">
+                            <svg class="w-4 h-4 eye-open" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" id="login-btn" class="w-full btn-gradient py-3.5 rounded-xl text-xs font-bold text-white uppercase tracking-widest hover:opacity-90 transition transform active:scale-[0.98] shadow-lg shadow-brand-600/30 flex items-center justify-center gap-2">
+                    <span>Login</span>
+                    <svg class="w-4 h-4 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </button>
+                <div class="text-center mt-3">
+                    <button type="button" onclick="showForgotPassword()" class="text-[11px] text-gray-500 hover:text-brand-500 transition font-medium">Forgot your password?</button>
+                </div>
+            </form>
+
+            <!-- ════════ SIGNUP FORM ════════ -->
+            <form id="signup-form" onsubmit="handleSignup(event)" class="space-y-5 hidden">
+                <div>
+                    <label class="text-[10px] font-mono text-gray-500 mb-1.5 block uppercase tracking-widest">Display Name</label>
+                    <input type="text" id="signup-name" required class="w-full form-input px-4 py-3.5 rounded-xl text-sm" placeholder="Jordan T." autocomplete="name">
+                </div>
+                <div>
+                    <label class="text-[10px] font-mono text-gray-500 mb-1.5 block uppercase tracking-widest">Email Address</label>
+                    <input type="email" id="signup-email" required class="w-full form-input px-4 py-3.5 rounded-xl text-sm" placeholder="you@email.com" autocomplete="email">
+                </div>
+                <div>
+                    <label class="text-[10px] font-mono text-gray-500 mb-1.5 block uppercase tracking-widest">Password</label>
+                    <input type="password" id="signup-pw" required minlength="8" oninput="updateStrength(this.value)" class="w-full form-input px-4 py-3.5 rounded-xl text-sm" placeholder="Min. 8 characters" autocomplete="new-password">
+                    <div class="flex gap-1 mt-2">
+                        <div id="str-1" class="strength-bar flex-1 bg-white/10"></div>
+                        <div id="str-2" class="strength-bar flex-1 bg-white/10"></div>
+                        <div id="str-3" class="strength-bar flex-1 bg-white/10"></div>
+                        <div id="str-4" class="strength-bar flex-1 bg-white/10"></div>
+                    </div>
+                    <p id="str-label" class="text-[9px] font-mono text-gray-600 mt-1"></p>
+                </div>
+                <div>
+                    <label class="text-[10px] font-mono text-gray-500 mb-1.5 block uppercase tracking-widest">Confirm Password</label>
+                    <input type="password" id="signup-pw2" required class="w-full form-input px-4 py-3.5 rounded-xl text-sm" placeholder="••••••••" autocomplete="new-password">
+                </div>
+                <button type="submit" id="signup-btn" class="w-full btn-gradient py-3.5 rounded-xl text-xs font-bold text-white uppercase tracking-widest hover:opacity-90 transition transform active:scale-[0.98] shadow-lg shadow-brand-600/30 flex items-center justify-center gap-2">
+                    <span>Create Account</span>
+                    <svg class="w-4 h-4 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                </button>
+            </form>
+
+            <!-- ════════ FORGOT PASSWORD FORM ════════ -->
+            <form id="forgot-form" onsubmit="handleForgot(event)" class="space-y-5 hidden">
+                <div class="text-center mb-2">
+                    <p class="text-sm text-gray-400">Enter your email and we'll send you a reset link.</p>
+                </div>
+                <div>
+                    <label class="text-[10px] font-mono text-gray-500 mb-1.5 block uppercase tracking-widest">Email Address</label>
+                    <div class="relative">
+                        <input type="email" id="forgot-email" required class="w-full form-input pl-10 pr-4 py-3.5 rounded-xl text-sm" placeholder="you@email.com" autocomplete="email">
+                        <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    </div>
+                </div>
+                <button type="submit" id="forgot-btn" class="w-full btn-gradient py-3.5 rounded-xl text-xs font-bold text-white uppercase tracking-widest hover:opacity-90 transition transform active:scale-[0.98] shadow-lg shadow-brand-600/30 flex items-center justify-center gap-2">
+                    <span>Send Reset Link</span>
+                    <svg class="w-4 h-4 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                </button>
+                <div class="text-center mt-2">
+                    <button type="button" onclick="switchTab('login')" class="text-[11px] text-gray-500 hover:text-white transition font-medium">← Back to Login</button>
+                </div>
+            </form>
+
+            <!-- ════════ RESET PASSWORD FORM ════════ -->
+            <form id="reset-form" onsubmit="handleReset(event)" class="space-y-5 hidden">
+                <div class="text-center mb-2">
+                    <div class="flex items-center justify-center gap-2 mb-2">
+                        <div class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></div>
+                        <p class="text-[10px] text-brand-500 uppercase tracking-widest font-bold">Password Reset</p>
+                    </div>
+                    <p class="text-sm text-gray-400">Choose a new password for your account.</p>
+                </div>
+                <div>
+                    <label class="text-[10px] font-mono text-gray-500 mb-1.5 block uppercase tracking-widest">New Password</label>
+                    <div class="relative">
+                        <input type="password" id="reset-pw" required minlength="8" class="w-full form-input pl-10 pr-12 py-3.5 rounded-xl text-sm" placeholder="Min. 8 characters" autocomplete="new-password">
+                        <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        <button type="button" onclick="togglePw('reset-pw', this)" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-600 hover:text-white transition">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[10px] font-mono text-gray-500 mb-1.5 block uppercase tracking-widest">Confirm Password</label>
+                    <input type="password" id="reset-pw2" required class="w-full form-input px-4 py-3.5 rounded-xl text-sm" placeholder="••••••••" autocomplete="new-password">
+                </div>
+                <button type="submit" id="reset-btn" class="w-full btn-gradient py-3.5 rounded-xl text-xs font-bold text-white uppercase tracking-widest hover:opacity-90 transition transform active:scale-[0.98] shadow-lg shadow-brand-600/30 flex items-center justify-center gap-2">
+                    <span>Reset Password</span>
+                    <svg class="w-4 h-4 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                </button>
+            </form>
+
+            <!-- Message Area -->
+            <div id="auth-msg" class="hidden mt-5 text-center text-sm p-3.5 rounded-xl border transition-all duration-300"></div>
+
+            <!-- AFP Display (shown after successful signup — only for admin-created accounts) -->
+            <div id="afp-display" class="hidden mt-6 animate-fade-in-up">
+                <div class="p-5 rounded-2xl bg-gradient-to-br from-brand-500/10 to-brand-900/20 border border-brand-500/20 text-center">
+                    <div class="flex items-center justify-center gap-2 mb-3">
+                        <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Your Unique Affiliate ID</p>
+                    </div>
+                    <p class="text-3xl font-mono font-bold text-brand-500 tracking-wider" id="afp-code"></p>
+                    <p class="text-[10px] text-gray-500 mt-3 leading-relaxed">This is your permanent partner identifier.<br>Use it to track all your referrals and commissions.</p>
+                    <button onclick="copyAfp()" class="mt-4 px-4 py-2 rounded-lg border border-brand-500/30 text-brand-500 hover:bg-brand-500 hover:text-white transition-all text-[10px] font-bold uppercase tracking-wider">
+                        <svg class="w-3.5 h-3.5 inline mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy ID
+                    </button>
+                </div>
+                <p class="text-[10px] text-green-500/80 text-center mt-3 flex items-center justify-center gap-1">
+                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    Credentials sent to your email
+                </p>
+            </div>
+
+            <!-- Pending Approval Display (shown after regular signup) -->
+            <div id="pending-display" class="hidden mt-6 animate-fade-in-up">
+                <div class="p-6 rounded-2xl bg-gradient-to-br from-amber-500/10 to-amber-900/10 border border-amber-500/20 text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Application Submitted</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">Your account is pending approval.<br>An administrator will review your application shortly.</p>
+                    <div class="mt-4 flex items-center justify-center gap-2 text-[10px] text-amber-500/80">
+                        <div class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></div>
+                        <span class="uppercase tracking-wider font-bold">Waiting for admin review</span>
+                    </div>
+                    <p class="text-[10px] text-gray-600 mt-4">You will be able to log in once your account is approved.</p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <p class="text-center mt-8 text-[10px] text-gray-700 font-mono">© 2026 TFXS Network — All rights reserved</p>
+        </div>
+
+
+    </div>
+
+    <script src="js/theme.js"></script>
+    <script>
+        const API_BASE = "https://tfxs-affiliates-backend.onrender.com";
+
+        // If already logged in, verify token is still valid before redirecting
+        (async function checkExistingToken() {
+            const jwt = localStorage.getItem('tfxs_jwt');
+            if (!jwt) return;
+            try {
+                // Decode and check expiry client-side first
+                const parts = jwt.split('.');
+                if (parts.length !== 3) throw new Error('bad');
+                const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+                if (payload.exp && payload.exp * 1000 < Date.now()) throw new Error('expired');
+                // Token looks valid client-side — redirect to dashboard
+                window.location.replace('/');
+            } catch (e) {
+                // Token invalid or expired — clear it and stay on login
+                localStorage.removeItem('tfxs_jwt');
+                localStorage.removeItem('affiliate_id');
+                localStorage.removeItem('is_admin');
+            }
+        })();
+
+        // ── FORGOT PASSWORD ──
+        function showForgotPassword() {
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('signup-form').classList.add('hidden');
+            document.getElementById('forgot-form').classList.remove('hidden');
+            document.getElementById('reset-form').classList.add('hidden');
+            document.getElementById('auth-msg').classList.add('hidden');
+            // Update tab visuals
+            document.getElementById('tab-login').className = 'flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all duration-300 text-gray-500 hover:text-gray-300';
+            document.getElementById('tab-signup').className = 'flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all duration-300 text-gray-500 hover:text-gray-300';
+        }
+
+        async function handleForgot(e) {
+            e.preventDefault();
+            const btn = document.getElementById('forgot-btn');
+            const email = document.getElementById('forgot-email').value.trim();
+            btn.querySelector('span').textContent = 'Sending...';
+            btn.disabled = true;
+            btn.classList.add('opacity-75');
+            try {
+                const res = await fetch(`${API_BASE}/api/auth/forgot-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await res.json();
+                showMsg(data.message || 'If that email exists, a reset link has been sent.', 'success');
+                btn.querySelector('span').textContent = '✓ Email Sent';
+            } catch (err) {
+                showMsg('Network error. Please try again.', 'error');
+                btn.querySelector('span').textContent = 'Send Reset Link';
+                btn.disabled = false;
+                btn.classList.remove('opacity-75');
+            }
+        }
+
+        async function handleReset(e) {
+            e.preventDefault();
+            const btn = document.getElementById('reset-btn');
+            const pw = document.getElementById('reset-pw').value;
+            const pw2 = document.getElementById('reset-pw2').value;
+            if (pw !== pw2) { showMsg('Passwords do not match', 'error'); return; }
+            if (pw.length < 8) { showMsg('Password must be at least 8 characters', 'error'); return; }
+            btn.querySelector('span').textContent = 'Resetting...';
+            btn.disabled = true;
+            btn.classList.add('opacity-75');
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const res = await fetch(`${API_BASE}/api/auth/reset-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: params.get('email'), token: params.get('reset'), new_password: pw })
+                });
+                const data = await res.json();
+                if (!res.ok || !data.ok) throw new Error(data.error || 'Reset failed');
+                showMsg('Password reset! You can now log in.', 'success');
+                btn.querySelector('span').textContent = '✓ Done';
+                // Clean URL and switch to login after 2s
+                setTimeout(() => { window.history.replaceState({}, '', '/login'); switchTab('login'); }, 2000);
+            } catch (err) {
+                showMsg(err.message, 'error');
+                btn.querySelector('span').textContent = 'Reset Password';
+                btn.disabled = false;
+                btn.classList.remove('opacity-75');
+            }
+        }
+
+        // ── Auto-detect reset token in URL ──
+        (function checkResetToken() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('reset') && params.get('email')) {
+                // Show reset form directly
+                document.getElementById('login-form').classList.add('hidden');
+                document.getElementById('signup-form').classList.add('hidden');
+                document.getElementById('forgot-form').classList.add('hidden');
+                document.getElementById('reset-form').classList.remove('hidden');
+                document.getElementById('tab-login').className = 'flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all duration-300 text-gray-500 hover:text-gray-300';
+                document.getElementById('tab-signup').className = 'flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all duration-300 text-gray-500 hover:text-gray-300';
+            }
+        })();
+
+        // ── Tab switching ──
+        function switchTab(tab) {
+            const loginForm = document.getElementById('login-form');
+            const signupForm = document.getElementById('signup-form');
+            const forgotForm = document.getElementById('forgot-form');
+            const resetForm = document.getElementById('reset-form');
+            const tabLogin = document.getElementById('tab-login');
+            const tabSignup = document.getElementById('tab-signup');
+            document.getElementById('auth-msg').classList.add('hidden');
+            document.getElementById('afp-display').classList.add('hidden');
+            forgotForm.classList.add('hidden');
+            resetForm.classList.add('hidden');
+
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+                tabLogin.className = 'flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all duration-300 text-brand-500 bg-white/10 shadow-sm';
+                tabSignup.className = 'flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all duration-300 text-gray-500 hover:text-gray-300';
+            } else {
+                loginForm.classList.add('hidden');
+                signupForm.classList.remove('hidden');
+                tabLogin.className = 'flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all duration-300 text-gray-500 hover:text-gray-300';
+                tabSignup.className = 'flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all duration-300 text-brand-500 bg-white/10 shadow-sm';
+            }
+        }
+
+        // ── Password visibility toggle ──
+        function togglePw(inputId, btn) {
+            const input = document.getElementById(inputId);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        // ── Password strength meter ──
+        function updateStrength(pw) {
+            let score = 0;
+            if (pw.length >= 8) score++;
+            if (/[A-Z]/.test(pw)) score++;
+            if (/[0-9]/.test(pw)) score++;
+            if (/[^A-Za-z0-9]/.test(pw)) score++;
+
+            const colors = ['', '#ef4444', '#f59e0b', '#22c55e', '#22c55e'];
+            const labels = ['', 'Weak', 'Fair', 'Strong', 'Very Strong'];
+
+            for (let i = 1; i <= 4; i++) {
+                const bar = document.getElementById(`str-${i}`);
+                bar.style.background = i <= score ? colors[score] : 'rgba(255,255,255,0.06)';
+            }
+            document.getElementById('str-label').textContent = pw.length > 0 ? labels[score] : '';
+            document.getElementById('str-label').style.color = colors[score];
+        }
+
+        // ── Messages ──
+        function showMsg(text, type) {
+            const msg = document.getElementById('auth-msg');
+            msg.classList.remove('hidden');
+            msg.textContent = text;
+            msg.className = type === 'error'
+                ? 'mt-5 text-center text-sm p-3.5 rounded-xl border border-red-500/30 bg-red-500/10 text-red-400'
+                : 'mt-5 text-center text-sm p-3.5 rounded-xl border border-green-500/30 bg-green-500/10 text-green-400';
+        }
+
+        // ── Copy AFP ──
+        function copyAfp() {
+            const code = document.getElementById('afp-code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                showMsg('ID copied to clipboard!', 'success');
+            });
+        }
+
+        // ── LOGIN ──
+        async function handleLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('login-btn');
+            const identifier = document.getElementById('login-id').value.trim();
+            const password = document.getElementById('login-pw').value;
+
+            btn.querySelector('span').textContent = 'Logging in...';
+            btn.disabled = true;
+            btn.classList.add('opacity-75');
+
+            try {
+                const res = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ identifier, password })
+                });
+                const data = await res.json();
+
+                if (!res.ok || !data.ok) {
+                    // Handle pending / rejected account states
+                    if (data.error === 'pending') {
+                        document.getElementById('login-form').classList.add('hidden');
+                        document.getElementById('pending-display').classList.remove('hidden');
+                        showMsg('Your account is pending approval.', 'error');
+                        return;
+                    }
+                    if (data.error === 'rejected') {
+                        showMsg('Your account application has been declined. Contact support for more information.', 'error');
+                        btn.querySelector('span').textContent = 'Sign In';
+                        btn.disabled = false;
+                        btn.classList.remove('opacity-75');
+                        return;
+                    }
+                    throw new Error(data.error || 'Login failed');
+                }
+
+                // Store auth data
+                localStorage.setItem('tfxs_jwt', data.token);
+                localStorage.setItem('affiliate_id', data.afp);
+                if (data.is_admin) localStorage.setItem('is_admin', 'true');
+                else localStorage.removeItem('is_admin');
+
+                // Also cache display name for settings-loader
+                if (data.display_name) {
+                    const cache = JSON.parse(localStorage.getItem('tfxs_settings') || '{}');
+                    cache.displayName = data.display_name;
+                    localStorage.setItem('tfxs_settings', JSON.stringify(cache));
+                }
+
+                showMsg('Login successful! Redirecting...', 'success');
+                btn.querySelector('span').textContent = '✓ Success';
+
+                setTimeout(() => { window.location.href = '/'; }, 800);
+
+            } catch (err) {
+                showMsg(err.message, 'error');
+                btn.querySelector('span').textContent = 'Login';
+                btn.disabled = false;
+                btn.classList.remove('opacity-75');
+            }
+        }
+
+        // ── SIGNUP ──
+        async function handleSignup(e) {
+            e.preventDefault();
+            const btn = document.getElementById('signup-btn');
+            const displayName = document.getElementById('signup-name').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-pw').value;
+            const confirm = document.getElementById('signup-pw2').value;
+
+            if (password !== confirm) {
+                showMsg('Passwords do not match', 'error');
+                return;
+            }
+            if (password.length < 8) {
+                showMsg('Password must be at least 8 characters', 'error');
+                return;
+            }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showMsg('Please enter a valid email address', 'error');
+                return;
+            }
+
+            btn.querySelector('span').textContent = 'Creating account...';
+            btn.disabled = true;
+            btn.classList.add('opacity-75');
+
+            try {
+                const res = await fetch(`${API_BASE}/api/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ display_name: displayName, email, password })
+                });
+                const data = await res.json();
+
+                if (!res.ok || !data.ok) {
+                    throw new Error(data.error || 'Registration failed');
+                }
+
+                // Account is now PENDING — do NOT store JWT or redirect
+                if (data.pending) {
+                    // Hide signup form, show pending approval screen
+                    document.getElementById('signup-form').classList.add('hidden');
+                    document.getElementById('afp-display').classList.add('hidden');
+                    document.getElementById('pending-display').classList.remove('hidden');
+                    showMsg('Application submitted successfully!', 'success');
+                    return;
+                }
+
+                // Fallback for admin-created accounts that return token directly
+                if (data.token) {
+                    localStorage.setItem('tfxs_jwt', data.token);
+                    localStorage.setItem('affiliate_id', data.afp);
+                    if (data.display_name) {
+                        localStorage.setItem('tfxs_settings', JSON.stringify({ displayName: data.display_name, email }));
+                    }
+                    document.getElementById('afp-code').textContent = data.afp;
+                    document.getElementById('afp-display').classList.remove('hidden');
+                    document.getElementById('signup-form').classList.add('hidden');
+                    showMsg(`Account created! Welcome ${displayName}`, 'success');
+                    setTimeout(() => { window.location.href = '/'; }, 5000);
+                }
+
+            } catch (err) {
+                showMsg(err.message, 'error');
+                btn.querySelector('span').textContent = 'Create Account';
+                btn.disabled = false;
+                btn.classList.remove('opacity-75');
+            }
+        }
+    </script>
+</body>
+</html>

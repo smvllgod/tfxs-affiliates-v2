@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>((t)=>{if(t==="light")document.documentElement.classList.add("light-theme")})(localStorage.getItem("tfxs_theme")||"light")</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TFXS Affiliate | Broker Deals</title>
+    <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+    <link rel="manifest" href="/manifest.json">
+    <meta property="og:title" content="TFXS Affiliates — Broker Deals">
+    <meta property="og:description" content="Active CPA commission structures and broker partnerships.">
+    <meta property="og:image" content="assets/logo.svg">
+    <meta property="og:type" content="website">
+    <meta name="theme-color" content="#dc2626">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/shared.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fff1f2',
+                            100: '#ffe4e6',
+                            500: '#ef4444', 
+                            600: '#dc2626',
+                            900: '#7f1d1d',
+                            neon: '#ff3333',
+                            yellow: '#fbbf24',
+                            dark: '#050505',
+                            panel: '#0A0A0A'
+                        }
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #050505;
+            color: #d4d4d8;
+        }
+
+        .halo-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(ellipse 140% 70% at 50% -5%, rgba(220,38,38,0.14) 0%, rgba(220,38,38,0.08) 20%, rgba(220,38,38,0.04) 38%, rgba(220,38,38,0.015) 55%, rgba(220,38,38,0.004) 72%, rgba(220,38,38,0) 100%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .glass-panel {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .glass-hover {
+            transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+        }
+        .glass-hover:hover {
+            border-color: rgba(220, 38, 38, 0.5);
+            background: rgba(30,30,30, 0.8);
+            transform: translateY(-3px) scale(1.005);
+            box-shadow: 0 12px 36px -10px rgba(220, 38, 38, 0.22), 0 0 0 1px rgba(220,38,38,0.12);
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #dc2626; }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+    </style>
+</head>
+<body class="antialiased font-sans min-h-screen relative overflow-x-hidden selection:bg-brand-500 selection:text-white pb-20">
+
+    <div class="halo-bg"></div>
+
+    <nav class="sticky top-0 z-50 w-full glass-panel border-b-0 border-white/5 py-3 sm:py-4">
+        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 flex items-center justify-between gap-3 sm:gap-4 relative">
+            <div class="flex items-center gap-4 sm:gap-10">
+                <a href="/" class="flex items-center gap-2 group cursor-pointer no-underline">
+                    <img src="assets/logo.svg" alt="TFXS Logo" class="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow-[0_0_15px_rgba(220,38,38,0.5)]">
+                    <span class="hidden sm:inline text-lg sm:text-xl font-bold tracking-tight text-white group-hover:text-brand-500 transition-colors">TFXS<span class="opacity-50 font-light"> AFFILIATES</span></span>
+                </a>
+
+                <div id="nav-links" class="hidden md:flex items-center gap-1 bg-white/5 p-1 rounded-lg border border-white/5">
+                    <a href="/" class="px-4 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition rounded-md hover:bg-white/5" data-i18n="nav.dashboard">Dashboard</a>
+                    <a href="/reports" class="px-4 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition rounded-md hover:bg-white/5" data-i18n="nav.reports">Reports</a>
+                    <a href="/deals" class="px-4 py-1.5 text-xs font-semibold text-brand-500 bg-white/10 rounded-md shadow-sm" data-i18n="nav.deals">Deals</a>
+                    <a href="/assets" class="px-4 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition rounded-md hover:bg-white/5" data-i18n="nav.assets">Assets</a>
+                    <a href="/settings" class="px-4 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition rounded-md hover:bg-white/5" data-i18n="nav.settings">Settings</a>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 sm:gap-6">
+                <div class="hidden lg:flex flex-col items-end">
+                    <span class="text-[10px] text-gray-500 font-mono btn-primary uppercase tracking-wider" data-i18n="nav.serverTime">Server Time</span>
+                    <span id="server-time" class="text-xs font-mono font-bold text-white">--:--:--</span>
+                </div>
+                <div class="h-8 w-[1px] bg-white/10 hidden lg:block"></div>
+                
+                <!-- Language Selector -->
+                <div id="lang-selector-anchor"></div>
+                <!-- Theme Toggle -->
+                <div id="theme-toggle-anchor"></div>
+
+                <!-- Notification Bell -->
+                <button class="notification-bell-btn relative p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                    <span id="notif-badge" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-brand-500 text-white text-[9px] font-bold shadow-[0_0_8px_#ef4444]" style="display:none;">0</span>
+                </button>
+
+                <!-- Mobile Menu Toggle -->
+                <button id="mobile-menu-toggle" class="md:hidden p-2 text-gray-400 hover:text-white transition rounded-lg hover:bg-white/5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+
+                <a id="nav-avatar-link" href="/settings" class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-sm font-bold text-white leading-none nav-display-name">—</p>
+                        <p class="text-[10px] text-brand-500 font-mono mt-1 nav-afp-label">—</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-b from-gray-700 to-black border border-white/20 relative overflow-hidden ring-2 ring-brand-500/20">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=default" alt="Avatar" class="w-full h-full object-cover opacity-80">
+                    </div>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Connecting overlay — full-page, fixed at top -->
+    <div id="connecting-overlay" class="fixed inset-0 z-[9998]" style="background:rgba(5,5,5,0.85); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);">
+        <div class="flex items-center justify-center gap-3 px-6 py-3 mt-[72px]" style="background:linear-gradient(90deg, transparent, rgba(220,38,38,0.06), transparent);">
+            <div class="relative w-5 h-5 flex-shrink-0">
+                <div class="absolute inset-0 rounded-full border-2 border-white/10"></div>
+                <div class="absolute inset-0 rounded-full border-2 border-t-red-500 animate-spin"></div>
+            </div>
+            <p class="text-xs font-mono text-gray-400 tracking-wider" data-i18n="deals.connecting">Connecting to live data<span class="connecting-dots"></span></p>
+            <p class="text-[10px] text-gray-600 ml-1" data-i18n="deals.mayTake">— may take a few seconds</p>
+        </div>
+    </div>
+    <style>
+        @keyframes connectDots { 0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} }
+        .connecting-dots::after { content:''; animation: connectDots 1.5s steps(4,end) infinite; }
+    </style>
+
+    <main class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 mt-8 sm:mt-12 space-y-8 animate-fade-in-up">
+        
+        <header class="flex justify-between items-end gap-8 border-b border-white/5 pb-8">
+            <div>
+                 <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight" data-i18n="deals.title">Active Commission Structures</h1>
+                 <p class="text-gray-400 mt-2 font-light" data-i18n="deals.subtitle">Detailed breakdown of your current CPA deals.</p>
+            </div>
+        </header>
+
+        <!-- Dynamic deals container — populated by deals.js -->
+        <div id="deals-container" class="space-y-6">
+            <!-- Loading skeleton while waiting for API -->
+            <div class="glass-panel p-6 rounded-2xl border border-white/10 animate-pulse">
+                <div class="flex gap-4 items-start">
+                    <div class="w-12 h-12 rounded-lg bg-white/5"></div>
+                    <div class="flex-1 space-y-3">
+                        <div class="h-6 w-48 bg-white/5 rounded"></div>
+                        <div class="h-3 w-64 bg-white/5 rounded"></div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mt-6">
+                    <div class="h-16 bg-white/5 rounded-lg"></div>
+                    <div class="h-16 bg-white/5 rounded-lg"></div>
+                </div>
+            </div>
+            <div class="glass-panel p-6 rounded-2xl border border-white/10 animate-pulse">
+                <div class="flex gap-4 items-start">
+                    <div class="w-12 h-12 rounded-lg bg-white/5"></div>
+                    <div class="flex-1 space-y-3">
+                        <div class="h-6 w-40 bg-white/5 rounded"></div>
+                        <div class="h-3 w-56 bg-white/5 rounded"></div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mt-6">
+                    <div class="h-16 bg-white/5 rounded-lg"></div>
+                    <div class="h-16 bg-white/5 rounded-lg"></div>
+                    <div class="h-16 bg-white/5 rounded-lg col-span-2"></div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+    <script src="js/app.js"></script>
+    <script>
+        // Server Time Clock
+        function updateServerTime() {
+            const timeElement = document.getElementById("server-time");
+            if (!timeElement) return;
+
+            const now = new Date();
+            
+            // Format time: HH:MM:SS
+            const timeString = now.toLocaleTimeString("en-US", { 
+                hour12: false, 
+                hour: "2-digit", 
+                minute: "2-digit", 
+                second: "2-digit" 
+            });
+
+            // Get Timezone offset (e.g. UTC+1)
+            const offset = -now.getTimezoneOffset() / 60;
+            const sign = offset >= 0 ? "+" : "-";
+            const absOffset = Math.abs(offset);
+            const timezoneString = `UTC${sign}${absOffset}`;
+
+            timeElement.textContent = `${timeString} ${timezoneString}`;
+        }
+
+        // Update immediately and then every second
+        updateServerTime();
+        setInterval(updateServerTime, 1000);
+    </script>
+
+    <!-- Live Data Connectors -->
+    <script src="js/theme.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/settings-loader.js"></script>
+    <script src="js/deals.js"></script>
+</body>
+</html>
