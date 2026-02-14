@@ -1004,7 +1004,7 @@
             });
 
             // Calculate KPIs from live data (these are initial values, overwritten by backend)
-            const totalCommission = filteredEarnings.filter(e => e.type === 'Commission' || e.type === 'QCPA').reduce((acc, curr) => acc + (curr.commission_amount || curr.amount || 0), 0);
+            const totalCommission = filteredEarnings.filter(e => e.type === 'Commission').reduce((acc, curr) => acc + (curr.commission_amount || curr.amount || 0), 0);
             const totalRegs = filteredRegs.length;
             const ftDs = filteredEarnings.filter(e => e.type === 'FTD').length;
             // QFTD: only count actual qualified_cpa events (not mock logic)
@@ -1222,16 +1222,16 @@
                 });
             });
 
-            // Add earnings — distinguish FTD vs Commission/QCPA by event type
-            earnings.filter(e => e.amount > 0).forEach(e => {
+            // Add earnings — distinguish FTD vs Commission vs QCPA by event type
+            earnings.filter(e => e.type === 'Commission' || e.type === 'FTD' || e.type === 'QCPA').forEach(e => {
                 let country = 'Unknown', flag = '🌍', countryCode = '';
                 if(database) {
                     const user = database.registrations.find(u => u.userId === e.userId);
                     if(user && user.country) { country = user.country.name; flag = user.country.flag; countryCode = user.country.code; }
                 }
-                // Use the actual event type from the data
-                const evType = (e.type === 'Commission' || e.type === 'QCPA') ? 'comm' : (e.type === 'FTD' ? 'ftd' : null);
-                if (!evType) return; // skip Registration-type earnings (already covered above)
+                // QCPA is a KPI status event (no money), Commission is money, FTD is deposit
+                const evType = e.type === 'Commission' ? 'comm' : (e.type === 'FTD' ? 'ftd' : (e.type === 'QCPA' ? 'qcpa' : null));
+                if (!evType) return;
                 events.push({
                     type: evType,
                     date: new Date(e.created),
@@ -1239,7 +1239,7 @@
                     flag: flag,
                     countryCode: countryCode,
                     userId: e.userId,
-                    amount: e.amount
+                    amount: e.type === 'Commission' ? (e.commission_amount || e.amount || 0) : (e.type === 'FTD' ? (e.deposit_amount || e.amount || 0) : 0)
                 });
             });
 
@@ -1260,17 +1260,22 @@
 
                 const isComm = ev.type === 'comm';
                 const isFtd = ev.type === 'ftd';
+                const isQcpa = ev.type === 'qcpa';
                 const dotColor = isComm ? 'bg-brand-500 shadow-[0_0_8px_#ef4444]'
                     : isFtd ? 'bg-green-500 shadow-[0_0_8px_#22c55e]'
+                    : isQcpa ? 'bg-amber-500 shadow-[0_0_8px_#f59e0b]'
                     : 'bg-blue-500 shadow-[0_0_8px_#3b82f6]';
                 const title = isComm ? `New Commission (${ev.country})`
                     : isFtd ? `New FTD (${ev.country})`
+                    : isQcpa ? `Qualified CPA (${ev.country})`
                     : `Registration (${ev.country})`;
                 const fHTML = ev.flag || '🌍';
                 const desc = isComm
                     ? `${fHTML} Conversion from ${ev.userId}, payout: $${ev.amount.toFixed(2)}`
                     : isFtd
                     ? `${fHTML} Deposit from ${ev.userId}, amount: $${ev.amount.toFixed(2)}`
+                    : isQcpa
+                    ? `${fHTML} ${ev.userId} qualified`
                     : `${fHTML} New signup: ${ev.userId}`;
 
                 // Time ago
@@ -2719,8 +2724,8 @@
                     }
                 });
 
-                // Add Earnings/Commissions as Red dots
-                earnings.forEach((e, i) => {
+                // Add Commission events as Red dots (only real commission, not QCPA)
+                earnings.filter(e => e.type === 'Commission').forEach((e, i) => {
                      const database = window.db; 
                      if(database) {
                         const user = database.registrations.find(u => u.userId === e.userId);

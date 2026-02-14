@@ -86,12 +86,12 @@
     if (!window.db) return;
 
     const liveEarnings = events
-      .filter(e => parseFloat(e.commission_amount) > 0)
+      .filter(e => e.event_type === "commission" && parseFloat(e.commission_amount) > 0)
       .map((e, i) => ({
         id: `live-rpt-${e.id || i}`,
         userId: e.user_id || `user-${i}`,
         amount: parseFloat(e.commission_amount),
-        type: e.event_type === "ftd" ? "CPA" : e.event_type === "qualified_cpa" ? "QCPA" : "Commission",
+        type: "Commission",
         created: e.occurred_at,
         country: resolveCountry(e.country),
         affiliate_code: e.affiliate_code || "",
@@ -120,9 +120,9 @@
       if (e.event_type === "registration") u.date = e.occurred_at;
       // FTD: set deposit amount
       if (e.event_type === "ftd") u.firstDeposit = parseFloat(e.deposit_amount) || 0;
-      // Commission/QFTD: set commission amount
-      if (e.event_type === "qualified_cpa" || e.event_type === "commission") {
-        u.commission = parseFloat(e.commission_amount) || 0;
+      // Only 'commission' event carries money (QCPA is KPI-only, $0)
+      if (e.event_type === "commission") {
+        u.commission += parseFloat(e.commission_amount) || 0;
       }
     });
     const liveRegs = Object.values(userMap);

@@ -145,7 +145,7 @@ async function buildNotifications() {
                     extra: null
                 });
             }
-            if (parseFloat(ev.commission_amount) > 0) {
+            if (ev.event_type === 'commission' && parseFloat(ev.commission_amount) > 0) {
                 notifications.push({
                     type: 'comm', userId, date: evDate, icon: '🔴',
                     title: 'Commission Earned',
@@ -158,7 +158,7 @@ async function buildNotifications() {
                     type: 'qcpa', userId, date: evDate, icon: '⭐',
                     title: 'Qualified CPA',
                     desc: `${ctry.flag} ${ctry.name} — ${userId}`,
-                    extra: ev.commission_amount ? `+$${parseFloat(ev.commission_amount).toFixed(2)}` : null
+                    extra: '+1 QFTD'
                 });
             }
         });

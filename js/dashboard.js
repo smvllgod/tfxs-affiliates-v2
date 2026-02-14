@@ -206,7 +206,8 @@
       const evType = (ev.event_type || "unknown");
       let displayAmt = 0;
       if (evType === "ftd") displayAmt = parseFloat(ev.deposit_amount) || 0;
-      else if (evType === "qualified_cpa" || evType === "commission") displayAmt = parseFloat(ev.commission_amount) || 0;
+      else if (evType === "commission") displayAmt = parseFloat(ev.commission_amount) || 0;
+      // QCPA shows $0 — it's a KPI-only event, not money
       const amount = `$${displayAmt.toFixed(2)}`;
       const type = evType.replace("_", " ").toUpperCase();
       const ctry = resolveCountry(ev.country);
@@ -271,9 +272,9 @@
       if (e.event_type === "registration") u.date = e.occurred_at;
       // FTD: set deposit amount
       if (e.event_type === "ftd") u.firstDeposit = parseFloat(e.deposit_amount) || 0;
-      // Commission/QFTD: set commission
-      if (e.event_type === "qualified_cpa" || e.event_type === "commission") {
-        u.commission = parseFloat(e.commission_amount) || 0;
+      // Only 'commission' event carries money (QCPA is KPI-only)
+      if (e.event_type === "commission") {
+        u.commission += parseFloat(e.commission_amount) || 0;
       }
     });
     const liveRegs = Object.values(userMap);
@@ -282,9 +283,9 @@
     const liveEarnings = events.map((e, i) => ({
         id: `live-earn-${e.id || i}`,
         userId: e.user_id || `user-${i}`,
-        amount: e.event_type === "ftd" ? parseFloat(e.deposit_amount) || 0 : parseFloat(e.commission_amount) || 0,
+        amount: e.event_type === "ftd" ? parseFloat(e.deposit_amount) || 0 : (e.event_type === "commission" ? parseFloat(e.commission_amount) || 0 : 0),
         deposit_amount: parseFloat(e.deposit_amount) || 0,
-        commission_amount: parseFloat(e.commission_amount) || 0,
+        commission_amount: e.event_type === "commission" ? parseFloat(e.commission_amount) || 0 : 0,
         type: e.event_type === "ftd" ? "FTD" : e.event_type === "qualified_cpa" ? "QCPA" : e.event_type === "commission" ? "Commission" : "Registration",
         created: e.occurred_at,
         country: resolveCountry(e.country),
@@ -297,8 +298,8 @@
     window.db.registrations = liveRegs;
     window.db.earnings = liveEarnings;
 
-    // Update balance from live data (only approved commissions)
-    const totalComm = events.filter(e => e.status === "approved").reduce((s, e) => s + (parseFloat(e.commission_amount) || 0), 0);
+    // Update balance from live data (only approved commission events — not QCPA)
+    const totalComm = events.filter(e => e.status === "approved" && e.event_type === "commission").reduce((s, e) => s + (parseFloat(e.commission_amount) || 0), 0);
     window.db.user.balance = totalComm;
 
     // Trigger a re-render of the dashboard if the function exists
