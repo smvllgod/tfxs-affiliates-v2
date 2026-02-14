@@ -625,7 +625,7 @@
                     </div>
                 </div>
                 <div id="chartArea" class="relative w-full" style="flex:1 1 0%; min-height:0; overflow:visible;">
-                <style>@media(min-width:1024px){#chartArea{height:clamp(280px,32vh,420px);max-height:420px;min-height:280px;flex:0 0 auto}}</style>
+                <style>@media(min-width:1024px){#chartArea{height:clamp(320px,34vh,460px);max-height:460px;min-height:320px;flex:0 0 auto}}</style>
                     <div id="revenueChartContainer" style="width:100%;height:100%;overflow:visible;"></div>
                 </div>
             </div>
@@ -1443,7 +1443,8 @@
                     type: 'areaspline',
                     height: window.innerWidth >= 1024 ? '100%' : null,
                     backgroundColor: 'transparent',
-                    spacing: window.innerWidth < 640 ? [8, 4, 6, 4] : [24, 8, 0, 8],
+                    spacing: window.innerWidth < 640 ? [8, 4, 6, 4] : [24, 8, 24, 8],
+                    marginBottom: window.innerWidth >= 1024 ? 40 : undefined,
                     animation: { duration: 600, easing: 'easeOutCubic' },
                     reflow: true,
                     zooming: { type: 'x' },
@@ -1472,7 +1473,9 @@
                         rotation: window.innerWidth < 640 ? -45 : 0,
                         step: window.innerWidth < 480 ? 2 : (window.innerWidth < 640 ? 1 : 0),
                         overflow: 'allow',
-                        allowOverlap: false
+                        allowOverlap: false,
+                        reserveSpace: true,
+                        y: window.innerWidth >= 1024 ? 18 : undefined
                     },
                     lineColor: 'rgba(255,255,255,0.06)',
                     lineWidth: 1,
