@@ -607,7 +607,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-in-up" style="animation-delay: 0.2s;">
             
             <!-- Chart Section -->
-            <div class="lg:col-span-2 glass-panel rounded-2xl p-4 md:p-5 flex flex-col border border-white/5">
+            <div class="lg:col-span-2 glass-panel rounded-2xl p-4 md:p-5 flex flex-col border border-white/5 chart-card-desktop">
                 <div class="flex justify-between items-center mb-2">
                     <div>
                         <h3 class="text-lg font-bold text-white" data-i18n="dash.revenueAnalytics">Revenue Analytics</h3>
@@ -625,7 +625,7 @@
                     </div>
                 </div>
                 <div id="chartArea" class="relative w-full" style="flex:1 1 0%; min-height:0; overflow:visible;">
-                <style>@media(min-width:1024px){#chartArea{height:clamp(340px,36vh,480px);max-height:480px;min-height:340px;flex:0 0 auto}}</style>
+                <style>@media(min-width:1024px){#chartArea{min-height:380px;flex:1 1 auto}.chart-card-desktop{overflow:visible !important}}</style>
                     <div id="revenueChartContainer" style="width:100%;height:100%;overflow:visible;"></div>
                 </div>
             </div>
