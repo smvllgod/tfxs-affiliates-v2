@@ -21,12 +21,12 @@ html { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparen
 /* ── Halo glow ─────────────────────────────────────────────── */
 .halo-bg {
   position: fixed;
-  top: -30%;
+  top: -40%;
   left: 50%;
   transform: translateX(-50%);
-  width: 1100px;
-  height: 1100px;
-  background: radial-gradient(circle, rgba(220,38,38,0.18) 0%, rgba(220,38,38,0.08) 30%, transparent 70%);
+  width: 1400px;
+  height: 1400px;
+  background: radial-gradient(circle, rgba(220,38,38,0.45) 0%, rgba(220,38,38,0.25) 20%, rgba(220,38,38,0.10) 40%, transparent 70%);
   z-index: 0;
   pointer-events: none;
 }
@@ -247,7 +247,7 @@ html { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparen
 .light-theme html { background-color: #f5f5f7 !important; }
 
 .light-theme .halo-bg {
-  background: radial-gradient(circle, rgba(220,38,38,0.06) 0%, rgba(220,38,38,0.03) 30%, transparent 70%) !important;
+  background: radial-gradient(circle, rgba(220,38,38,0.18) 0%, rgba(220,38,38,0.10) 20%, rgba(220,38,38,0.04) 40%, transparent 70%) !important;
 }
 
 /* Glass panels */
