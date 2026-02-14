@@ -443,7 +443,8 @@ html { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparen
 }
 
 /* Dropdown portals — light mode */
-.light-theme #timeframe-dropdown-portal {
+.light-theme #timeframe-dropdown-portal,
+.light-theme #broker-filter-portal {
   background: #ffffff !important;
   border-color: rgba(0,0,0,0.1) !important;
   box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
