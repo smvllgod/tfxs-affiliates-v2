@@ -650,7 +650,7 @@
                     </div>
                 </div>
                 <!-- 3D Globe Container -->
-                <div class="relative w-full flex-1 min-h-[220px] bg-transparent rounded-lg overflow-hidden flex items-center justify-center cursor-move" id="globe-container">
+                <div class="relative w-full h-[220px] bg-transparent rounded-lg overflow-hidden flex items-center justify-center cursor-move" id="globe-container">
                     <canvas id="globeCanvas"></canvas>
                     <div class="absolute inset-0 pointer-events-none bg-radial-gradient"></div>
                 </div>
@@ -3023,17 +3023,14 @@
                     setTimeout(() => modal.classList.add('hidden'), 300);
                     
                     // Move Canvas Back
-                    originalContainer.appendChild(canvas); 
-                    // Important: Insert before the overlay (which is :after or absolute) is tricky if we just append.
-                    // Actually originalContainer has canvas + div.overlay. 
-                    // Let's prepend to ensure it's behind overlay if overlay has higher z-index, or check DOM order.
-                    // The overlay is `absolute inset-0`. Canvas has no adjust. 
-                    // Just appending should be fine as long as overlay has `pointer-events-none`.
+                    originalContainer.appendChild(canvas);
                     
-                    // Resize Back
-                    width = originalContainer.clientWidth;
-                    height = originalContainer.clientHeight;
-                    initGlobe();
+                    // Resize Back — use a rAF so the container has settled to its CSS height
+                    requestAnimationFrame(() => {
+                        width = originalContainer.clientWidth;
+                        height = Math.min(originalContainer.clientHeight, 220);
+                        initGlobe();
+                    });
                 }
             }
 
