@@ -1640,6 +1640,8 @@ async function loadBrokers() {
       $("deal-broker-filter")?.value || '');
     // Render broker cards in Deals & Brokers tab
     renderBrokerCards();
+    // Refresh prefix mapping broker dropdown
+    if (typeof populatePrefixBrokerDropdown === 'function') populatePrefixBrokerDropdown();
   } catch (_) {}
 }
 
@@ -1888,11 +1890,20 @@ async function loadBrokerPrefixes() {
     const res = await fetchBrokerPrefixes();
     _brokerPrefixes = res.data || res || [];
     renderBrokerPrefixes();
+    populatePrefixBrokerDropdown();
   } catch (e) {
     console.warn("[Admin] Failed to load broker prefixes:", e.message);
     const tbody = $("prefix-tbody");
     if (tbody) tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-8 text-center text-red-400 text-xs">Failed to load prefixes</td></tr>';
   }
+}
+
+function populatePrefixBrokerDropdown() {
+  const sel = $("prefix-broker-select");
+  if (!sel) return;
+  const current = sel.value;
+  sel.innerHTML = '<option value="" disabled selected>Select a broker...</option>' +
+    allBrokers.map(b => `<option value="${esc(b.name)}"${b.name === current ? ' selected' : ''}>${esc(b.name)}</option>`).join('');
 }
 
 function renderBrokerPrefixes() {
@@ -1917,15 +1928,16 @@ function renderBrokerPrefixes() {
 
 async function addBrokerPrefix() {
   const prefix = $("prefix-input")?.value.trim();
-  const broker_name = $("prefix-broker-input")?.value.trim();
+  const sel = $("prefix-broker-select");
+  const broker_name = sel?.value;
   if (!prefix) return toast("Enter a prefix pattern", "warn");
-  if (!broker_name) return toast("Enter a broker name", "warn");
+  if (!broker_name) return toast("Select a broker", "warn");
   try {
     const { addBrokerPrefixAPI } = window.TFXS_API;
     await addBrokerPrefixAPI(prefix, broker_name);
     toast("Prefix rule added");
     $("prefix-input").value = "";
-    $("prefix-broker-input").value = "";
+    sel.selectedIndex = 0;
     await loadBrokerPrefixes();
   } catch (e) { toast("Failed to add prefix: " + e.message, "error"); }
 }

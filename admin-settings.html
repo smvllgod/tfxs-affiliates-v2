@@ -342,8 +342,10 @@
                             <input type="text" id="prefix-input" class="form-input w-full px-3 py-2 rounded-lg text-sm font-mono" placeholder="e.g. vtuk-">
                         </div>
                         <div class="flex-1">
-                            <label class="text-[9px] text-gray-600 block mb-1">Broker Name *</label>
-                            <input type="text" id="prefix-broker-input" class="form-input w-full px-3 py-2 rounded-lg text-sm" placeholder="e.g. VTMarkets">
+                            <label class="text-[9px] text-gray-600 block mb-1">Broker *</label>
+                            <select id="prefix-broker-select" class="form-input w-full px-3 py-2 rounded-lg text-sm bg-white/5 border border-white/10 text-white">
+                                <option value="" disabled selected>Select a broker...</option>
+                            </select>
                         </div>
                         <button onclick="addBrokerPrefix()" class="btn-gradient px-4 py-2 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider whitespace-nowrap">+ Add</button>
                     </div>
