@@ -1532,9 +1532,9 @@
                     style: { padding: '0' },
                     formatter: function() {
                         const isLt = document.documentElement.classList.contains('light-theme');
-                        const bg = isLt ? 'rgba(255,255,255,0.96)' : 'rgba(15,15,20,0.94)';
-                        const border = isLt ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.08)';
-                        const shadow = isLt ? '0 4px 12px rgba(0,0,0,0.1)' : '0 4px 12px rgba(0,0,0,0.4)';
+                        const bg = isLt ? 'rgba(240,240,242,0.92)' : 'rgba(15,15,20,0.94)';
+                        const border = isLt ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.08)';
+                        const shadow = isLt ? '0 4px 16px rgba(0,0,0,0.15)' : '0 4px 12px rgba(0,0,0,0.4)';
                         const headerColor = isLt ? '#6b7280' : '#a1a1aa';
                         const valColor = isLt ? '#1d1d1f' : '#fff';
                         const lblColor = isLt ? '#6b7280' : '#a1a1aa';
@@ -2250,7 +2250,7 @@
                         const emoji = REGION_EMOJIS[label] || '🌐';
                         const val = series[seriesIndex];
                         const pct = ((val / regs.length) * 100).toFixed(1);
-                        return `<div style="background:${lt ? 'rgba(255,255,255,0.96)' : '#1a1a1a'};border:1px solid ${lt ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'};padding:8px 12px;border-radius:8px;font-family:Inter;box-shadow:${lt ? '0 4px 16px rgba(0,0,0,0.1)' : 'none'}">
+                        return `<div style="background:${lt ? 'rgba(240,240,242,0.92)' : '#1a1a1a'};border:1px solid ${lt ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.1)'};padding:8px 12px;border-radius:8px;font-family:Inter;box-shadow:${lt ? '0 4px 16px rgba(0,0,0,0.15)' : 'none'}">
                             <span style="font-size:14px">${emoji}</span>
                             <span style="color:${lt ? '#1d1d1f' : '#fff'};font-weight:600;font-size:12px;margin-left:4px">${label}</span>
                             <div style="color:#fbbf24;font-size:13px;font-weight:700;font-family:JetBrains Mono;margin-top:2px">${val} registrations (${pct}%)</div>
@@ -2338,7 +2338,7 @@
                         const name = countryNames[seriesIndex];
                         const d = countryData[name];
                         const pct = ((d.count / regionRegs.length) * 100).toFixed(1);
-                        return `<div style="background:${lt ? 'rgba(255,255,255,0.96)' : '#1a1a1a'};border:1px solid ${lt ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'};padding:8px 12px;border-radius:8px;font-family:Inter;box-shadow:${lt ? '0 4px 16px rgba(0,0,0,0.1)' : 'none'}">
+                        return `<div style="background:${lt ? 'rgba(240,240,242,0.92)' : '#1a1a1a'};border:1px solid ${lt ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.1)'};padding:8px 12px;border-radius:8px;font-family:Inter;box-shadow:${lt ? '0 4px 16px rgba(0,0,0,0.15)' : 'none'}">
                             <span style="font-size:16px">${d.flag}</span>
                             <span style="color:${lt ? '#1d1d1f' : '#fff'};font-weight:600;font-size:12px;margin-left:4px">${name}</span>
                             <span style="color:#71717a;font-size:10px;margin-left:4px">${d.code}</span>
@@ -2423,7 +2423,7 @@
                         const info = countryRegions[name];
                         const val = series[seriesIndex][dataPointIndex];
                         const regionColor = REGION_COLORS[info.region] || '#6b7280';
-                        return `<div style="background:${lt ? 'rgba(255,255,255,0.96)' : '#1a1a1a'};border:1px solid ${lt ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'};padding:8px 12px;border-radius:8px;font-family:Inter;box-shadow:${lt ? '0 4px 16px rgba(0,0,0,0.1)' : 'none'}">
+                        return `<div style="background:${lt ? 'rgba(240,240,242,0.92)' : '#1a1a1a'};border:1px solid ${lt ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.1)'};padding:8px 12px;border-radius:8px;font-family:Inter;box-shadow:${lt ? '0 4px 16px rgba(0,0,0,0.15)' : 'none'}">
                             <span style="font-size:14px">${info.flag}</span>
                             <span style="color:${lt ? '#1d1d1f' : '#fff'};font-weight:600;font-size:12px;margin-left:4px">${name}</span>
                             <div style="color:${regionColor};font-size:13px;font-weight:700;font-family:JetBrains Mono;margin-top:2px">$${val.toFixed(2)}</div>
