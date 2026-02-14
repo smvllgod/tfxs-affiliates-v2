@@ -1410,7 +1410,7 @@
                 revenueChart.xAxis[0].setCategories(labels, false);
                 revenueChart.series[0].setData(commData, true);
                 revenueChart.series[1].setData(regData, true);
-                revenueChart.yAxis[1].update({ tickInterval: regTick.interval, max: regTick.max }, false);
+                revenueChart.yAxis[1].update({ tickInterval: regTick.interval, max: regTick.max, tickAmount: 5 }, false);
                 revenueChart.redraw(true);
                 _lastUpdateTs = Date.now();
             };
@@ -1496,6 +1496,7 @@
                             }
                         },
                         min: 0,
+                        tickAmount: 5,
                         gridLineColor: 'rgba(255,255,255,0.04)',
                         gridLineDashStyle: 'Dot',
                         gridLineWidth: 1,
@@ -1513,9 +1514,8 @@
                             formatter: function() { return Math.round(this.value); }
                         },
                         min: 0,
-                        max: 2,
                         allowDecimals: false,
-                        tickInterval: 1,
+                        tickAmount: 5,
                         gridLineWidth: 0,
                         lineWidth: 0,
                         tickWidth: 0,
