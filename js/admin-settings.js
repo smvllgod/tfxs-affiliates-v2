@@ -551,6 +551,53 @@ async function toggleAffAutoPayoutLock() {
   } catch (e) { /* error already toasted by api() */ }
 }
 
+// ── Telegram Unlock (Admin per-affiliate) ────────────
+let _affTelegramUnlocked = false;
+let _affTelegramAffId = null;
+let _affTelegramAfp = null;
+
+function renderAffTelegramUnlock() {
+  const btn = $("aff-telegram-lock-btn");
+  const icon = $("aff-tg-lock-icon");
+  const label = $("aff-tg-lock-label");
+  if (!btn || !icon || !label) return;
+
+  if (_affTelegramUnlocked) {
+    btn.className = "flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border bg-blue-600/20 border-blue-500/40 text-blue-400 hover:bg-blue-600/30";
+    icon.innerHTML = `<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>`;
+    label.textContent = "Telegram Enabled";
+  } else {
+    btn.className = "flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border bg-gray-600/20 border-gray-500/40 text-gray-400 hover:bg-gray-600/30";
+    icon.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
+    label.textContent = "Telegram Locked";
+  }
+}
+
+async function loadAffTelegramState(dbId, afpCode) {
+  _affTelegramAffId = dbId;
+  _affTelegramAfp = afpCode;
+  _affTelegramUnlocked = false;
+  try {
+    const res = await api(`/api/settings?affiliate_id=${afpCode}`);
+    if (res?.data?.telegram_unlocked === "true" || res?.data?.telegram_unlocked === true) _affTelegramUnlocked = true;
+  } catch (_) {}
+  renderAffTelegramUnlock();
+}
+
+async function toggleAffTelegramUnlock() {
+  if (!_affTelegramAffId) return;
+  const newUnlocked = !_affTelegramUnlocked;
+  try {
+    await api(`/admin/affiliates/${_affTelegramAffId}/telegram-unlock`, {
+      method: "PATCH",
+      body: JSON.stringify({ unlocked: newUnlocked })
+    });
+    _affTelegramUnlocked = newUnlocked;
+    renderAffTelegramUnlock();
+    toast(newUnlocked ? "Telegram enabled for affiliate" : "Telegram locked for affiliate", "ok");
+  } catch (e) { /* error already toasted by api() */ }
+}
+
 function openAffModal(data) {
   affDealChips = [];
   if (data) {
@@ -568,6 +615,10 @@ function openAffModal(data) {
     const apRow = $("aff-autopayout-row");
     if (apRow) { apRow.classList.remove("hidden"); }
     loadAffAutoPayoutState(data.id, data.afp);
+    // Telegram unlock
+    const tgRow = $("aff-telegram-row");
+    if (tgRow) { tgRow.classList.remove("hidden"); }
+    loadAffTelegramState(data.id, data.afp);
     // Payment settings
     const payRow = $("aff-payment-row");
     if (payRow) { payRow.classList.remove("hidden"); }
@@ -586,6 +637,9 @@ function openAffModal(data) {
     // Hide auto-payout lock for create mode
     const apRow = $("aff-autopayout-row");
     if (apRow) { apRow.classList.add("hidden"); }
+    // Hide telegram for create mode
+    const tgRow = $("aff-telegram-row");
+    if (tgRow) { tgRow.classList.add("hidden"); }
     // Hide payment settings for create mode
     const payRow = $("aff-payment-row");
     if (payRow) { payRow.classList.add("hidden"); }
@@ -2426,6 +2480,10 @@ async function loadNotificationSettings() {
     $("notif-admin-email").value = email.config?.admin_email || "";
     $("email-evt-reg").checked = (email.events || []).includes("registration");
     $("email-evt-dep").checked = (email.events || []).includes("deposit");
+    $("email-evt-signup").checked = (email.events || []).includes("affiliate_signup");
+    $("email-evt-payout").checked = (email.events || []).includes("payout_request");
+    $("email-evt-kyc").checked = (email.events || []).includes("kyc_submitted");
+    $("email-evt-commission").checked = (email.events || []).includes("commission");
 
     _notifSettingsLoaded = true;
     loading.classList.add("hidden");
@@ -2448,6 +2506,10 @@ async function saveNotificationSettings() {
     const emailEvents = [];
     if ($("email-evt-reg").checked) emailEvents.push("registration");
     if ($("email-evt-dep").checked) emailEvents.push("deposit");
+    if ($("email-evt-signup").checked) emailEvents.push("affiliate_signup");
+    if ($("email-evt-payout").checked) emailEvents.push("payout_request");
+    if ($("email-evt-kyc").checked) emailEvents.push("kyc_submitted");
+    if ($("email-evt-commission").checked) emailEvents.push("commission");
 
     const payload = {
       channels: [

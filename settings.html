@@ -324,6 +324,188 @@
                 </div>
             </div>
 
+            <!-- ═══════ TELEGRAM NOTIFICATIONS ═══════ -->
+            <div class="mt-10 border-t border-white/5 pt-10" id="telegram-section">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                        <svg class="w-4 h-4 text-blue-400" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                        Telegram Notifications
+                    </h3>
+                    <div id="tg-status-badge"></div>
+                </div>
+
+                <!-- LOCKED STATE (default) -->
+                <div id="tg-locked-state" class="rounded-2xl p-6 border border-white/5 bg-white/[0.02]">
+                    <div class="flex flex-col items-center text-center py-6">
+                        <div class="w-16 h-16 rounded-2xl bg-gray-500/10 border border-gray-500/20 flex items-center justify-center mb-4">
+                            <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </div>
+                        <h4 class="text-sm font-bold text-gray-400 mb-2">Telegram Not Available</h4>
+                        <p class="text-xs text-gray-600 max-w-sm">Telegram notifications are not enabled for your account yet. Contact your account manager to unlock this feature.</p>
+                        <div class="mt-4 flex items-center gap-2 text-[10px] text-gray-600">
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                            <span>Requires admin activation</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- UNLOCKED STATE (hidden by default) -->
+                <div id="tg-unlocked-state" class="hidden">
+                    <div class="rounded-2xl p-6 border border-blue-500/10 bg-blue-500/[0.03]">
+                        <div class="flex items-center justify-between mb-5">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-blue-400" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-white">Your Telegram Bot</h4>
+                                    <p class="text-[10px] text-gray-500">Receive real-time alerts on your phone</p>
+                                </div>
+                            </div>
+                            <button onclick="openTelegramTutorial()" class="text-[9px] font-bold text-blue-400 hover:text-blue-300 transition uppercase tracking-wider flex items-center gap-1 px-3 py-1.5 rounded-lg border border-blue-500/20 hover:bg-blue-500/10">
+                                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                Need help?
+                            </button>
+                        </div>
+
+                        <div class="space-y-4">
+                            <!-- Bot Token -->
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1 block">Bot Token</label>
+                                <div class="relative">
+                                    <input type="password" id="aff-tg-bot-token" class="form-input text-xs px-3 py-2.5 rounded-lg w-full font-mono pr-10" placeholder="123456:ABCdefGHIjklMNOpqrSTUvwx">
+                                    <button type="button" onclick="toggleTgTokenVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition">
+                                        <svg id="tg-eye-icon" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Chat ID + Auto-discover -->
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1 block">Chat / Group ID</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="aff-tg-chat-id" class="form-input text-xs px-3 py-2.5 rounded-lg flex-1 font-mono" placeholder="-1001234567890">
+                                    <button onclick="discoverTelegramGroups()" id="tg-discover-btn" class="px-3 py-2.5 rounded-lg text-[10px] font-bold text-blue-400 border border-blue-500/20 hover:bg-blue-500/10 transition flex items-center gap-1.5 whitespace-nowrap">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                        Find Groups
+                                    </button>
+                                </div>
+                                <!-- Discovered groups dropdown -->
+                                <div id="tg-groups-list" class="hidden mt-2 rounded-xl bg-[#1a1a1a] border border-white/10 shadow-xl overflow-hidden max-h-48 overflow-y-auto"></div>
+                            </div>
+
+                            <!-- Events -->
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-2 block">Notify me about</label>
+                                <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" id="aff-tg-evt-commission" checked class="rounded">
+                                        <span class="text-xs text-gray-300">💰 Commissions</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" id="aff-tg-evt-payout" checked class="rounded">
+                                        <span class="text-xs text-gray-300">💸 Payouts</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" id="aff-tg-evt-registration" class="rounded">
+                                        <span class="text-xs text-gray-300">👤 Registrations</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" id="aff-tg-evt-deposit" class="rounded">
+                                        <span class="text-xs text-gray-300">🏦 Deposits</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="flex items-center gap-3 pt-2 border-t border-white/5">
+                                <button onclick="testAffiliateTelegram()" class="text-[9px] font-bold text-blue-400 hover:text-blue-300 transition uppercase tracking-wider flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                    Send Test
+                                </button>
+                                <span id="aff-tg-test-status" class="text-[9px] text-gray-600"></span>
+                                <div class="flex-1"></div>
+                                <button onclick="saveAffiliateTelegram()" class="btn-gradient px-4 py-2 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    Save Telegram
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════ TELEGRAM TUTORIAL MODAL ═══════ -->
+            <div id="telegram-tutorial-modal" class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-4" style="background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);">
+                <div class="glass-panel rounded-2xl p-6 w-full max-w-lg max-h-[85vh] overflow-y-auto border border-blue-500/10">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                            <svg class="w-4 h-4 text-blue-400" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                            Telegram Setup Guide
+                        </h3>
+                        <button onclick="closeTelegramTutorial()" class="text-gray-500 hover:text-white transition p-1">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+
+                    <div class="space-y-5">
+                        <!-- Step 1 -->
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400 text-sm font-bold">1</div>
+                            <div>
+                                <h4 class="text-xs font-bold text-white mb-1">Create Your Bot</h4>
+                                <p class="text-[11px] text-gray-400 leading-relaxed">Open Telegram and search for <strong class="text-blue-400">@BotFather</strong>. Send <code class="bg-white/10 px-1.5 py-0.5 rounded text-blue-300">/newbot</code> and follow the prompts to name your bot.</p>
+                            </div>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400 text-sm font-bold">2</div>
+                            <div>
+                                <h4 class="text-xs font-bold text-white mb-1">Copy the Bot Token</h4>
+                                <p class="text-[11px] text-gray-400 leading-relaxed">BotFather will give you a token like <code class="bg-white/10 px-1.5 py-0.5 rounded text-green-300 text-[10px]">123456:ABCdef...</code>. Copy it and paste it in the <strong class="text-white">Bot Token</strong> field above.</p>
+                            </div>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400 text-sm font-bold">3</div>
+                            <div>
+                                <h4 class="text-xs font-bold text-white mb-1">Create a Group & Add Your Bot</h4>
+                                <p class="text-[11px] text-gray-400 leading-relaxed">Create a new Telegram group (or use an existing one). Add your bot to the group as a member. Send any message in the group.</p>
+                            </div>
+                        </div>
+
+                        <!-- Step 4 -->
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400 text-sm font-bold">4</div>
+                            <div>
+                                <h4 class="text-xs font-bold text-white mb-1">Find Your Group</h4>
+                                <p class="text-[11px] text-gray-400 leading-relaxed">Click the <strong class="text-blue-400">"Find Groups"</strong> button to automatically detect your groups. Or manually paste the Chat ID.</p>
+                            </div>
+                        </div>
+
+                        <!-- Step 5 -->
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center text-green-400 text-sm font-bold">5</div>
+                            <div>
+                                <h4 class="text-xs font-bold text-white mb-1">Test & Save</h4>
+                                <p class="text-[11px] text-gray-400 leading-relaxed">Click <strong class="text-blue-400">"Send Test"</strong> to verify it works, then click <strong class="text-white">"Save Telegram"</strong>. Done! 🎉</p>
+                            </div>
+                        </div>
+
+                        <div class="rounded-xl bg-blue-500/5 border border-blue-500/10 p-3">
+                            <p class="text-[10px] text-blue-300/70 flex items-start gap-2">
+                                <svg class="w-3.5 h-3.5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <span>Your bot token is stored securely and is only used to send notifications to the group you specify. We never read your messages.</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <button onclick="closeTelegramTutorial()" class="w-full mt-6 py-2.5 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider border border-white/10 hover:bg-white/5 transition">Got it!</button>
+                </div>
+            </div>
+
             <!-- KYC Verification Section -->
             <div class="mt-10 border-t border-white/5 pt-10" id="kyc-section">
                 <div class="flex items-center justify-between mb-6">
@@ -533,6 +715,8 @@
                         }
                         // Auto-payout toggle state
                         loadAutoPayoutState(s);
+                        // Telegram state
+                        loadAffiliateTelegramState();
                     }
                 }).catch(err => {
                     console.warn("[Settings] Could not load saved settings:", err.message);
@@ -898,6 +1082,158 @@
             _autoPayoutEnabled = settingsData.auto_payout_enabled === 'true';
             _autoPayoutLocked = settingsData.auto_payout_locked === 'true';
             renderAutoPayoutToggle();
+        }
+
+        // ═══════ AFFILIATE TELEGRAM FUNCTIONS ═══════
+
+        async function loadAffiliateTelegramState() {
+            const API = window.TFXS_API;
+            if (!API) return;
+            try {
+                const res = await API.get('/api/telegram-settings');
+                if (!res || !res.ok) return;
+                const d = res.data || {};
+                const locked = document.getElementById('tg-locked-state');
+                const unlocked = document.getElementById('tg-unlocked-state');
+                const badge = document.getElementById('tg-status-badge');
+
+                if (d.telegram_unlocked) {
+                    // Show unlocked state
+                    if (locked) locked.classList.add('hidden');
+                    if (unlocked) unlocked.classList.remove('hidden');
+                    if (badge) badge.innerHTML = '<span class="text-[9px] font-bold px-2 py-1 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/20 uppercase">Enabled</span>';
+                    // Fill fields
+                    const tokenInput = document.getElementById('aff-tg-bot-token');
+                    const chatInput = document.getElementById('aff-tg-chat-id');
+                    if (tokenInput) tokenInput.value = d.telegram_bot_token || '';
+                    if (chatInput) chatInput.value = d.telegram_chat_id || '';
+                    // Events
+                    const events = d.telegram_events || ['commission', 'payout_processed'];
+                    const evtComm = document.getElementById('aff-tg-evt-commission');
+                    const evtPay = document.getElementById('aff-tg-evt-payout');
+                    const evtReg = document.getElementById('aff-tg-evt-registration');
+                    const evtDep = document.getElementById('aff-tg-evt-deposit');
+                    if (evtComm) evtComm.checked = events.includes('commission');
+                    if (evtPay) evtPay.checked = events.includes('payout_processed');
+                    if (evtReg) evtReg.checked = events.includes('registration');
+                    if (evtDep) evtDep.checked = events.includes('deposit');
+                } else {
+                    // Locked
+                    if (locked) locked.classList.remove('hidden');
+                    if (unlocked) unlocked.classList.add('hidden');
+                    if (badge) badge.innerHTML = '<span class="text-[9px] font-bold px-2 py-1 rounded-full bg-gray-500/20 text-gray-500 border border-gray-500/20 uppercase">Locked</span>';
+                }
+            } catch (err) {
+                console.warn('[TG Settings]', err.message);
+            }
+        }
+
+        async function saveAffiliateTelegram() {
+            const API = window.TFXS_API;
+            if (!API) return;
+            const events = [];
+            if (document.getElementById('aff-tg-evt-commission')?.checked) events.push('commission');
+            if (document.getElementById('aff-tg-evt-payout')?.checked) events.push('payout_processed');
+            if (document.getElementById('aff-tg-evt-registration')?.checked) events.push('registration');
+            if (document.getElementById('aff-tg-evt-deposit')?.checked) events.push('deposit');
+
+            try {
+                const res = await API.put('/api/telegram-settings', {
+                    bot_token: document.getElementById('aff-tg-bot-token')?.value.trim() || '',
+                    chat_id: document.getElementById('aff-tg-chat-id')?.value.trim() || '',
+                    enabled: true,
+                    events
+                });
+                if (res?.ok) {
+                    if (typeof showToast === 'function') showToast('Telegram settings saved!', 'success');
+                } else {
+                    throw new Error(res?.error || 'Save failed');
+                }
+            } catch (err) {
+                if (typeof showToast === 'function') showToast(err.message || 'Could not save', 'error');
+            }
+        }
+
+        async function testAffiliateTelegram() {
+            const API = window.TFXS_API;
+            if (!API) return;
+            const token = document.getElementById('aff-tg-bot-token')?.value.trim();
+            const chatId = document.getElementById('aff-tg-chat-id')?.value.trim();
+            const statusEl = document.getElementById('aff-tg-test-status');
+            if (!token) { if (typeof showToast === 'function') showToast('Enter a bot token first', 'error'); return; }
+            if (!chatId) { if (typeof showToast === 'function') showToast('Enter a chat ID first', 'error'); return; }
+            if (statusEl) { statusEl.textContent = 'Sending...'; statusEl.className = 'text-[9px] text-yellow-400'; }
+            try {
+                const res = await API.post('/api/telegram-settings/test', { bot_token: token, chat_id: chatId });
+                if (res?.ok) {
+                    if (statusEl) { statusEl.textContent = '✔ Sent!'; statusEl.className = 'text-[9px] text-green-400'; }
+                    setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 4000);
+                } else {
+                    throw new Error(res?.error || 'Test failed');
+                }
+            } catch (err) {
+                if (statusEl) { statusEl.textContent = '✘ ' + (err.message || 'Failed'); statusEl.className = 'text-[9px] text-red-400'; }
+            }
+        }
+
+        async function discoverTelegramGroups() {
+            const API = window.TFXS_API;
+            if (!API) return;
+            const token = document.getElementById('aff-tg-bot-token')?.value.trim();
+            if (!token) { if (typeof showToast === 'function') showToast('Enter a bot token first', 'error'); return; }
+            const btn = document.getElementById('tg-discover-btn');
+            const list = document.getElementById('tg-groups-list');
+            if (btn) btn.textContent = 'Searching...';
+            try {
+                const res = await API.post('/api/telegram-settings/discover-groups', { bot_token: token });
+                if (!res?.ok) throw new Error(res?.error || 'Failed');
+                const groups = res.groups || [];
+                if (!groups.length) {
+                    if (list) { list.innerHTML = '<div class="px-3 py-3 text-xs text-gray-500 text-center">No groups found. Make sure your bot is added to a group and someone has sent a message.</div>'; list.classList.remove('hidden'); }
+                } else {
+                    if (list) {
+                        list.innerHTML = groups.map(g => `
+                            <div class="px-3 py-2.5 text-xs hover:bg-white/10 cursor-pointer transition flex items-center justify-between border-b border-white/5 last:border-0" onclick="selectTelegramGroup('${g.id}')">
+                                <span class="text-white font-medium">${g.title}</span>
+                                <span class="text-gray-500 font-mono text-[10px]">${g.id}</span>
+                            </div>
+                        `).join('');
+                        list.classList.remove('hidden');
+                    }
+                }
+            } catch (err) {
+                if (list) { list.innerHTML = `<div class="px-3 py-3 text-xs text-red-400 text-center">${err.message || 'Error discovering groups'}</div>`; list.classList.remove('hidden'); }
+            }
+            if (btn) btn.innerHTML = '<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Find Groups';
+        }
+
+        function selectTelegramGroup(chatId) {
+            const input = document.getElementById('aff-tg-chat-id');
+            if (input) input.value = chatId;
+            const list = document.getElementById('tg-groups-list');
+            if (list) list.classList.add('hidden');
+            if (typeof showToast === 'function') showToast('Group selected!', 'success');
+        }
+
+        function toggleTgTokenVisibility() {
+            const input = document.getElementById('aff-tg-bot-token');
+            const svg = document.getElementById('tg-eye-icon');
+            if (!input) return;
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            if (svg) {
+                svg.innerHTML = isPassword
+                    ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L6.59 6.59m7.532 7.532l3.29 3.29M3 3l18 18"/>'
+                    : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>';
+            }
+        }
+
+        function openTelegramTutorial() {
+            document.getElementById('telegram-tutorial-modal')?.classList.remove('hidden');
+        }
+
+        function closeTelegramTutorial() {
+            document.getElementById('telegram-tutorial-modal')?.classList.add('hidden');
         }
 
         // --- KYC Logic ---

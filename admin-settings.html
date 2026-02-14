@@ -876,7 +876,7 @@
 
                         <div>
                             <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-2 block">Events</label>
-                            <div class="flex items-center gap-4">
+                            <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
                                 <label class="flex items-center gap-2 cursor-pointer">
                                     <input type="checkbox" id="email-evt-reg" checked class="rounded">
                                     <span class="text-xs text-gray-300">Registrations</span>
@@ -884,6 +884,22 @@
                                 <label class="flex items-center gap-2 cursor-pointer">
                                     <input type="checkbox" id="email-evt-dep" checked class="rounded">
                                     <span class="text-xs text-gray-300">Deposits</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="email-evt-signup" class="rounded">
+                                    <span class="text-xs text-gray-300">Affiliate Signup</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="email-evt-payout" class="rounded">
+                                    <span class="text-xs text-gray-300">Payout Requests</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="email-evt-kyc" class="rounded">
+                                    <span class="text-xs text-gray-300">KYC Submitted</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="email-evt-commission" class="rounded">
+                                    <span class="text-xs text-gray-300">Commission</span>
                                 </label>
                             </div>
                         </div>
@@ -967,6 +983,15 @@
                         <span id="aff-ap-lock-label">Loading...</span>
                     </button>
                     <p class="text-[9px] text-gray-600 mt-1.5">When locked, the affiliate cannot toggle auto-payout or request manual payouts.</p>
+                </div>
+                <!-- Telegram Unlock -->
+                <div id="aff-telegram-row" class="hidden border-t border-white/5 pt-4">
+                    <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-2">Telegram Notifications</label>
+                    <button id="aff-telegram-lock-btn" onclick="toggleAffTelegramUnlock()" class="flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border">
+                        <svg id="aff-tg-lock-icon" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"></svg>
+                        <span id="aff-tg-lock-label">Loading...</span>
+                    </button>
+                    <p class="text-[9px] text-gray-600 mt-1.5">When enabled, the affiliate can configure their own Telegram bot for personal notifications.</p>
                 </div>
                 <!-- Payment Method (admin-editable) -->
                 <div id="aff-payment-row" class="hidden border-t border-white/5 pt-4">
