@@ -146,11 +146,12 @@ async function buildNotifications() {
                 });
             }
             if (ev.event_type === 'commission' && parseFloat(ev.commission_amount) > 0) {
+                const commAmt = parseFloat(ev.commission_amount);
                 notifications.push({
                     type: 'comm', userId, date: evDate, icon: '🔴',
                     title: 'Commission Earned',
-                    desc: `${ctry.flag} $${parseFloat(ev.commission_amount).toFixed(2)} from ${userId}`,
-                    extra: null
+                    desc: `${ctry.flag} $${commAmt.toFixed(2)} from ${userId}`,
+                    extra: `+${Math.round(commAmt)}$`
                 });
             }
             if (ev.event_type === 'qualified_cpa') {

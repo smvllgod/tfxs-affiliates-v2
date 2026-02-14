@@ -515,6 +515,15 @@
                     <input type="hidden" id="dashboard-timeframe" value="mtd">
                 </div>
             </div>
+
+            <!-- Broker Filter -->
+            <div class="glass-panel px-4 py-2 rounded-lg flex items-center gap-2 border-white/10">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-brand-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
+                <select id="broker-filter" class="bg-transparent text-sm font-medium text-white border-none focus:ring-0 outline-none cursor-pointer appearance-none pr-6" style="background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 fill=%22%236b7280%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M19 9l-7 7-7-7%22 stroke=%22%236b7280%22 stroke-width=%222%22 fill=%22none%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 0 center;">
+                    <option value="">All Brokers</option>
+                </select>
+            </div>
+
             
             <div class="glass-panel px-4 py-2 rounded-lg flex items-center gap-2 border-white/10">
                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
@@ -1277,6 +1286,10 @@
                     : isQcpa
                     ? `${fHTML} ${ev.userId} qualified`
                     : `${fHTML} New signup: ${ev.userId}`;
+                // Extra badge for Commission (+250$) and QCPA (+1 QFTD)
+                const extraBadge = isComm ? `+${Math.round(ev.amount)}$`
+                    : isQcpa ? '+1 QFTD'
+                    : null;
 
                 // Time ago
                 const diffMs = now - ev.date;
@@ -1297,6 +1310,7 @@
                             <span class="text-[10px] font-mono text-gray-500 whitespace-nowrap">${ago}</span>
                         </div>
                         <p class="text-[10px] text-gray-400 font-light mt-0.5 truncate">${desc}</p>
+                        ${extraBadge ? `<p class="text-[10px] text-brand-500 font-medium mt-0.5">${extraBadge}</p>` : ''}
                     </div>
                 `;
                 feed.appendChild(li);

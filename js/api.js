@@ -87,15 +87,34 @@ async function apiSend(method, path, body) {
 
 // ── Exported fetch functions ─────────────────────────────
 
+/** Get the currently selected broker filter (empty string = all) */
+function getSelectedBroker() {
+  const el = document.getElementById('broker-filter');
+  return el ? el.value : '';
+}
+
+/** Fetch broker list for filter dropdown */
+async function fetchBrokers() {
+  return apiGet('/api/brokers');
+}
+
 /** KPI summary: { registrations, ftd, qualified_cpa, total_commission } */
 async function fetchSummary(affiliateId) {
-  const qs = affiliateId ? `?affiliate_id=${encodeURIComponent(affiliateId)}` : "";
+  const params = [];
+  if (affiliateId) params.push(`affiliate_id=${encodeURIComponent(affiliateId)}`);
+  const broker = getSelectedBroker();
+  if (broker) params.push(`broker=${encodeURIComponent(broker)}`);
+  const qs = params.length ? `?${params.join('&')}` : '';
   return apiGet(`/api/summary${qs}`);
 }
 
 /** Latest 50 conversion events */
 async function fetchEvents(affiliateId) {
-  const qs = affiliateId ? `?affiliate_id=${encodeURIComponent(affiliateId)}` : "";
+  const params = [];
+  if (affiliateId) params.push(`affiliate_id=${encodeURIComponent(affiliateId)}`);
+  const broker = getSelectedBroker();
+  if (broker) params.push(`broker=${encodeURIComponent(broker)}`);
+  const qs = params.length ? `?${params.join('&')}` : '';
   return apiGet(`/api/events${qs}`);
 }
 
@@ -116,6 +135,8 @@ async function fetchReports(affiliateId, from, to) {
   if (affiliateId) params.push(`affiliate_id=${encodeURIComponent(affiliateId)}`);
   if (from) params.push(`from=${from}`);
   if (to)   params.push(`to=${to}`);
+  const broker = getSelectedBroker();
+  if (broker) params.push(`broker=${encodeURIComponent(broker)}`);
   const qs = params.length > 0 ? `?${params.join("&")}` : "";
   return apiGet(`/api/reports${qs}`);
 }
@@ -334,6 +355,8 @@ window.TFXS_API = {
   getAffiliateId,
   setAffiliateId,
   clearAffiliateId,
+  getSelectedBroker,
+  fetchBrokers,
   fetchMe,
   changePassword,
   fetchSummary,

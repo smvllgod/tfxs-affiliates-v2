@@ -11,7 +11,7 @@
   "use strict";
 
   // Use shared country resolver from api.js
-  const { getAffiliateId, apiGet, fetchSummary, fetchEvents, fetchReports, fetchRoiSettings, showError, hideError, resolveCountry, escapeHtml } = window.TFXS_API;
+  const { getAffiliateId, apiGet, fetchSummary, fetchEvents, fetchReports, fetchRoiSettings, fetchBrokers, showError, hideError, resolveCountry, escapeHtml } = window.TFXS_API;
 
   const IS_ADMIN = localStorage.getItem("is_admin") === "true";
   let affiliateId = null;
@@ -31,9 +31,37 @@
     // Add a small "LIVE" indicator next to the server time
     addLiveBadge();
 
+    // Populate broker filter dropdown (non-blocking)
+    populateBrokerFilter();
+
     // First load — retry automatically on failure (Render cold start)
     attemptConnection();
   });
+
+  // ── Broker filter dropdown ──────────────────────────────
+  async function populateBrokerFilter() {
+    const select = document.getElementById('broker-filter');
+    if (!select) return;
+    try {
+      const res = await fetchBrokers();
+      if (res?.ok && res.data?.length) {
+        res.data.forEach(b => {
+          const opt = document.createElement('option');
+          opt.value = b.name;
+          opt.textContent = b.name;
+          select.appendChild(opt);
+        });
+      }
+    } catch (e) {
+      console.warn('[TFXS] Could not load brokers for filter:', e.message);
+    }
+    // Re-load dashboard when broker filter changes
+    select.addEventListener('change', () => {
+      if (typeof loadLiveData === 'function') loadLiveData().catch(() => {});
+      // Also trigger the Update button logic if updateDashboardData exists
+      if (typeof window.updateDashboardData === 'function') window.updateDashboardData();
+    });
+  }
 
   // ── Admin-specific UI tweaks ────────────────────────────
   function applyAdminUI() {
