@@ -1263,7 +1263,7 @@
 
             // Sort most recent first, take top 6
             events.sort((a, b) => b.date - a.date);
-            const top = events.slice(0, 3);
+            const top = events.slice(0, 7);
 
             if(top.length === 0) {
                 feed.innerHTML = '<li class="text-xs text-gray-500 text-center py-4">No activity for this period</li>';
