@@ -95,7 +95,8 @@
         created: e.occurred_at,
         country: resolveCountry(e.country),
         affiliate_code: e.affiliate_code || "",
-        afp: e.affiliate_code || ""
+        afp: e.affiliate_code || "",
+        broker: e.broker || ""
       }));
 
     // ── Build ONE row per user_id for Registration Report ──
@@ -112,7 +113,8 @@
           firstDeposit: 0,
           commission: 0,
           status: "Active",
-          affiliate_code: e.affiliate_code || ""
+          affiliate_code: e.affiliate_code || "",
+          broker: e.broker || ""
         };
       }
       const u = userMap[uid];

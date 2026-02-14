@@ -398,11 +398,12 @@
                 <table class="w-full">
                     <thead class="bg-white/5 text-[10px] uppercase text-gray-500 font-mono">
                         <tr>
-                            <th class="px-6 py-4 font-semibold tracking-wider text-left w-1/5" data-i18n="rep.country">Country</th>
-                            <th class="px-6 py-4 font-semibold tracking-wider text-center w-1/5" data-i18n="rep.userId">User ID</th>
-                            <th class="px-6 py-4 font-semibold tracking-wider text-center w-1/5" data-i18n="rep.created">Created</th>
-                            <th class="px-6 py-4 font-semibold tracking-wider text-center w-1/5" data-i18n="rep.firstDeposit">First Deposit</th>
-                            <th class="px-6 py-4 font-semibold tracking-wider text-center w-1/5" data-i18n="rep.commission">Commission</th>
+                            <th class="px-6 py-4 font-semibold tracking-wider text-left" data-i18n="rep.country">Country</th>
+                            <th class="px-6 py-4 font-semibold tracking-wider text-center" data-i18n="rep.userId">User ID</th>
+                            <th class="px-6 py-4 font-semibold tracking-wider text-center">Broker</th>
+                            <th class="px-6 py-4 font-semibold tracking-wider text-center" data-i18n="rep.created">Created</th>
+                            <th class="px-6 py-4 font-semibold tracking-wider text-center" data-i18n="rep.firstDeposit">First Deposit</th>
+                            <th class="px-6 py-4 font-semibold tracking-wider text-center" data-i18n="rep.commission">Commission</th>
                         </tr>
                     </thead>
                     <tbody class="text-xs divide-y divide-white/5 font-mono" id="registrations-table-body">
@@ -503,6 +504,7 @@
                     <thead class="bg-white/5 text-[10px] uppercase text-gray-500 font-mono">
                         <tr class="border-b border-white/5">
                             <th class="px-6 py-4 font-semibold tracking-wider" data-i18n="rep.userId">User ID</th>
+                            <th class="px-6 py-4 font-semibold tracking-wider">Broker</th>
                             <th class="px-6 py-4 font-semibold tracking-wider" data-i18n="rep.created">Created</th>
                             <th class="px-6 py-4 font-semibold tracking-wider" data-i18n="rep.amount">Amount</th>
                             <th class="px-6 py-4 font-semibold tracking-wider" data-i18n="rep.commType">Commission Type</th>
@@ -874,14 +876,14 @@
 
             if (regSearchVal) {
                 filteredRegs = filteredRegs.filter(r => {
-                    const haystack = [r.userId, r.country?.name, r.country?.code, new Date(r.date).toLocaleDateString()].join(' ').toLowerCase();
+                    const haystack = [r.userId, r.country?.name, r.country?.code, r.broker, new Date(r.date).toLocaleDateString()].join(' ').toLowerCase();
                     return haystack.includes(regSearchVal);
                 });
             }
 
             if (earnSearchVal) {
                 filteredEarnings = filteredEarnings.filter(e => {
-                    const haystack = [e.userId, e.type, e.afp, formatCurrency(e.amount), new Date(e.created).toLocaleDateString()].join(' ').toLowerCase();
+                    const haystack = [e.userId, e.type, e.afp, e.broker, formatCurrency(e.amount), new Date(e.created).toLocaleDateString()].join(' ').toLowerCase();
                     return haystack.includes(earnSearchVal);
                 });
             }
@@ -1083,9 +1085,11 @@
                 tr.className = 'hover:bg-white/5 transition-colors';
                 tr.dataset.userid = row.userId;
                 const affCell = IS_ADMIN ? `<td class="px-6 py-4 font-mono text-brand-500">${row.affiliate_code || row.afp || '—'}</td>` : '';
+                const brokerName = row.broker || '—';
                 tr.innerHTML = `
                     ${affCell}
                     <td class="px-6 py-4 text-white font-medium">${row.userId}</td>
+                    <td class="px-6 py-4 text-gray-300"><span class="bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded border border-purple-500/20 text-[10px]">${brokerName}</span></td>
                     <td class="px-6 py-4 text-gray-400">${formatDate(row.created)}</td>
                     <td class="px-6 py-4 text-white">${formatCurrency(row.amount)}</td>
                     <td class="px-6 py-4 text-gray-300"><span class="bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20">${row.type}</span></td>
@@ -1095,7 +1099,7 @@
             });
 
             // Total Row
-            const colSpan = IS_ADMIN ? 3 : 2;
+            const colSpan = IS_ADMIN ? 4 : 3;
             const totalRow = document.createElement('tr');
             totalRow.className = 'bg-white/5 font-bold';
             totalRow.innerHTML = `
@@ -1122,6 +1126,7 @@
                 tr.className = 'hover:bg-white/5 transition-colors';
                 tr.dataset.userid = row.userId;
                 const affCell = IS_ADMIN ? `<td class="px-6 py-4 font-mono text-brand-500">${row.affiliate_code || '—'}</td>` : '';
+                const brokerName = row.broker || '—';
                 tr.innerHTML = `
                     ${affCell}
                     <td class="px-6 py-4 text-left">
@@ -1131,6 +1136,7 @@
                         </div>
                     </td>
                     <td class="px-6 py-4 text-gray-300 text-center">${row.userId}</td>
+                    <td class="px-6 py-4 text-center"><span class="bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded border border-purple-500/20 text-[10px]">${brokerName}</span></td>
                     <td class="px-6 py-4 text-gray-400 text-center text-[10px] uppercase font-mono">${new Date(row.date).toLocaleDateString()}</td>
                     <td class="px-6 py-4 text-white text-center">${row.firstDeposit > 0 ? formatCurrency(row.firstDeposit) : '-'}</td>
                     <td class="px-6 py-4 text-brand-500 font-bold text-center">${row.commission > 0 ? formatCurrency(row.commission) : '-'}</td>
@@ -1139,7 +1145,7 @@
             });
 
             // Total Row
-            const colSpan = IS_ADMIN ? 4 : 3;
+            const colSpan = IS_ADMIN ? 5 : 4;
             const totalRow = document.createElement('tr');
             totalRow.className = 'bg-white/5 font-bold border-t border-white/10 sticky bottom-0 backdrop-blur-sm';
             totalRow.innerHTML = `

@@ -1877,6 +1877,70 @@ async function submitBrokerEdit() {
 }
 
 // ══════════════════════════════════════════════════════
+// BROKER UID PREFIX MAPPING
+// ══════════════════════════════════════════════════════
+
+let _brokerPrefixes = [];
+
+async function loadBrokerPrefixes() {
+  try {
+    const { fetchBrokerPrefixes } = window.TFXS_API;
+    const res = await fetchBrokerPrefixes();
+    _brokerPrefixes = res.data || res || [];
+    renderBrokerPrefixes();
+  } catch (e) {
+    console.warn("[Admin] Failed to load broker prefixes:", e.message);
+    const tbody = $("prefix-tbody");
+    if (tbody) tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-8 text-center text-red-400 text-xs">Failed to load prefixes</td></tr>';
+  }
+}
+
+function renderBrokerPrefixes() {
+  const tbody = $("prefix-tbody");
+  if (!tbody) return;
+  if (!_brokerPrefixes.length) {
+    tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-8 text-center text-gray-600 text-xs">No prefix rules configured yet. Add one above.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = _brokerPrefixes.map(p => `
+    <tr class="border-b border-white/5 hover:bg-white/[0.02] transition">
+      <td class="px-4 py-3 text-sm font-mono text-purple-400">${esc(p.prefix)}</td>
+      <td class="px-4 py-3 text-sm text-white">${esc(p.broker_name)}</td>
+      <td class="px-4 py-3 text-right">
+        <button onclick="deleteBrokerPrefix('${p.id}')" class="text-red-400 hover:text-red-300 text-[10px] font-bold uppercase tracking-wider transition">
+          <svg class="w-4 h-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function addBrokerPrefix() {
+  const prefix = $("prefix-input")?.value.trim();
+  const broker_name = $("prefix-broker-input")?.value.trim();
+  if (!prefix) return toast("Enter a prefix pattern", "warn");
+  if (!broker_name) return toast("Enter a broker name", "warn");
+  try {
+    const { addBrokerPrefixAPI } = window.TFXS_API;
+    await addBrokerPrefixAPI(prefix, broker_name);
+    toast("Prefix rule added");
+    $("prefix-input").value = "";
+    $("prefix-broker-input").value = "";
+    await loadBrokerPrefixes();
+  } catch (e) { toast("Failed to add prefix: " + e.message, "error"); }
+}
+
+async function deleteBrokerPrefix(id) {
+  if (!confirm("Delete this prefix mapping?")) return;
+  try {
+    const { deleteBrokerPrefixAPI } = window.TFXS_API;
+    await deleteBrokerPrefixAPI(id);
+    toast("Prefix rule deleted");
+    await loadBrokerPrefixes();
+  } catch (e) { toast("Failed to delete prefix: " + e.message, "error"); }
+}
+
+// ══════════════════════════════════════════════════════
 // AFFILIATE DEAL ASSIGNMENT (from affiliate edit modal)
 // ══════════════════════════════════════════════════════
 
@@ -2109,6 +2173,7 @@ setupAfpSearch("payout-sched-afp-input", "payout-sched-afp-dropdown", "payout-sc
 
 // Load brokers on startup
 loadBrokers();
+loadBrokerPrefixes();
 
 // Load payout schedule settings
 loadPayoutScheduleSettings();

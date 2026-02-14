@@ -325,6 +325,42 @@
                 </div>
             </div>
 
+            <!-- ═══ BROKER UID PREFIX MAPPING ═══ -->
+            <div class="mt-8 pt-6 border-t border-white/5">
+                <div class="flex items-center gap-3 mb-4">
+                    <svg class="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                    <div>
+                        <h3 class="text-sm font-bold text-white uppercase tracking-wider">UID Prefix → Broker Mapping</h3>
+                        <p class="text-[10px] text-gray-600 mt-0.5">Define which User ID prefix patterns resolve to which broker. Used to auto-detect brokers from user IDs (e.g. <code class="text-purple-400/80 bg-purple-500/5 px-1 rounded">vtuk-</code> → VTMarkets).</p>
+                    </div>
+                </div>
+                <!-- Add Prefix Form -->
+                <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5 mb-4">
+                    <div class="flex gap-3 items-end">
+                        <div class="flex-1">
+                            <label class="text-[9px] text-gray-600 block mb-1">UID Prefix *</label>
+                            <input type="text" id="prefix-input" class="form-input w-full px-3 py-2 rounded-lg text-sm font-mono" placeholder="e.g. vtuk-">
+                        </div>
+                        <div class="flex-1">
+                            <label class="text-[9px] text-gray-600 block mb-1">Broker Name *</label>
+                            <input type="text" id="prefix-broker-input" class="form-input w-full px-3 py-2 rounded-lg text-sm" placeholder="e.g. VTMarkets">
+                        </div>
+                        <button onclick="addBrokerPrefix()" class="btn-gradient px-4 py-2 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider whitespace-nowrap">+ Add</button>
+                    </div>
+                </div>
+                <!-- Prefix List Table -->
+                <div class="overflow-hidden rounded-xl border border-white/5">
+                    <table class="w-full">
+                        <thead><tr class="bg-white/[0.03]">
+                            <th class="text-left px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Prefix</th>
+                            <th class="text-left px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Broker</th>
+                            <th class="text-right px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Action</th>
+                        </tr></thead>
+                        <tbody id="prefix-tbody"><tr><td colspan="3" class="px-4 py-8 text-center text-gray-600 text-xs">Loading...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
             <!-- ═══ ROI CALCULATION SETTINGS ═══ -->
             <div class="mt-8 pt-6 border-t border-white/5">
                 <div class="flex items-center gap-3 mb-4">
