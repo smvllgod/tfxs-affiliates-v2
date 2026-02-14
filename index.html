@@ -1146,9 +1146,13 @@
                         window._lifetimeEarned = lifetime;
 
                         // ── Commission KPI shows total_earned from backend (NOT available balance) ──
-                        const commKpi = document.getElementById('kpi-commission');
-                        if (commKpi) {
-                            animateValue(commKpi, 0, lifetime, 900, v => formatCurrency(v));
+                        // BUT: when a broker filter is active, keep the broker-filtered value from fetchSummary
+                        const activeBrokerFilter = API.getSelectedBroker ? API.getSelectedBroker() : '';
+                        if (!activeBrokerFilter) {
+                            const commKpi = document.getElementById('kpi-commission');
+                            if (commKpi) {
+                                animateValue(commKpi, 0, lifetime, 900, v => formatCurrency(v));
+                            }
                         }
 
                         // Next payout date (affiliates only) / Active affiliates count (admins)
