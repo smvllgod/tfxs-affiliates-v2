@@ -81,7 +81,7 @@
             width: 1100px;
             height: 1100px;
             background: radial-gradient(circle, rgba(220,38,38,0.10) 0%, rgba(220,38,38,0.05) 30%, transparent 70%);
-            z-index: -1;
+            z-index: 0;
             pointer-events: none;
         }
 
@@ -296,6 +296,7 @@
 
     <div class="halo-bg"></div>
 
+    <div class="relative" style="z-index:1;">
     <!-- Top Navigation -->
     <nav class="sticky top-0 z-50 w-full glass-panel border-b-0 border-white/5 py-3 sm:py-4">
         <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 flex items-center justify-between gap-3 sm:gap-4 relative">
@@ -3687,6 +3688,8 @@
         if (e.target === document.getElementById('payout-modal')) closePayoutModal();
     });
     </script>
+
+    </div><!-- end relative z-1 wrapper -->
 
     <!-- Auth Guard + Live Data Connectors -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
