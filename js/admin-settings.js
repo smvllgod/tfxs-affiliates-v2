@@ -241,6 +241,7 @@ async function loadActiveTab() {
   else if (active === "kyc") await loadKycSubmissions();
   else if (active === "users") await loadUsers();
   else if (active === "audit") await loadAudit();
+  else if (active === "notifications") await loadNotificationSettings();
 }
 
 // ══════════════════════════════════════════════════════
@@ -2371,7 +2372,7 @@ async function rejectKyc(affiliateId) {
   // Hash-based tab routing (e.g. /admin-settings#kyc, #affiliates, #payouts)
   const hash = window.location.hash.replace("#", "");
   if (hash) {
-    const validTabs = ["affiliates", "deals", "conversions", "payouts", "kyc", "users", "audit"];
+    const validTabs = ["affiliates", "deals", "conversions", "payouts", "kyc", "users", "audit", "notifications"];
     if (validTabs.includes(hash)) {
       switchTab(hash);
       // If navigating to affiliates from notification, auto-filter pending
@@ -2391,3 +2392,151 @@ async function rejectKyc(affiliateId) {
   }
 })();
 
+// ══════════════════════════════════════════════════════════════
+// NOTIFICATION SETTINGS
+// ══════════════════════════════════════════════════════════════
+
+let _notifSettingsLoaded = false;
+
+async function loadNotificationSettings() {
+  const loading = $("notif-loading");
+  const content = $("notif-content");
+  if (!loading || !content) return;
+
+  try {
+    loading.classList.remove("hidden");
+    content.classList.add("hidden");
+
+    const res = await api("/admin/notification-settings");
+    const channels = res.data || [];
+
+    const tg = channels.find(c => c.channel === "telegram") || { enabled: false, config: {}, events: [] };
+    const email = channels.find(c => c.channel === "email") || { enabled: false, config: {}, events: [] };
+
+    // Telegram
+    $("tg-enabled").checked = tg.enabled;
+    $("tg-bot-token").value = tg.config?.bot_token || "";
+    $("tg-chat-regs").value = tg.config?.registrations_chat_id || "";
+    $("tg-chat-deps").value = tg.config?.deposits_chat_id || "";
+    $("tg-evt-reg").checked = (tg.events || []).includes("registration");
+    $("tg-evt-dep").checked = (tg.events || []).includes("deposit");
+
+    // Email
+    $("email-enabled").checked = email.enabled;
+    $("notif-admin-email").value = email.config?.admin_email || "";
+    $("email-evt-reg").checked = (email.events || []).includes("registration");
+    $("email-evt-dep").checked = (email.events || []).includes("deposit");
+
+    _notifSettingsLoaded = true;
+    loading.classList.add("hidden");
+    content.classList.remove("hidden");
+  } catch (err) {
+    loading.textContent = "Failed to load notification settings.";
+    console.error("[NOTIF]", err);
+  }
+}
+
+async function saveNotificationSettings() {
+  const statusEl = $("notif-save-status");
+  if (statusEl) { statusEl.textContent = "Saving..."; statusEl.className = "text-[10px] text-yellow-400"; }
+
+  try {
+    const tgEvents = [];
+    if ($("tg-evt-reg").checked) tgEvents.push("registration");
+    if ($("tg-evt-dep").checked) tgEvents.push("deposit");
+
+    const emailEvents = [];
+    if ($("email-evt-reg").checked) emailEvents.push("registration");
+    if ($("email-evt-dep").checked) emailEvents.push("deposit");
+
+    const payload = {
+      channels: [
+        {
+          channel: "telegram",
+          enabled: $("tg-enabled").checked,
+          config: {
+            bot_token: $("tg-bot-token").value.trim(),
+            registrations_chat_id: $("tg-chat-regs").value.trim(),
+            deposits_chat_id: $("tg-chat-deps").value.trim()
+          },
+          events: tgEvents
+        },
+        {
+          channel: "email",
+          enabled: $("email-enabled").checked,
+          config: {
+            admin_email: $("notif-admin-email").value.trim()
+          },
+          events: emailEvents
+        }
+      ]
+    };
+
+    await api("/admin/notification-settings", {
+      method: "PUT",
+      body: JSON.stringify(payload)
+    });
+
+    toast("Notification settings saved");
+    if (statusEl) { statusEl.textContent = "Saved ✔"; statusEl.className = "text-[10px] text-green-400"; }
+    setTimeout(() => { if (statusEl) statusEl.textContent = ""; }, 3000);
+  } catch (err) {
+    toast("Failed to save: " + err.message, "err");
+    if (statusEl) { statusEl.textContent = "Error"; statusEl.className = "text-[10px] text-red-400"; }
+  }
+}
+
+async function testTelegram(type) {
+  const statusId = type === "regs" ? "tg-regs-status" : "tg-deps-status";
+  const chatId = type === "regs" ? $("tg-chat-regs").value.trim() : $("tg-chat-deps").value.trim();
+  const token = $("tg-bot-token").value.trim();
+  const statusEl = $(statusId);
+
+  if (!token) { toast("Enter a bot token first", "err"); return; }
+  if (!chatId) { toast("Enter a chat ID first", "err"); return; }
+
+  if (statusEl) { statusEl.textContent = "Sending..."; statusEl.className = "text-[9px] text-yellow-400"; }
+
+  try {
+    await api("/admin/notification-settings/test-telegram", {
+      method: "POST",
+      body: JSON.stringify({ bot_token: token, chat_id: chatId })
+    });
+    if (statusEl) { statusEl.textContent = "✔ Sent!"; statusEl.className = "text-[9px] text-green-400"; }
+    setTimeout(() => { if (statusEl) statusEl.textContent = ""; }, 4000);
+  } catch (err) {
+    if (statusEl) { statusEl.textContent = "✘ Failed"; statusEl.className = "text-[9px] text-red-400"; }
+  }
+}
+
+async function testEmail() {
+  const email = $("notif-admin-email").value.trim();
+  const statusEl = $("email-test-status");
+  if (!email) { toast("Enter an email address first", "err"); return; }
+
+  if (statusEl) { statusEl.textContent = "Sending..."; statusEl.className = "text-[9px] text-yellow-400"; }
+
+  try {
+    await api("/admin/notification-settings/test-email", {
+      method: "POST",
+      body: JSON.stringify({ email })
+    });
+    if (statusEl) { statusEl.textContent = "✔ Sent!"; statusEl.className = "text-[9px] text-green-400"; }
+    setTimeout(() => { if (statusEl) statusEl.textContent = ""; }, 4000);
+  } catch (err) {
+    if (statusEl) { statusEl.textContent = "✘ Failed"; statusEl.className = "text-[9px] text-red-400"; }
+  }
+}
+
+function togglePasswordVisibility(inputId, btn) {
+  const input = $(inputId);
+  if (!input) return;
+  const isPassword = input.type === "password";
+  input.type = isPassword ? "text" : "password";
+  const svg = btn.querySelector("svg");
+  if (svg) {
+    svg.innerHTML = isPassword
+      ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L6.59 6.59m7.532 7.532l3.29 3.29M3 3l18 18"/>'
+      : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>';
+  }
+}

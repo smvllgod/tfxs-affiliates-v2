@@ -206,6 +206,7 @@
             <button class="admin-tab flex-1 min-w-[100px] py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg relative" data-tab="kyc">KYC <span id="kyc-tab-badge" class="hidden absolute -top-1 -right-1 bg-amber-500 text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span></button>
             <button class="admin-tab flex-1 min-w-[100px] py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg" data-tab="users">Users &amp; Roles</button>
             <button class="admin-tab flex-1 min-w-[100px] py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg" data-tab="audit">Audit Log</button>
+            <button class="admin-tab flex-1 min-w-[120px] py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg" data-tab="notifications">🔔 Notifications</button>
         </div>
 
         <!-- ═══════ AFFILIATES TAB ═══════ -->
@@ -759,6 +760,145 @@
                 </div>
             </div>
             <div id="audit-pagination" class="mt-3"></div>
+        </div>
+
+        <!-- ═══════ NOTIFICATIONS TAB ═══════ -->
+        <div id="tab-notifications" class="tab-content hidden">
+            <div class="mb-6">
+                <h3 class="text-sm font-bold text-white mb-1">Notification Channels</h3>
+                <p class="text-xs text-gray-500">Configure how you receive admin alerts for new registrations and deposits.</p>
+            </div>
+
+            <div id="notif-loading" class="text-center py-12 text-gray-500 text-xs">Loading notification settings...</div>
+
+            <div id="notif-content" class="hidden space-y-6">
+
+                <!-- ── TELEGRAM CHANNEL ── -->
+                <div class="glass-panel rounded-2xl p-6 border border-white/5">
+                    <div class="flex items-center justify-between mb-5">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-blue-400" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-white">Telegram Bot</h4>
+                                <p class="text-[10px] text-gray-500">Real-time alerts to your Telegram groups</p>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="tg-enabled" class="sr-only peer" checked>
+                            <div class="w-9 h-5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1 block">Bot Token</label>
+                            <div class="relative">
+                                <input type="password" id="tg-bot-token" class="form-input text-xs px-3 py-2.5 rounded-lg w-full font-mono pr-10" placeholder="123456:ABCdefGHIjklMNOpqrSTUvwx">
+                                <button type="button" onclick="togglePasswordVisibility('tg-bot-token', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition">
+                                    <svg class="w-4 h-4 eye-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1 block">Registrations Chat ID</label>
+                                <input type="text" id="tg-chat-regs" class="form-input text-xs px-3 py-2.5 rounded-lg w-full font-mono" placeholder="-1001234567890">
+                                <div class="flex items-center gap-2 mt-2">
+                                    <button onclick="testTelegram('regs')" class="text-[9px] font-bold text-blue-400 hover:text-blue-300 transition uppercase tracking-wider flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                        Test
+                                    </button>
+                                    <span id="tg-regs-status" class="text-[9px] text-gray-600"></span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1 block">Deposits Chat ID</label>
+                                <input type="text" id="tg-chat-deps" class="form-input text-xs px-3 py-2.5 rounded-lg w-full font-mono" placeholder="-1001234567890">
+                                <div class="flex items-center gap-2 mt-2">
+                                    <button onclick="testTelegram('deps')" class="text-[9px] font-bold text-blue-400 hover:text-blue-300 transition uppercase tracking-wider flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                        Test
+                                    </button>
+                                    <span id="tg-deps-status" class="text-[9px] text-gray-600"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-2 block">Events</label>
+                            <div class="flex items-center gap-4">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="tg-evt-reg" checked class="rounded">
+                                    <span class="text-xs text-gray-300">Registrations</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="tg-evt-dep" checked class="rounded">
+                                    <span class="text-xs text-gray-300">Deposits</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── EMAIL CHANNEL ── -->
+                <div class="glass-panel rounded-2xl p-6 border border-white/5">
+                    <div class="flex items-center justify-between mb-5">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-white">Admin Email</h4>
+                                <p class="text-[10px] text-gray-500">Receive formatted admin notifications via email</p>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="email-enabled" class="sr-only peer" checked>
+                            <div class="w-9 h-5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-600"></div>
+                        </label>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1 block">Admin Email Address</label>
+                            <input type="email" id="notif-admin-email" class="form-input text-xs px-3 py-2.5 rounded-lg w-full" placeholder="admin@example.com">
+                            <div class="flex items-center gap-2 mt-2">
+                                <button onclick="testEmail()" class="text-[9px] font-bold text-green-400 hover:text-green-300 transition uppercase tracking-wider flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                    Send Test
+                                </button>
+                                <span id="email-test-status" class="text-[9px] text-gray-600"></span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-2 block">Events</label>
+                            <div class="flex items-center gap-4">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="email-evt-reg" checked class="rounded">
+                                    <span class="text-xs text-gray-300">Registrations</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="email-evt-dep" checked class="rounded">
+                                    <span class="text-xs text-gray-300">Deposits</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <div class="flex items-center justify-between pt-2">
+                    <p id="notif-save-status" class="text-[10px] text-gray-600"></p>
+                    <button onclick="saveNotificationSettings()" class="btn-gradient px-6 py-2.5 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        Save Notification Settings
+                    </button>
+                </div>
+            </div>
         </div>
 
     </main>
