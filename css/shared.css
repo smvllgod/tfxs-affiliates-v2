@@ -238,9 +238,9 @@ html { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparen
 
 /* Glass panels */
 .light-theme .glass-panel {
-  background: rgba(255,255,255,0.55) !important;
-  border-color: rgba(0,0,0,0.08) !important;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04) !important;
+  background: rgba(255,255,255,0.40) !important;
+  border-color: rgba(0,0,0,0.06) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03) !important;
   backdrop-filter: blur(40px) saturate(1.2) !important;
 }
 .light-theme .glass-panel-hover:hover {
