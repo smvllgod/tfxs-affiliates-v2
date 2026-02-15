@@ -996,12 +996,26 @@ let allConversions = [];
 let selectedConvIds = new Set();
 let convTotalCount = 0;
 let convCurrentPage = 1;
+let convUnlinkedOnly = false;
+
+function toggleUnlinkedFilter() {
+  convUnlinkedOnly = !convUnlinkedOnly;
+  const btn = $("conv-unlinked-btn");
+  if (btn) {
+    if (convUnlinkedOnly) {
+      btn.className = "text-[10px] font-bold text-black uppercase tracking-wider border border-amber-400 rounded-lg px-3 py-2 bg-amber-400";
+    } else {
+      btn.className = "text-[10px] font-bold text-amber-400 hover:text-amber-300 transition uppercase tracking-wider border border-amber-500/20 rounded-lg px-3 py-2 hover:bg-amber-500/10";
+    }
+  }
+  loadConversions(1);
+}
 
 async function loadConversions(page) {
   page = page || 1;
   convCurrentPage = page;
   const params = new URLSearchParams();
-  const afp = $("conv-filter-afp-value")?.value || $("conv-filter-afp-input")?.value.trim() || "";
+  const afp = convUnlinkedOnly ? "__UNLINKED__" : ($("conv-filter-afp-value")?.value || $("conv-filter-afp-input")?.value.trim() || "");
   const status = $("conv-status").value;
   const type = $("conv-type").value;
   const from = $("conv-from").value;
@@ -1048,7 +1062,7 @@ function renderConvPage(page) {
     <tr class="border-t border-white/5 hover:bg-white/[0.02] transition">
       <td class="px-2 py-2.5 text-center"><input type="checkbox" ${checked} onchange="toggleConvSelect('${r.id}', this.checked)" class="cursor-pointer"></td>
       <td class="px-3 py-2.5 text-gray-500">${fmtDate(r.occurred_at || r.created_at)}</td>
-      <td class="px-3 py-2.5 font-mono text-brand-500 text-[10px] font-bold">${esc(r.affiliate_code)}</td>
+      <td class="px-3 py-2.5 font-mono text-[10px] font-bold">${r.affiliate_code === "__UNLINKED__" ? '<span class="text-amber-400 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded text-[9px]">⚠ NO AFP</span>' : '<span class="text-brand-500">' + esc(r.affiliate_code) + '</span>'}</td>
       <td class="px-3 py-2.5 text-gray-300">${esc(r.event_type)}</td>
       <td class="px-3 py-2.5 text-white">${esc(r.user_id || "—")}</td>
       <td class="px-3 py-2.5 text-gray-400">${esc(r.country || "—")}</td>
@@ -2763,13 +2777,71 @@ async function adminDiscoverTgGroups() {
 }
 
 function pickTgGroup(chatId) {
-  // Show a small menu to pick which field to fill
+  // Show a styled selection modal instead of browser prompt()
   const list = $("tg-discover-list");
   if (list) list.classList.add("hidden");
-  const target = prompt("Assign this group to:\n1 = Registrations\n2 = Deposits\n3 = General\n\nEnter 1, 2, or 3:");
-  if (target === "1") { $("tg-chat-regs").value = chatId; toast("Set as Registrations group"); }
-  else if (target === "2") { $("tg-chat-deps").value = chatId; toast("Set as Deposits group"); }
-  else if (target === "3") { $("tg-chat-general").value = chatId; toast("Set as General group"); }
+
+  // Build a custom 3-button selection modal via styledConfirm infrastructure
+  const modal = $("confirm-modal");
+  const iconWrap = $("confirm-icon");
+  $("confirm-title").textContent = "Assign Telegram Group";
+  $("confirm-message").textContent = "Choose which notification channel this group should receive:";
+  $("confirm-ok-btn").textContent = "Cancel";
+  // Telegram-style icon
+  iconWrap.className = "w-10 h-10 rounded-xl flex items-center justify-center bg-blue-500/10 border border-blue-500/20";
+  iconWrap.innerHTML = '<svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.42-1.43-.88.03-.24.37-.49 1.02-.74 3.98-1.73 6.64-2.88 7.97-3.44 3.79-1.58 4.58-1.86 5.09-1.87.11 0 .37.03.54.17.14.12.18.28.2.45-.01.06.01.24 0 .38z"/></svg>';
+  // Hide the default input wrap
+  $("confirm-input-wrap").classList.add("hidden");
+  // Replace the button area with 3 selection buttons
+  const okBtn = $("confirm-ok-btn");
+  const cancelBtn = $("confirm-cancel-btn");
+  const btnContainer = okBtn.parentElement;
+  // Inject selection buttons before the existing buttons
+  const selId = "tg-assign-selection";
+  let selDiv = document.getElementById(selId);
+  if (selDiv) selDiv.remove();
+  selDiv = document.createElement("div");
+  selDiv.id = selId;
+  selDiv.className = "flex flex-col gap-2 mb-3 w-full";
+  selDiv.innerHTML = `
+    <button data-tg-target="1" class="w-full py-2.5 rounded-lg text-[11px] font-bold text-white uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 transition flex items-center justify-center gap-2">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+      Registrations
+    </button>
+    <button data-tg-target="2" class="w-full py-2.5 rounded-lg text-[11px] font-bold text-white uppercase tracking-wider bg-blue-600 hover:bg-blue-500 transition flex items-center justify-center gap-2">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      Deposits
+    </button>
+    <button data-tg-target="3" class="w-full py-2.5 rounded-lg text-[11px] font-bold text-white uppercase tracking-wider bg-purple-600 hover:bg-purple-500 transition flex items-center justify-center gap-2">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+      General
+    </button>`;
+  btnContainer.parentElement.insertBefore(selDiv, btnContainer);
+  // Style the cancel button, hide the ok button (we use the 3 buttons above)
+  okBtn.classList.add("hidden");
+  cancelBtn.className = "w-full py-2 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-wider bg-white/5 hover:bg-white/10 border border-white/10 transition";
+  cancelBtn.textContent = "Cancel";
+
+  openModal("confirm-modal");
+
+  function cleanup() {
+    closeModal("confirm-modal");
+    if (selDiv) selDiv.remove();
+    okBtn.classList.remove("hidden");
+    cancelBtn.removeEventListener("click", onCancel);
+  }
+  function onCancel() { cleanup(); }
+  cancelBtn.addEventListener("click", onCancel);
+
+  selDiv.querySelectorAll("button[data-tg-target]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const t = btn.getAttribute("data-tg-target");
+      if (t === "1") { $("tg-chat-regs").value = chatId; toast("✅ Set as Registrations group"); }
+      else if (t === "2") { $("tg-chat-deps").value = chatId; toast("✅ Set as Deposits group"); }
+      else if (t === "3") { $("tg-chat-general").value = chatId; toast("✅ Set as General group"); }
+      cleanup();
+    });
+  });
 }
 
 async function testEmail() {
