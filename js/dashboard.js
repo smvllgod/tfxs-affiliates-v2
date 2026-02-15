@@ -11,7 +11,7 @@
   "use strict";
 
   // Use shared country resolver from api.js
-  const { getAffiliateId, apiGet, fetchSummary, fetchEvents, fetchReports, fetchRoiSettings, fetchBrokers, showError, hideError, resolveCountry, escapeHtml } = window.TFXS_API;
+  const { getAffiliateId, apiGet, apiSend, fetchSummary, fetchEvents, fetchReports, fetchRoiSettings, fetchBrokers, showError, hideError, resolveCountry, escapeHtml } = window.TFXS_API;
 
   const IS_ADMIN = localStorage.getItem("is_admin") === "true";
   let affiliateId = null;
@@ -150,6 +150,21 @@
     if (lastIcon) lastIcon.innerHTML = '<svg class="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>';
     const nextPayoutEl = document.getElementById("popup-next-payout");
     if (nextPayoutEl) nextPayoutEl.textContent = "--";
+
+    // 5. Show admin business section
+    const bizSection = document.getElementById("admin-business-section");
+    if (bizSection) bizSection.classList.remove("hidden");
+
+    // 6. Show backfill button
+    const backfillBtn = document.getElementById("backfill-btn");
+    if (backfillBtn) backfillBtn.classList.remove("hidden");
+
+    // 7. Replace KPI labels for admin
+    const commLabel = document.querySelector('[data-i18n="dash.commission"]');
+    if (commLabel && commLabel.closest('.kpi-tooltip')) {
+      commLabel.textContent = "Aff. Commission";
+      commLabel.closest('.kpi-tooltip').setAttribute('data-tooltip', 'Total commission owed to all affiliates (deal-calculated)');
+    }
   }
 
   async function attemptConnection() {
@@ -229,6 +244,24 @@
       // ROI calculation using real deposit data + formula
       const roi = calculateROI(_roiFormula, s.total_deposit || 0, s.total_commission || 0);
       updateKPI("kpi-roi", parseFloat(roi), v => v.toFixed(2));
+
+      // ── Admin business KPIs ──
+      if (IS_ADMIN && s.raw_revenue !== undefined) {
+        updateKPI("kpi-revenue", s.raw_revenue, v => formatCurrency(v));
+        updateKPI("kpi-aff-cost", s.affiliate_cost, v => formatCurrency(v));
+        updateKPI("kpi-profit", s.profit, v => formatCurrency(v));
+        updateKPI("kpi-margin", s.margin, v => v.toFixed(1) + "%");
+
+        // Color profit based on positive/negative
+        const profitEl = document.getElementById("kpi-profit");
+        if (profitEl) {
+          profitEl.className = profitEl.className.replace(/text-(red|green|white)-\d+/g, '');
+          profitEl.classList.add(s.profit >= 0 ? "text-emerald-400" : "text-red-400");
+        }
+
+        // Load affiliate performance table (non-blocking)
+        loadAffiliatePerformance().catch(() => {});
+      }
 
       // Expose total_deposit for index.html calculations
       window._tfxsTotalDeposit = s.total_deposit || 0;
@@ -428,5 +461,94 @@
       window.updateDashboardData();
     }
   }
+
+  // ── Admin: Load affiliate performance table ─────────────
+  async function loadAffiliatePerformance() {
+    const tbody = document.getElementById("affiliate-perf-tbody");
+    const tfoot = document.getElementById("affiliate-perf-tfoot");
+    if (!tbody) return;
+
+    try {
+      const brokerFilter = document.getElementById("broker-filter")?.value || "";
+      let url = "/admin/affiliate-performance";
+      if (brokerFilter) url += `?broker=${encodeURIComponent(brokerFilter)}`;
+      const res = await apiGet(url);
+      if (!res?.ok) throw new Error("Failed");
+
+      const { affiliates, totals } = res;
+
+      if (!affiliates.length) {
+        tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-8 text-center text-xs text-gray-600">No data for selected period</td></tr>';
+        if (tfoot) tfoot.innerHTML = '';
+        return;
+      }
+
+      tbody.innerHTML = affiliates.map(a => {
+        const profitClass = a.profit >= 0 ? "text-emerald-400" : "text-red-400";
+        const marginClass = a.margin >= 50 ? "text-emerald-400" : a.margin >= 20 ? "text-yellow-400" : "text-red-400";
+        const isUnattributed = a.affiliate_code === "UNATTRIBUTED";
+        const nameClass = isUnattributed ? "text-gray-500 italic" : "text-white";
+        return `<tr class="hover:bg-white/[0.02] transition-colors">
+          <td class="px-4 py-3">
+            <div class="flex flex-col">
+              <span class="text-xs font-medium ${nameClass}">${escapeHtml(a.display_name)}</span>
+              ${!isUnattributed ? `<span class="text-[9px] text-gray-600 font-mono">${escapeHtml(a.affiliate_code)}</span>` : ''}
+            </div>
+          </td>
+          <td class="px-4 py-3 text-xs text-center text-gray-300">${a.registrations}</td>
+          <td class="px-4 py-3 text-xs text-center text-gray-300">${a.ftd}</td>
+          <td class="px-4 py-3 text-xs text-center text-gray-300">${a.qualified_cpa}</td>
+          <td class="px-4 py-3 text-xs text-right font-mono text-gray-300">$${a.deposits.toFixed(2)}</td>
+          <td class="px-4 py-3 text-xs text-right font-mono font-bold text-green-400">$${a.raw_revenue.toFixed(2)}</td>
+          <td class="px-4 py-3 text-xs text-right font-mono text-orange-400">$${a.affiliate_cost.toFixed(2)}</td>
+          <td class="px-4 py-3 text-xs text-right font-mono font-bold ${profitClass}">$${a.profit.toFixed(2)}</td>
+          <td class="px-4 py-3 text-xs text-right font-mono font-bold ${marginClass}">${a.margin.toFixed(1)}%</td>
+        </tr>`;
+      }).join("");
+
+      // Totals footer
+      if (tfoot) {
+        const profitClass = totals.profit >= 0 ? "text-emerald-400" : "text-red-400";
+        tfoot.innerHTML = `<tr>
+          <td class="px-4 py-3 text-xs font-bold text-white uppercase">Total (${affiliates.length} affiliates)</td>
+          <td class="px-4 py-3 text-xs text-center font-bold text-white">${totals.registrations}</td>
+          <td class="px-4 py-3 text-xs text-center font-bold text-white">${totals.ftd}</td>
+          <td class="px-4 py-3 text-xs text-center font-bold text-white">${totals.qualified_cpa}</td>
+          <td class="px-4 py-3 text-xs text-right font-mono font-bold text-white">$${totals.deposits.toFixed(2)}</td>
+          <td class="px-4 py-3 text-xs text-right font-mono font-bold text-green-400">$${totals.raw_revenue.toFixed(2)}</td>
+          <td class="px-4 py-3 text-xs text-right font-mono font-bold text-orange-400">$${totals.affiliate_cost.toFixed(2)}</td>
+          <td class="px-4 py-3 text-xs text-right font-mono font-bold ${profitClass}">$${totals.profit.toFixed(2)}</td>
+          <td class="px-4 py-3 text-xs text-right font-mono font-bold text-white">${totals.margin.toFixed(1)}%</td>
+        </tr>`;
+      }
+    } catch (err) {
+      console.warn("[TFXS] Affiliate performance load failed:", err.message);
+      tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-8 text-center text-xs text-red-400">Could not load data</td></tr>';
+    }
+  }
+
+  // ── Admin: Backfill raw_commission from webhook logs ─────
+  window.backfillRawCommission = async function() {
+    const btn = document.getElementById("backfill-btn");
+    if (btn) { btn.textContent = "Processing..."; btn.disabled = true; }
+    try {
+      const res = await apiSend("POST", "/admin/backfill-raw-commission", {});
+      if (res?.ok) {
+        if (typeof showToast === "function") showToast(res.message || "Backfill complete!", "success");
+        else alert(res.message || "Done");
+        // Reload data
+        loadLiveData().catch(() => {});
+      } else {
+        throw new Error(res?.error || "Failed");
+      }
+    } catch (err) {
+      if (typeof showToast === "function") showToast(err.message || "Backfill failed", "error");
+      else alert("Error: " + err.message);
+    }
+    if (btn) {
+      btn.innerHTML = '<svg class="w-3 h-3 inline mr-1 -mt-px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Backfill Historical';
+      btn.disabled = false;
+    }
+  };
 
 })();

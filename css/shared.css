@@ -47,6 +47,15 @@ html { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparen
   border-color: rgba(255,255,255,0.1);
 }
 
+/* ── Contact admin dropdown (opaque for readability) ───────── */
+#contact-admin-dropdown {
+  background: rgba(15,15,15,0.97) !important;
+  backdrop-filter: blur(24px) saturate(1.4) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(1.4) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06) !important;
+}
+
 /* ── Form inputs ───────────────────────────────────────────── */
 .form-input {
   width: 100%;
@@ -254,6 +263,13 @@ html { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparen
 .light-theme .glass-panel-hover:hover {
   background: rgba(255,255,255,0.9) !important;
   border-color: rgba(0,0,0,0.12) !important;
+}
+
+/* Contact admin dropdown — light */
+.light-theme #contact-admin-dropdown {
+  background: rgba(255,255,255,0.97) !important;
+  border: 1px solid rgba(0,0,0,0.1) !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04) !important;
 }
 
 /* Nav link pill container */
@@ -1470,7 +1486,10 @@ html { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparen
 /* ── Safe area padding (notch phones) ──────────────────────── */
 @supports (padding: env(safe-area-inset-bottom)) {
   body {
+    padding-top: env(safe-area-inset-top);
     padding-bottom: calc(60px + env(safe-area-inset-bottom));
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
   }
   nav {
     padding-left: env(safe-area-inset-left);

@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script>((t)=>{if(t==="light")document.documentElement.classList.add("light-theme")})(localStorage.getItem("tfxs_theme")||"light")</script>
+    <meta name="theme-color" content="#f5f5f7">
+    <script>((t)=>{if(t==="light"){document.documentElement.classList.add("light-theme")};var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==="light"?"#f5f5f7":"#050505"})(localStorage.getItem("tfxs_theme")||"light")</script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>TFXS Affiliate | Marketing Assets</title>
     <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#DC2626">
     <meta property="og:title" content="TFXS Affiliates — Marketing Assets">
     <meta property="og:description" content="Download banners, landing pages and creatives.">
     <meta property="og:image" content="assets/logo.svg">
-    <meta name="theme-color" content="#dc2626">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/shared.css">

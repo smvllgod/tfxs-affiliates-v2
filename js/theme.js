@@ -9,6 +9,16 @@
   const THEME_KEY = "tfxs_theme";
   let _theme = localStorage.getItem(THEME_KEY) || "light";
 
+  const DARK_BG  = "#050505";
+  const LIGHT_BG = "#f5f5f7";
+
+  function setThemeColor(color) {
+    let meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) {
+      meta.setAttribute('content', color);
+    }
+  }
+
   function applyTheme(theme) {
     _theme = theme;
     localStorage.setItem(THEME_KEY, theme);
@@ -16,8 +26,10 @@
 
     if (theme === "light") {
       html.classList.add("light-theme");
+      setThemeColor(LIGHT_BG);
     } else {
       html.classList.remove("light-theme");
+      setThemeColor(DARK_BG);
     }
     updateToggleIcon();
   }

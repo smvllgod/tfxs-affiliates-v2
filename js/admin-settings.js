@@ -256,16 +256,26 @@ async function loadStats() {
     const res = await api(`/admin/kpis?days=${chartDays}`);
     const d = res.data || {};
     const s = d.summary || {};
-    $("stat-affiliates").textContent = s.total_affiliates ?? "—";
+    // Row 1 — Operational KPIs
+    $("stat-commission").textContent = fmtMoney(s.total_commission);
     $("stat-regs").textContent = s.registrations ?? "—";
     $("stat-ftds").textContent = s.ftds ?? "—";
     if ($("stat-qftds")) $("stat-qftds").textContent = s.qftds ?? "—";
-    $("stat-pending").textContent = s.pending_conversions ?? "—";
-    $("stat-commission").textContent = fmtMoney(s.total_commission);
     if ($("stat-deposits")) $("stat-deposits").textContent = fmtMoney(s.total_deposit);
+    // Row 2 — Business Overview
+    if ($("stat-revenue")) $("stat-revenue").textContent = fmtMoney(s.raw_revenue);
+    if ($("stat-aff-cost")) $("stat-aff-cost").textContent = fmtMoney(s.affiliate_cost);
+    if ($("stat-profit")) {
+      $("stat-profit").textContent = fmtMoney(s.net_profit);
+      $("stat-profit").className = $("stat-profit").className.replace(/text-(red|green|white|emerald)-\d+/g, '');
+      $("stat-profit").classList.add(s.net_profit >= 0 ? "text-emerald-400" : "text-red-400");
+    }
+    if ($("stat-margin")) $("stat-margin").textContent = (s.margin ?? 0).toFixed(1) + "%";
+    // Secondary stats
+    $("stat-affiliates").textContent = s.total_affiliates ?? "—";
     $("stat-unpaid").textContent = fmtMoney(s.unpaid_commission);
     $("stat-paid").textContent = fmtMoney(s.paid_payouts);
-    $("stat-admins").textContent = s.admin_users ?? "—";
+    $("stat-pending").textContent = s.pending_conversions ?? "—";
 
     // Render timeseries chart
     renderKpiChart(d.timeseries || []);
@@ -2599,8 +2609,17 @@ async function loadNotificationSettings() {
     $("tg-bot-token").value = tg.config?.bot_token || "";
     $("tg-chat-regs").value = tg.config?.registrations_chat_id || "";
     $("tg-chat-deps").value = tg.config?.deposits_chat_id || "";
+    $("tg-chat-general").value = tg.config?.general_chat_id || "";
     $("tg-evt-reg").checked = (tg.events || []).includes("registration");
     $("tg-evt-dep").checked = (tg.events || []).includes("deposit");
+    // General group events
+    const genEvts = tg.config?.general_events || [];
+    $("tg-gen-evt-reg").checked = genEvts.includes("registration");
+    $("tg-gen-evt-dep").checked = genEvts.includes("deposit");
+    $("tg-gen-evt-signup").checked = genEvts.includes("affiliate_signup");
+    $("tg-gen-evt-payout").checked = genEvts.includes("payout_request");
+    $("tg-gen-evt-kyc").checked = genEvts.includes("kyc_submitted");
+    $("tg-gen-evt-commission").checked = genEvts.includes("commission");
 
     // Email
     $("email-enabled").checked = email.enabled;
@@ -2630,6 +2649,15 @@ async function saveNotificationSettings() {
     if ($("tg-evt-reg").checked) tgEvents.push("registration");
     if ($("tg-evt-dep").checked) tgEvents.push("deposit");
 
+    // General group events
+    const generalEvents = [];
+    if ($("tg-gen-evt-reg").checked) generalEvents.push("registration");
+    if ($("tg-gen-evt-dep").checked) generalEvents.push("deposit");
+    if ($("tg-gen-evt-signup").checked) generalEvents.push("affiliate_signup");
+    if ($("tg-gen-evt-payout").checked) generalEvents.push("payout_request");
+    if ($("tg-gen-evt-kyc").checked) generalEvents.push("kyc_submitted");
+    if ($("tg-gen-evt-commission").checked) generalEvents.push("commission");
+
     const emailEvents = [];
     if ($("email-evt-reg").checked) emailEvents.push("registration");
     if ($("email-evt-dep").checked) emailEvents.push("deposit");
@@ -2646,7 +2674,9 @@ async function saveNotificationSettings() {
           config: {
             bot_token: $("tg-bot-token").value.trim(),
             registrations_chat_id: $("tg-chat-regs").value.trim(),
-            deposits_chat_id: $("tg-chat-deps").value.trim()
+            deposits_chat_id: $("tg-chat-deps").value.trim(),
+            general_chat_id: $("tg-chat-general").value.trim(),
+            general_events: generalEvents
           },
           events: tgEvents
         },
@@ -2676,10 +2706,11 @@ async function saveNotificationSettings() {
 }
 
 async function testTelegram(type) {
-  const statusId = type === "regs" ? "tg-regs-status" : "tg-deps-status";
-  const chatId = type === "regs" ? $("tg-chat-regs").value.trim() : $("tg-chat-deps").value.trim();
+  const statusMap = { regs: "tg-regs-status", deps: "tg-deps-status", general: "tg-general-status" };
+  const chatMap = { regs: "tg-chat-regs", deps: "tg-chat-deps", general: "tg-chat-general" };
+  const statusEl = $(statusMap[type]);
+  const chatId = $(chatMap[type])?.value.trim();
   const token = $("tg-bot-token").value.trim();
-  const statusEl = $(statusId);
 
   if (!token) { toast("Enter a bot token first", "err"); return; }
   if (!chatId) { toast("Enter a chat ID first", "err"); return; }
@@ -2696,6 +2727,48 @@ async function testTelegram(type) {
   } catch (err) {
     if (statusEl) { statusEl.textContent = "✘ Failed"; statusEl.className = "text-[9px] text-red-400"; }
   }
+}
+
+async function adminDiscoverTgGroups() {
+  const token = $("tg-bot-token")?.value.trim();
+  if (!token) { toast("Enter a bot token first", "err"); return; }
+  const btn = $("tg-discover-btn");
+  const list = $("tg-discover-list");
+  if (btn) btn.innerHTML = '<svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Searching...';
+  try {
+    const res = await api("/admin/notification-settings/discover-groups", {
+      method: "POST",
+      body: JSON.stringify({ bot_token: token })
+    });
+    if (!res?.ok) throw new Error(res?.error || "Failed");
+    const groups = res.groups || [];
+    if (!groups.length) {
+      if (list) { list.innerHTML = '<div class="px-3 py-3 text-xs text-gray-500 text-center">No groups found. Add the bot to a group and send a message first.</div>'; list.classList.remove("hidden"); }
+    } else {
+      if (list) {
+        list.innerHTML = groups.map(g => `
+          <div class="px-3 py-2.5 text-xs hover:bg-white/10 cursor-pointer transition flex items-center justify-between border-b border-white/5 last:border-0" onclick="pickTgGroup('${g.id}')">
+            <span class="text-white font-medium">${g.title}</span>
+            <span class="text-gray-500 font-mono text-[10px]">${g.id}</span>
+          </div>
+        `).join("");
+        list.classList.remove("hidden");
+      }
+    }
+  } catch (err) {
+    if (list) { list.innerHTML = `<div class="px-3 py-3 text-xs text-red-400 text-center">${err.message || "Error discovering groups"}</div>`; list.classList.remove("hidden"); }
+  }
+  if (btn) btn.innerHTML = '<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Find Groups from Bot';
+}
+
+function pickTgGroup(chatId) {
+  // Show a small menu to pick which field to fill
+  const list = $("tg-discover-list");
+  if (list) list.classList.add("hidden");
+  const target = prompt("Assign this group to:\n1 = Registrations\n2 = Deposits\n3 = General\n\nEnter 1, 2, or 3:");
+  if (target === "1") { $("tg-chat-regs").value = chatId; toast("Set as Registrations group"); }
+  else if (target === "2") { $("tg-chat-deps").value = chatId; toast("Set as Deposits group"); }
+  else if (target === "3") { $("tg-chat-general").value = chatId; toast("Set as General group"); }
 }
 
 async function testEmail() {

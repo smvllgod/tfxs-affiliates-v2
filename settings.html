@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script>((t)=>{if(t==="light")document.documentElement.classList.add("light-theme")})(localStorage.getItem("tfxs_theme")||"light")</script>
+    <meta name="theme-color" content="#f5f5f7">
+    <script>((t)=>{if(t==="light"){document.documentElement.classList.add("light-theme")};var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==="light"?"#f5f5f7":"#050505"})(localStorage.getItem("tfxs_theme")||"light")</script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>TFXS Affiliate | Settings</title>
     <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#DC2626">
     <meta property="og:title" content="TFXS Affiliates — Settings">
     <meta property="og:description" content="Account settings and preferences.">
     <meta property="og:image" content="assets/logo.svg">
-    <meta name="theme-color" content="#dc2626">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/shared.css">
@@ -1072,7 +1073,7 @@
             const API = window.TFXS_API;
             if (!API) return;
             try {
-                const res = await API.get('/api/telegram-settings');
+                const res = await API.apiGet('/api/telegram-settings');
                 if (!res || !res.ok) return;
                 const d = res.data || {};
                 const locked = document.getElementById('tg-locked-state');
@@ -1120,7 +1121,7 @@
             if (document.getElementById('aff-tg-evt-deposit')?.checked) events.push('deposit');
 
             try {
-                const res = await API.put('/api/telegram-settings', {
+                const res = await API.apiSend('PUT', '/api/telegram-settings', {
                     bot_token: document.getElementById('aff-tg-bot-token')?.value.trim() || '',
                     chat_id: document.getElementById('aff-tg-chat-id')?.value.trim() || '',
                     enabled: true,
@@ -1146,7 +1147,7 @@
             if (!chatId) { if (typeof showToast === 'function') showToast('Enter a chat ID first', 'error'); return; }
             if (statusEl) { statusEl.textContent = 'Sending...'; statusEl.className = 'text-[9px] text-yellow-400'; }
             try {
-                const res = await API.post('/api/telegram-settings/test', { bot_token: token, chat_id: chatId });
+                const res = await API.apiSend('POST', '/api/telegram-settings/test', { bot_token: token, chat_id: chatId });
                 if (res?.ok) {
                     if (statusEl) { statusEl.textContent = '✔ Sent!'; statusEl.className = 'text-[9px] text-green-400'; }
                     setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 4000);
@@ -1167,7 +1168,7 @@
             const list = document.getElementById('tg-groups-list');
             if (btn) btn.textContent = 'Searching...';
             try {
-                const res = await API.post('/api/telegram-settings/discover-groups', { bot_token: token });
+                const res = await API.apiSend('POST', '/api/telegram-settings/discover-groups', { bot_token: token });
                 if (!res?.ok) throw new Error(res?.error || 'Failed');
                 const groups = res.groups || [];
                 if (!groups.length) {
