@@ -242,6 +242,7 @@ async function loadActiveTab() {
   else if (active === "users") await loadUsers();
   else if (active === "audit") await loadAudit();
   else if (active === "notifications") await loadNotificationSettings();
+  else if (active === "integrations") await loadIntegrations();
 }
 
 // ══════════════════════════════════════════════════════
@@ -2802,3 +2803,262 @@ function togglePasswordVisibility(inputId, btn) {
       : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>';
   }
 }
+
+// ══════════════════════════════════════════════════════
+// INTEGRATIONS TAB
+// ══════════════════════════════════════════════════════
+
+let integConfig = null;
+let outgoingWebhooks = [];
+let whLogPage = 1;
+
+async function loadIntegrations() {
+  try {
+    const res = await api("/admin/integration-config");
+    integConfig = res.data || {};
+    renderIncomingWebhooks();
+    renderWebhookStatus();
+    renderOutgoingWebhooks();
+    renderBrokerConnections();
+    loadWebhookLogs(1);
+  } catch (err) {
+    console.warn("[Integrations] Load failed:", err.message);
+  }
+}
+
+function renderWebhookStatus() {
+  const d = integConfig;
+  const dot = $("integ-status-dot");
+  const text = $("integ-status-text");
+  const badge = $("integ-secret-badge");
+
+  // Secret status
+  if (d.webhook_secret_status === "configured") {
+    if (badge) { badge.textContent = d.webhook_secret_masked || "****"; badge.className = "text-[9px] font-mono px-2 py-0.5 rounded-full bg-green-900/50 text-green-400 border border-green-500/20"; }
+  } else {
+    if (badge) { badge.textContent = "Not configured"; badge.className = "text-[9px] font-mono px-2 py-0.5 rounded-full bg-red-900/50 text-red-400 border border-red-500/20"; }
+  }
+
+  // Activity stats
+  const act = d.activity || {};
+  if ($("integ-24h-count")) $("integ-24h-count").textContent = act.total_24h || 0;
+  if ($("integ-24h-ok")) $("integ-24h-ok").textContent = act.by_result?.ok || 0;
+  const errCount = Object.entries(act.by_result || {}).filter(([k]) => k !== "ok").reduce((s, [, v]) => s + v, 0);
+  if ($("integ-24h-err")) $("integ-24h-err").textContent = errCount;
+
+  // Status dot & text
+  if (act.total_24h > 0) {
+    dot.className = "w-3 h-3 rounded-full bg-green-500 animate-pulse";
+    text.textContent = `Active — ${act.total_24h} events in last 24h`;
+  } else {
+    dot.className = "w-3 h-3 rounded-full bg-yellow-500";
+    text.textContent = "No webhook activity in last 24h";
+  }
+}
+
+function renderIncomingWebhooks() {
+  const urls = integConfig.incoming_webhooks || {};
+  for (const [type, url] of Object.entries(urls)) {
+    const el = $(`webhook-url-${type}`);
+    if (el) el.textContent = url;
+  }
+}
+
+window.copyWebhookUrl = function(type) {
+  const el = $(`webhook-url-${type}`);
+  if (!el) return;
+  navigator.clipboard.writeText(el.textContent).then(() => {
+    if (typeof showToast === "function") showToast("Webhook URL copied!", "success");
+  });
+};
+
+function renderOutgoingWebhooks() {
+  outgoingWebhooks = integConfig.outgoing_webhooks || [];
+  const container = $("outgoing-webhooks-list");
+  const actions = $("outgoing-webhooks-actions");
+  if (!container) return;
+
+  if (outgoingWebhooks.length === 0) {
+    container.innerHTML = `
+      <div class="text-center py-6">
+        <svg class="w-8 h-8 text-gray-700 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+        <p class="text-xs text-gray-500">No outgoing webhooks configured</p>
+        <p class="text-[10px] text-gray-600 mt-1">Add a webhook to send real-time events to external services</p>
+      </div>`;
+    if (actions) actions.classList.add("hidden");
+    return;
+  }
+
+  if (actions) actions.classList.remove("hidden");
+  container.innerHTML = outgoingWebhooks.map((wh, i) => `
+    <div class="bg-white/[0.03] rounded-lg p-3 border border-white/5">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-[10px] font-bold text-white uppercase">${wh.name || 'Webhook ' + (i + 1)}</span>
+        <div class="flex items-center gap-2">
+          <button onclick="testOutgoingWebhook(${i})" class="text-[9px] text-blue-400 hover:text-blue-300 transition">Test</button>
+          <button onclick="removeOutgoingWebhook(${i})" class="text-[9px] text-red-400 hover:text-red-300 transition">Remove</button>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div>
+          <label class="text-[9px] text-gray-500 uppercase block mb-0.5">Endpoint URL</label>
+          <input type="text" value="${esc(wh.url || '')}" onchange="outgoingWebhooks[${i}].url=this.value" class="form-input text-[10px] px-2 py-1.5 rounded-lg w-full font-mono" placeholder="https://...">
+        </div>
+        <div>
+          <label class="text-[9px] text-gray-500 uppercase block mb-0.5">Secret (optional)</label>
+          <input type="text" value="${esc(wh.secret || '')}" onchange="outgoingWebhooks[${i}].secret=this.value" class="form-input text-[10px] px-2 py-1.5 rounded-lg w-full font-mono" placeholder="X-Webhook-Secret header">
+        </div>
+      </div>
+      <div class="mt-2">
+        <label class="text-[9px] text-gray-500 uppercase block mb-1">Events</label>
+        <div class="flex flex-wrap gap-1.5">
+          ${["registration", "ftd", "qualified_cpa", "commission", "payout"].map(evt => `
+            <label class="flex items-center gap-1 text-[10px] text-gray-400 cursor-pointer">
+              <input type="checkbox" ${(wh.events || []).includes(evt) ? "checked" : ""} onchange="toggleOutgoingEvent(${i}, '${evt}', this.checked)" class="rounded">
+              ${evt}
+            </label>
+          `).join("")}
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+window.addOutgoingWebhook = function() {
+  outgoingWebhooks.push({ name: "", url: "", secret: "", events: ["registration", "ftd", "commission"] });
+  renderOutgoingWebhooks();
+};
+
+window.removeOutgoingWebhook = function(i) {
+  outgoingWebhooks.splice(i, 1);
+  renderOutgoingWebhooks();
+};
+
+window.toggleOutgoingEvent = function(i, evt, checked) {
+  if (!outgoingWebhooks[i].events) outgoingWebhooks[i].events = [];
+  if (checked && !outgoingWebhooks[i].events.includes(evt)) outgoingWebhooks[i].events.push(evt);
+  if (!checked) outgoingWebhooks[i].events = outgoingWebhooks[i].events.filter(e => e !== evt);
+};
+
+window.saveOutgoingWebhooks = async function() {
+  const status = $("outgoing-save-status");
+  try {
+    if (status) status.textContent = "Saving...";
+    await api("/admin/outgoing-webhooks", { method: "PUT", body: JSON.stringify({ webhooks: outgoingWebhooks }) });
+    if (status) status.textContent = "Saved!";
+    if (typeof showToast === "function") showToast("Outgoing webhooks saved", "success");
+    setTimeout(() => { if (status) status.textContent = ""; }, 3000);
+  } catch (err) {
+    if (status) status.textContent = "Error: " + err.message;
+    if (typeof showToast === "function") showToast(err.message, "error");
+  }
+};
+
+window.testOutgoingWebhook = async function(i) {
+  const wh = outgoingWebhooks[i];
+  if (!wh?.url) return showToast("No URL set", "error");
+  try {
+    showToast("Sending test...", "info");
+    const res = await api("/admin/test-webhook", { method: "POST", body: JSON.stringify({ url: wh.url, secret: wh.secret }) });
+    if (res.ok) {
+      showToast(`Test sent! Status: ${res.status} ${res.statusText}`, "success");
+    } else {
+      showToast(`Test failed: ${res.error}`, "error");
+    }
+  } catch (err) {
+    showToast("Test failed: " + err.message, "error");
+  }
+};
+
+function renderBrokerConnections() {
+  const grid = $("integ-broker-grid");
+  if (!grid) return;
+  const brokers = integConfig.brokers || [];
+  const prefixes = integConfig.uid_prefixes || [];
+
+  if (brokers.length === 0) {
+    grid.innerHTML = `
+      <div class="text-center py-6 col-span-full">
+        <svg class="w-8 h-8 text-gray-700 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+        <p class="text-xs text-gray-500">No brokers configured</p>
+        <p class="text-[10px] text-gray-600 mt-1">Add brokers in the Deals & Brokers tab</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = brokers.map(b => {
+    const bPrefixes = prefixes.filter(p => p.broker_name === b.name);
+    const color = b.theme_color || "#ef4444";
+    return `
+      <div class="bg-white/[0.03] rounded-xl p-4 border border-white/5 hover:border-white/10 transition group">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm" style="background:${esc(color)}20; border: 1px solid ${esc(color)}40; color:${esc(color)}">
+            ${b.logo_url ? `<img src="${esc(b.logo_url)}" class="w-6 h-6 rounded" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'" alt=""><span style="display:none" class="items-center justify-center">${esc((b.name||'?')[0])}</span>` : esc((b.name||'?')[0].toUpperCase())}
+          </div>
+          <div>
+            <p class="text-sm font-bold text-white">${esc(b.name)}</p>
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+              <span class="text-[9px] text-green-400">Connected</span>
+            </div>
+          </div>
+        </div>
+        ${bPrefixes.length > 0 ? `
+          <div class="mt-2">
+            <p class="text-[9px] text-gray-500 uppercase mb-1">UID Prefixes</p>
+            <div class="flex flex-wrap gap-1">${bPrefixes.map(p => `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white/5 text-gray-400 border border-white/5">${esc(p.prefix)}</span>`).join("")}</div>
+          </div>` : `
+          <div class="mt-2">
+            <p class="text-[9px] text-amber-500 flex items-center gap-1">
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+              No UID prefixes — configure in Deals & Brokers tab
+            </p>
+          </div>`}
+        ${b.contact ? `<p class="text-[9px] text-gray-600 mt-2">Contact: ${esc(b.contact)}</p>` : ""}
+      </div>`;
+  }).join("");
+}
+
+// ── Webhook Activity Log ──
+window.loadWebhookLogs = async function(page) {
+  if (page < 1) return;
+  whLogPage = page || 1;
+  const tbody = $("wh-log-tbody");
+  if (!tbody) return;
+  try {
+    const typeFilter = $("wh-log-type-filter")?.value || "";
+    const days = $("wh-log-days-filter")?.value || "7";
+    let url = `/admin/webhook-logs?days=${days}&page=${whLogPage}&limit=30`;
+    if (typeFilter) url += `&event_type=${typeFilter}`;
+    const res = await api(url);
+    const logs = res.data || [];
+    const total = res.total || 0;
+
+    if ($("wh-log-count")) $("wh-log-count").textContent = `${total} events`;
+    if ($("wh-log-prev")) $("wh-log-prev").disabled = whLogPage <= 1;
+    if ($("wh-log-next")) $("wh-log-next").disabled = whLogPage * 30 >= total;
+
+    if (logs.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-600">No webhook events found</td></tr>';
+      return;
+    }
+
+    const typeColors = { registration: "text-blue-400", ftd: "text-green-400", qualified_cpa: "text-cyan-400", commission: "text-yellow-400" };
+    tbody.innerHTML = logs.map(l => {
+      const p = l.payload || {};
+      const time = new Date(l.received_at).toLocaleString("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      const resultClass = (l.result === "ok" || l.result === "duplicate") ? "text-green-400" : "text-red-400";
+      const resultBg = (l.result === "ok" || l.result === "duplicate") ? "bg-green-900/20" : "bg-red-900/20";
+      return `<tr class="border-t border-white/5 hover:bg-white/[0.02]">
+        <td class="px-4 py-2 text-[10px] text-gray-400 font-mono whitespace-nowrap">${time}</td>
+        <td class="px-4 py-2"><span class="text-[10px] font-bold uppercase ${typeColors[l.event_type] || 'text-gray-400'}">${l.event_type}</span></td>
+        <td class="px-4 py-2 text-[10px] font-mono text-white">${esc(p.userid || p.user_id || '—')}</td>
+        <td class="px-4 py-2 text-[10px] font-mono text-gray-400">${esc(p.afp || '—')}</td>
+        <td class="px-4 py-2"><span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${resultBg} ${resultClass}">${l.result || 'ok'}</span></td>
+        <td class="px-4 py-2 text-[10px] text-gray-500 max-w-[200px] truncate">${p.transaction_sum ? '$' + p.transaction_sum : ''} ${p.commissionamount ? 'comm: $' + p.commissionamount : ''} ${p.isocountry || ''}</td>
+      </tr>`;
+    }).join("");
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-red-400">${err.message}</td></tr>`;
+  }
+};

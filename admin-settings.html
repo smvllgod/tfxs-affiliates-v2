@@ -225,7 +225,7 @@
                 </div>
                 <p class="text-[10px] font-bold text-green-400 uppercase tracking-wider mb-1">Revenue</p>
                 <span id="stat-revenue" class="text-xl font-mono font-bold text-white">$0.00</span>
-                <p class="text-[9px] text-gray-500 mt-1">CellXpert total</p>
+                <p class="text-[9px] text-gray-500 mt-1">Broker revenue total</p>
             </div>
             <!-- Affiliate Cost -->
             <div class="glass-panel p-4 rounded-xl border-l-4 border-l-orange-500 group cursor-pointer relative overflow-hidden">
@@ -296,6 +296,7 @@
             <button class="admin-tab flex-1 min-w-[100px] py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg" data-tab="users">Users &amp; Roles</button>
             <button class="admin-tab flex-1 min-w-[100px] py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg" data-tab="audit">Audit Log</button>
             <button class="admin-tab flex-1 min-w-[120px] py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg flex items-center justify-center gap-1.5" data-tab="notifications"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg> Notifications</button>
+            <button class="admin-tab flex-1 min-w-[120px] py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg flex items-center justify-center gap-1.5" data-tab="integrations"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg> Integrations</button>
         </div>
 
         <!-- ═══════ AFFILIATES TAB ═══════ -->
@@ -1108,6 +1109,187 @@
                         Save Notification Settings
                     </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- ═══════ INTEGRATIONS TAB ═══════ -->
+        <div id="tab-integrations" class="tab-content hidden">
+            <div class="space-y-6">
+
+                <!-- Webhook Status Banner -->
+                <div id="integ-status-banner" class="glass-panel rounded-xl p-4 border border-white/5">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div id="integ-status-dot" class="w-3 h-3 rounded-full bg-gray-500 animate-pulse"></div>
+                            <div>
+                                <p class="text-sm font-bold text-white">Webhook Status</p>
+                                <p id="integ-status-text" class="text-[10px] text-gray-500">Checking...</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 text-center">
+                            <div><p class="text-[10px] text-gray-500 uppercase">Last 24h</p><p id="integ-24h-count" class="text-lg font-mono font-bold text-white">—</p></div>
+                            <div><p class="text-[10px] text-gray-500 uppercase">Success</p><p id="integ-24h-ok" class="text-lg font-mono font-bold text-green-400">—</p></div>
+                            <div><p class="text-[10px] text-gray-500 uppercase">Errors</p><p id="integ-24h-err" class="text-lg font-mono font-bold text-red-400">—</p></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── SECTION 1: Incoming Webhooks (Postback URLs) ── -->
+                <div class="glass-panel rounded-xl overflow-hidden border border-white/5">
+                    <div class="p-4 border-b border-white/5 flex items-center gap-3">
+                        <svg class="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+                        <div>
+                            <h3 class="text-sm font-bold text-white uppercase tracking-wider">Incoming Webhooks</h3>
+                            <p class="text-[10px] text-gray-500 mt-0.5">Postback URLs to configure in your broker/tracking platform</p>
+                        </div>
+                    </div>
+                    <div class="p-4 space-y-3">
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-[9px] font-bold uppercase text-gray-500">Secret:</span>
+                                <span id="integ-secret-badge" class="text-[9px] font-mono px-2 py-0.5 rounded-full bg-gray-800 text-gray-400">checking...</span>
+                            </div>
+                        </div>
+                        <!-- Registration URL -->
+                        <div class="bg-white/[0.03] rounded-lg p-3">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                                    <span class="text-[10px] font-bold text-white uppercase">Registration</span>
+                                </div>
+                                <button onclick="copyWebhookUrl('registration')" class="text-[9px] text-gray-500 hover:text-white transition flex items-center gap-1"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg> Copy</button>
+                            </div>
+                            <code id="webhook-url-registration" class="block text-[9px] font-mono text-green-400/80 bg-black/30 px-3 py-2 rounded overflow-x-auto whitespace-nowrap">Loading...</code>
+                            <p class="text-[8px] text-gray-600 mt-1">Params: afp, userid, trackingcode, isocountry</p>
+                        </div>
+                        <!-- FTD URL -->
+                        <div class="bg-white/[0.03] rounded-lg p-3">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                                    <span class="text-[10px] font-bold text-white uppercase">First Time Deposit (FTD)</span>
+                                </div>
+                                <button onclick="copyWebhookUrl('ftd')" class="text-[9px] text-gray-500 hover:text-white transition flex items-center gap-1"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg> Copy</button>
+                            </div>
+                            <code id="webhook-url-ftd" class="block text-[9px] font-mono text-green-400/80 bg-black/30 px-3 py-2 rounded overflow-x-auto whitespace-nowrap">Loading...</code>
+                            <p class="text-[8px] text-gray-600 mt-1">Params: afp, userid, trackingcode, isocountry, depositid, transaction_sum</p>
+                        </div>
+                        <!-- Qualified CPA URL -->
+                        <div class="bg-white/[0.03] rounded-lg p-3">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-cyan-500"></span>
+                                    <span class="text-[10px] font-bold text-white uppercase">Qualified CPA</span>
+                                </div>
+                                <button onclick="copyWebhookUrl('qualified_cpa')" class="text-[9px] text-gray-500 hover:text-white transition flex items-center gap-1"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg> Copy</button>
+                            </div>
+                            <code id="webhook-url-qualified_cpa" class="block text-[9px] font-mono text-green-400/80 bg-black/30 px-3 py-2 rounded overflow-x-auto whitespace-nowrap">Loading...</code>
+                            <p class="text-[8px] text-gray-600 mt-1">Params: afp, userid, trackingcode, isocountry, depositid, commissionamount</p>
+                        </div>
+                        <!-- Commission URL -->
+                        <div class="bg-white/[0.03] rounded-lg p-3">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                                    <span class="text-[10px] font-bold text-white uppercase">Commission</span>
+                                </div>
+                                <button onclick="copyWebhookUrl('commission')" class="text-[9px] text-gray-500 hover:text-white transition flex items-center gap-1"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg> Copy</button>
+                            </div>
+                            <code id="webhook-url-commission" class="block text-[9px] font-mono text-green-400/80 bg-black/30 px-3 py-2 rounded overflow-x-auto whitespace-nowrap">Loading...</code>
+                            <p class="text-[8px] text-gray-600 mt-1">Params: afp, userid, trackingcode, isocountry, depositid, transaction_sum, commissionamount</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── SECTION 2: Outgoing Webhooks ── -->
+                <div class="glass-panel rounded-xl overflow-hidden border border-white/5">
+                    <div class="p-4 border-b border-white/5 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                            <div>
+                                <h3 class="text-sm font-bold text-white uppercase tracking-wider">Outgoing Webhooks</h3>
+                                <p class="text-[10px] text-gray-500 mt-0.5">Send event notifications to external services when conversions happen</p>
+                            </div>
+                        </div>
+                        <button onclick="addOutgoingWebhook()" class="text-[10px] font-bold text-brand-500 hover:text-white transition uppercase tracking-wider flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg> Add Webhook
+                        </button>
+                    </div>
+                    <div id="outgoing-webhooks-list" class="p-4 space-y-3">
+                        <p class="text-xs text-gray-600 text-center py-4">Loading...</p>
+                    </div>
+                    <div id="outgoing-webhooks-actions" class="hidden p-4 border-t border-white/5 flex items-center justify-between">
+                        <p id="outgoing-save-status" class="text-[10px] text-gray-600"></p>
+                        <button onclick="saveOutgoingWebhooks()" class="btn-gradient px-5 py-2 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            Save Webhooks
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ── SECTION 3: Broker Connections ── -->
+                <div class="glass-panel rounded-xl overflow-hidden border border-white/5">
+                    <div class="p-4 border-b border-white/5 flex items-center gap-3">
+                        <svg class="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                        <div>
+                            <h3 class="text-sm font-bold text-white uppercase tracking-wider">Broker Connections</h3>
+                            <p class="text-[10px] text-gray-500 mt-0.5">Connected broker platforms and their UID prefix mappings</p>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div id="integ-broker-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            <p class="text-xs text-gray-600 text-center py-4 col-span-full">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── SECTION 4: Recent Webhook Activity Log ── -->
+                <div class="glass-panel rounded-xl overflow-hidden border border-white/5">
+                    <div class="p-4 border-b border-white/5 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                            <div>
+                                <h3 class="text-sm font-bold text-white uppercase tracking-wider">Webhook Activity Log</h3>
+                                <p class="text-[10px] text-gray-500 mt-0.5">Recent incoming postback events</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <select id="wh-log-type-filter" onchange="loadWebhookLogs()" class="text-[10px] bg-white/5 border border-white/10 text-white rounded-lg px-2 py-1">
+                                <option value="">All Types</option>
+                                <option value="registration">Registration</option>
+                                <option value="ftd">FTD</option>
+                                <option value="qualified_cpa">Qualified CPA</option>
+                                <option value="commission">Commission</option>
+                            </select>
+                            <select id="wh-log-days-filter" onchange="loadWebhookLogs()" class="text-[10px] bg-white/5 border border-white/10 text-white rounded-lg px-2 py-1">
+                                <option value="1">Last 24h</option>
+                                <option value="7" selected>Last 7 days</option>
+                                <option value="30">Last 30 days</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto max-h-[40vh] overflow-y-auto">
+                        <table class="w-full text-xs">
+                            <thead><tr class="bg-white/[0.03]">
+                                <th class="text-left px-4 py-2 text-[10px] text-gray-500 uppercase font-bold">Time</th>
+                                <th class="text-left px-4 py-2 text-[10px] text-gray-500 uppercase font-bold">Type</th>
+                                <th class="text-left px-4 py-2 text-[10px] text-gray-500 uppercase font-bold">User ID</th>
+                                <th class="text-left px-4 py-2 text-[10px] text-gray-500 uppercase font-bold">AFP</th>
+                                <th class="text-left px-4 py-2 text-[10px] text-gray-500 uppercase font-bold">Result</th>
+                                <th class="text-left px-4 py-2 text-[10px] text-gray-500 uppercase font-bold">Details</th>
+                            </tr></thead>
+                            <tbody id="wh-log-tbody"><tr><td colspan="6" class="px-4 py-8 text-center text-gray-600">Loading...</td></tr></tbody>
+                        </table>
+                    </div>
+                    <div id="wh-log-pagination" class="p-3 border-t border-white/5 flex items-center justify-between">
+                        <span id="wh-log-count" class="text-[10px] text-gray-500"></span>
+                        <div class="flex gap-1">
+                            <button onclick="loadWebhookLogs(whLogPage-1)" id="wh-log-prev" class="text-[9px] px-2 py-1 rounded bg-white/5 text-gray-400 hover:text-white transition disabled:opacity-30" disabled>← Prev</button>
+                            <button onclick="loadWebhookLogs(whLogPage+1)" id="wh-log-next" class="text-[9px] px-2 py-1 rounded bg-white/5 text-gray-400 hover:text-white transition disabled:opacity-30" disabled>Next →</button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
