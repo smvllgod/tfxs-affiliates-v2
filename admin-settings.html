@@ -211,10 +211,33 @@
         </div>
 
         <!-- KPI Stats Cards — Row 2: Business Overview -->
-        <div class="flex items-center gap-3 mb-3">
+        <div class="flex items-center justify-between mb-3">
             <div class="flex items-center gap-2">
                 <svg class="w-5 h-5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
                 <h2 class="text-sm font-bold text-white uppercase tracking-wider">Business Overview</h2>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-[9px] text-gray-600 uppercase tracking-wider">Currency</span>
+                <select id="currency-select" onchange="setCurrency(this.value)" class="form-select text-[10px] px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-white">
+                    <option value="USD" selected>🇺🇸 USD</option>
+                    <option value="EUR">🇪🇺 EUR</option>
+                    <option value="GBP">🇬🇧 GBP</option>
+                    <option value="CAD">🇨🇦 CAD</option>
+                    <option value="AUD">🇦🇺 AUD</option>
+                    <option value="CHF">🇨🇭 CHF</option>
+                    <option value="JPY">🇯🇵 JPY</option>
+                    <option value="AED">🇦🇪 AED</option>
+                    <option value="SAR">🇸🇦 SAR</option>
+                    <option value="ZAR">🇿🇦 ZAR</option>
+                    <option value="NGN">🇳🇬 NGN</option>
+                    <option value="BRL">🇧🇷 BRL</option>
+                    <option value="INR">🇮🇳 INR</option>
+                    <option value="TRY">🇹🇷 TRY</option>
+                    <option value="MXN">🇲🇽 MXN</option>
+                    <option value="BTC">₿ BTC</option>
+                    <option value="ETH">Ξ ETH</option>
+                    <option value="USDT">₮ USDT</option>
+                </select>
             </div>
         </div>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
@@ -297,6 +320,7 @@
             <button class="admin-tab flex-1 min-w-[100px] py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg" data-tab="audit">Audit Log</button>
             <button class="admin-tab flex-1 min-w-[120px] py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg flex items-center justify-center gap-1.5" data-tab="notifications"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg> Notifications</button>
             <button class="admin-tab flex-1 min-w-[120px] py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg flex items-center justify-center gap-1.5" data-tab="integrations"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg> Integrations</button>
+            <button class="admin-tab flex-1 min-w-[120px] py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg flex items-center justify-center gap-1.5" data-tab="analytics"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg> Analytics</button>
         </div>
 
         <!-- ═══════ AFFILIATES TAB ═══════ -->
@@ -906,6 +930,36 @@
                 <p class="text-xs text-gray-500">Configure how you receive admin alerts for new registrations and deposits.</p>
             </div>
 
+            <!-- ── SETUP GUIDES ── -->
+            <div class="glass-panel rounded-2xl p-5 mb-6 border border-white/5">
+                <div class="flex items-center gap-2 mb-4">
+                    <svg class="w-4 h-4 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    <h4 class="text-xs font-bold text-white uppercase tracking-wider">Setup Guides</h4>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                    <button onclick="openTutorial('telegram')" class="flex flex-col items-center gap-2 p-3 rounded-xl bg-blue-500/5 border border-blue-500/10 hover:bg-blue-500/10 transition group">
+                        <svg class="w-6 h-6 text-blue-400 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.07-.2c-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.42-1.43-.88.03-.24.37-.49 1.02-.74 3.98-1.73 6.64-2.88 7.97-3.44 3.79-1.58 4.58-1.86 5.09-1.87.11 0 .37.03.54.17.14.12.18.28.2.45-.01.06.01.24 0 .38z"/></svg>
+                        <span class="text-[9px] font-bold text-blue-400 uppercase">Telegram</span>
+                    </button>
+                    <button onclick="openTutorial('discord')" class="flex flex-col items-center gap-2 p-3 rounded-xl bg-indigo-500/5 border border-indigo-500/10 hover:bg-indigo-500/10 transition group">
+                        <svg class="w-6 h-6 text-indigo-400 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+                        <span class="text-[9px] font-bold text-indigo-400 uppercase">Discord</span>
+                    </button>
+                    <button onclick="openTutorial('slack')" class="flex flex-col items-center gap-2 p-3 rounded-xl bg-green-500/5 border border-green-500/10 hover:bg-green-500/10 transition group">
+                        <svg class="w-6 h-6 text-green-400 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/></svg>
+                        <span class="text-[9px] font-bold text-green-400 uppercase">Slack</span>
+                    </button>
+                    <button onclick="openTutorial('whatsapp')" class="flex flex-col items-center gap-2 p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10 hover:bg-emerald-500/10 transition group">
+                        <svg class="w-6 h-6 text-emerald-400 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        <span class="text-[9px] font-bold text-emerald-400 uppercase">WhatsApp</span>
+                    </button>
+                    <button onclick="openTutorial('email')" class="flex flex-col items-center gap-2 p-3 rounded-xl bg-amber-500/5 border border-amber-500/10 hover:bg-amber-500/10 transition group">
+                        <svg class="w-6 h-6 text-amber-400 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        <span class="text-[9px] font-bold text-amber-400 uppercase">Email</span>
+                    </button>
+                </div>
+            </div>
+
             <div id="notif-loading" class="text-center py-12 text-gray-500 text-xs">Loading notification settings...</div>
 
             <div id="notif-content" class="hidden space-y-6">
@@ -1294,11 +1348,147 @@
             </div>
         </div>
 
+        <!-- ═══════ ANALYTICS TAB ═══════ -->
+        <div id="tab-analytics" class="tab-content hidden">
+            <!-- Sub-navigation -->
+            <div class="flex gap-2 mb-6">
+                <button class="analytics-sub active px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-white/5 border border-white/10 text-white hover:bg-white/10 transition" data-sub="cohort" onclick="switchAnalyticsSub('cohort')">
+                    <svg class="w-3.5 h-3.5 inline mr-1 -mt-px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    Cohort Analysis
+                </button>
+                <button class="analytics-sub px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10 transition" data-sub="forecast" onclick="switchAnalyticsSub('forecast')">
+                    <svg class="w-3.5 h-3.5 inline mr-1 -mt-px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                    Revenue Forecast
+                </button>
+            </div>
+
+            <!-- ── COHORT ANALYSIS ── -->
+            <div id="analytics-cohort" class="analytics-panel">
+                <div class="glass-panel rounded-2xl p-6 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                                <svg class="w-4 h-4 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                Cohort Retention Analysis
+                            </h3>
+                            <p class="text-[10px] text-gray-500 mt-1">Track how users registered in each month convert and retain over time</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <select id="cohort-months" onchange="loadCohort()" class="form-select text-xs px-3 py-2 rounded-lg w-auto">
+                                <option value="3">Last 3 Months</option>
+                                <option value="6" selected>Last 6 Months</option>
+                                <option value="12">Last 12 Months</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs" id="cohort-table">
+                            <thead id="cohort-thead"><tr class="bg-white/[0.03]"><th class="px-3 py-3 text-left">Loading...</th></tr></thead>
+                            <tbody id="cohort-tbody"></tbody>
+                        </table>
+                    </div>
+                    <div class="mt-4 flex gap-4 text-[9px] text-gray-500">
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-green-500/30 inline-block"></span> High retention (&gt;30%)</span>
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-yellow-500/30 inline-block"></span> Medium (10-30%)</span>
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-red-500/30 inline-block"></span> Low (&lt;10%)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── REVENUE FORECAST ── -->
+            <div id="analytics-forecast" class="analytics-panel hidden">
+                <!-- Projections Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                    <div class="glass-panel rounded-xl p-4 border-l-2 border-green-500">
+                        <p class="text-[9px] text-gray-500 uppercase tracking-wider mb-1">Projected Monthly Revenue</p>
+                        <p class="text-lg font-bold text-green-400 font-mono" id="fc-proj-revenue">--</p>
+                        <p class="text-[8px] text-gray-600 mt-0.5" id="fc-proj-rev-sub">Based on current pace</p>
+                    </div>
+                    <div class="glass-panel rounded-xl p-4 border-l-2 border-orange-500">
+                        <p class="text-[9px] text-gray-500 uppercase tracking-wider mb-1">Projected Aff. Cost</p>
+                        <p class="text-lg font-bold text-orange-400 font-mono" id="fc-proj-cost">--</p>
+                    </div>
+                    <div class="glass-panel rounded-xl p-4 border-l-2 border-emerald-500">
+                        <p class="text-[9px] text-gray-500 uppercase tracking-wider mb-1">Projected Profit</p>
+                        <p class="text-lg font-bold text-emerald-400 font-mono" id="fc-proj-profit">--</p>
+                    </div>
+                    <div class="glass-panel rounded-xl p-4 border-l-2 border-blue-500">
+                        <p class="text-[9px] text-gray-500 uppercase tracking-wider mb-1">Model Confidence</p>
+                        <p class="text-lg font-bold text-blue-400 font-mono" id="fc-confidence">--</p>
+                        <p class="text-[8px] text-gray-600 mt-0.5">Linear regression R²</p>
+                    </div>
+                </div>
+
+                <!-- Forecast Chart -->
+                <div class="glass-panel rounded-2xl p-6 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                                <svg class="w-4 h-4 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                                Revenue Forecast
+                                <span class="text-[8px] font-normal text-gray-500 bg-white/5 px-2 py-0.5 rounded-full border border-white/10">AI-POWERED</span>
+                            </h3>
+                            <p class="text-[10px] text-gray-500 mt-1">Linear regression model based on 90-day historical data</p>
+                        </div>
+                        <select id="fc-days" onchange="loadForecast()" class="form-select text-xs px-3 py-2 rounded-lg w-auto">
+                            <option value="14">14 Day Forecast</option>
+                            <option value="30" selected>30 Day Forecast</option>
+                            <option value="60">60 Day Forecast</option>
+                        </select>
+                    </div>
+                    <div id="forecast-chart" style="height: 350px;"></div>
+                </div>
+
+                <!-- Trend Metrics -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div class="glass-panel rounded-xl p-4">
+                        <p class="text-[9px] text-gray-500 uppercase tracking-wider mb-1">Revenue Trend</p>
+                        <p class="text-sm font-bold font-mono" id="fc-rev-trend">--</p>
+                        <p class="text-[8px] text-gray-600">per day</p>
+                    </div>
+                    <div class="glass-panel rounded-xl p-4">
+                        <p class="text-[9px] text-gray-500 uppercase tracking-wider mb-1">Daily Avg Revenue</p>
+                        <p class="text-sm font-bold text-white font-mono" id="fc-rev-avg">--</p>
+                    </div>
+                    <div class="glass-panel rounded-xl p-4">
+                        <p class="text-[9px] text-gray-500 uppercase tracking-wider mb-1">Reg Trend</p>
+                        <p class="text-sm font-bold font-mono" id="fc-reg-trend">--</p>
+                        <p class="text-[8px] text-gray-600">per day</p>
+                    </div>
+                    <div class="glass-panel rounded-xl p-4">
+                        <p class="text-[9px] text-gray-500 uppercase tracking-wider mb-1">FTD Trend</p>
+                        <p class="text-sm font-bold font-mono" id="fc-ftd-trend">--</p>
+                        <p class="text-[8px] text-gray-600">per day</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <!-- ═══════════════════════════════════════════════════ -->
     <!-- MODALS -->
     <!-- ═══════════════════════════════════════════════════ -->
+
+    <!-- ═══ TUTORIAL MODAL ═══ -->
+    <div id="tutorial-modal" class="modal-overlay fixed inset-0 z-[99998] hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeTutorial()">
+        <div class="glass-panel rounded-2xl w-full max-w-lg mx-4 max-h-[90vh] flex flex-col overflow-hidden">
+            <div class="flex items-center justify-between p-5 border-b border-white/5">
+                <div class="flex items-center gap-3">
+                    <div id="tut-icon" class="w-10 h-10 rounded-xl flex items-center justify-center bg-brand-500/10 border border-brand-500/20"></div>
+                    <div>
+                        <h3 id="tut-title" class="text-sm font-bold text-white uppercase tracking-wider">Setup Guide</h3>
+                        <p id="tut-subtitle" class="text-[10px] text-gray-500"></p>
+                    </div>
+                </div>
+                <button onclick="closeTutorial()" class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/5 text-gray-500 hover:text-white transition">&times;</button>
+            </div>
+            <div id="tut-body" class="p-5 overflow-y-auto space-y-4 text-xs text-gray-400 leading-relaxed"></div>
+            <div class="p-4 border-t border-white/5 flex justify-end">
+                <button onclick="closeTutorial()" class="px-5 py-2 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-wider border border-white/10 hover:bg-white/5 transition">Got it</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Confirm / Prompt Modal (reusable) -->
     <div id="confirm-modal" class="modal-overlay fixed inset-0 z-[99999] hidden flex items-center justify-center">

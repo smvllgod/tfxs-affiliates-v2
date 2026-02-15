@@ -35,8 +35,41 @@ function fmtTime(d) {
     dt.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 }
 
+// ── Multi-Currency Support ──
+let currencyRates = {};
+let activeCurrency = localStorage.getItem("tfxs_currency") || "USD";
+
+async function loadCurrencyRates() {
+  try {
+    const res = await fetch(API + "/api/currencies");
+    const data = await res.json();
+    if (data.ok) currencyRates = data.data || {};
+  } catch (_) {}
+  // Restore saved currency
+  const sel = $("currency-select");
+  if (sel) sel.value = activeCurrency;
+}
+
+function setCurrency(code) {
+  activeCurrency = code;
+  localStorage.setItem("tfxs_currency", code);
+  // Re-render all money values
+  loadStats();
+  const active = document.querySelector(".admin-tab.active")?.dataset.tab;
+  if (active === "analytics") loadAnalytics();
+}
+
 function fmtMoney(n) {
-  return "$" + Number(n || 0).toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const usd = Number(n || 0);
+  if (activeCurrency === "USD" || !currencyRates[activeCurrency]) {
+    return "$" + usd.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  const rate = currencyRates[activeCurrency] || 1;
+  const converted = usd * rate;
+  const symbols = { EUR: "€", GBP: "£", CAD: "C$", AUD: "A$", CHF: "CHF ", JPY: "¥", AED: "AED ", SAR: "SAR ", ZAR: "R", NGN: "₦", BRL: "R$", INR: "₹", TRY: "₺", MXN: "MX$", BTC: "₿", ETH: "Ξ", USDT: "₮" };
+  const sym = symbols[activeCurrency] || activeCurrency + " ";
+  const decimals = ["BTC", "ETH"].includes(activeCurrency) ? 6 : ["JPY", "NGN"].includes(activeCurrency) ? 0 : 2;
+  return sym + converted.toLocaleString("en", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
 }
 
 function statusBadge(s) {
@@ -243,6 +276,7 @@ async function loadActiveTab() {
   else if (active === "audit") await loadAudit();
   else if (active === "notifications") await loadNotificationSettings();
   else if (active === "integrations") await loadIntegrations();
+  else if (active === "analytics") await loadAnalytics();
 }
 
 // ══════════════════════════════════════════════════════
@@ -2574,11 +2608,11 @@ async function rejectKyc(affiliateId) {
   // Add spin keyframe if not present
   if (!document.getElementById("admin-spin-style")) { const s = document.createElement("style"); s.id="admin-spin-style"; s.textContent="@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}"; document.head.appendChild(s); }
   // Initial load
-  try { setLoading(); await loadStats(); await loadAffiliates(); loadPendingCounts(); setConnected(); stopLoading(); } catch(e) { setDisconnected(); stopLoading(); }
+  try { setLoading(); await loadCurrencyRates(); await loadStats(); await loadAffiliates(); loadPendingCounts(); setConnected(); stopLoading(); } catch(e) { setDisconnected(); stopLoading(); }
   // Hash-based tab routing (e.g. /admin-settings#kyc, #affiliates, #payouts)
   const hash = window.location.hash.replace("#", "");
   if (hash) {
-    const validTabs = ["affiliates", "deals", "conversions", "payouts", "kyc", "users", "audit", "notifications"];
+    const validTabs = ["affiliates", "deals", "conversions", "payouts", "kyc", "users", "audit", "notifications", "integrations", "analytics"];
     if (validTabs.includes(hash)) {
       switchTab(hash);
       // If navigating to affiliates from notification, auto-filter pending
@@ -3134,3 +3168,455 @@ window.loadWebhookLogs = async function(page) {
     tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-red-400">${err.message}</td></tr>`;
   }
 };
+
+// ══════════════════════════════════════════════════════
+// ANALYTICS TAB — Cohort Analysis & Revenue Forecasting
+// ══════════════════════════════════════════════════════
+
+let forecastChart = null;
+
+async function loadAnalytics() {
+  await loadCohort();
+}
+
+function switchAnalyticsSub(name) {
+  document.querySelectorAll(".analytics-sub").forEach(b => {
+    const isActive = b.dataset.sub === name;
+    b.classList.toggle("active", isActive);
+    b.classList.toggle("text-white", isActive);
+    b.classList.toggle("text-gray-400", !isActive);
+  });
+  if ($("analytics-cohort")) $("analytics-cohort").classList.toggle("hidden", name !== "cohort");
+  if ($("analytics-forecast")) $("analytics-forecast").classList.toggle("hidden", name !== "forecast");
+  if (name === "cohort") loadCohort();
+  else loadForecast();
+}
+
+async function loadCohort() {
+  const months = $("cohort-months")?.value || 6;
+  const tbody = $("cohort-tbody");
+  const thead = $("cohort-thead");
+  if (!tbody || !thead) return;
+  tbody.innerHTML = '<tr><td colspan="20" class="px-4 py-8 text-center text-gray-600">Loading cohort data...</td></tr>';
+
+  try {
+    const res = await api(`/admin/cohort?months=${months}`);
+    const cohorts = res.data || [];
+
+    if (cohorts.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="20" class="px-4 py-8 text-center text-gray-600">No cohort data yet — need user registrations with FTDs.</td></tr>';
+      thead.innerHTML = '';
+      return;
+    }
+
+    // Build header
+    const maxM = Math.max(...cohorts.map(c => c.retention.length));
+    let hdr = '<tr><th class="px-3 py-2 text-left text-[9px] font-bold text-gray-500 uppercase">Cohort</th>';
+    hdr += '<th class="px-3 py-2 text-center text-[9px] font-bold text-gray-500 uppercase">Users</th>';
+    for (let i = 0; i < maxM; i++) {
+      hdr += `<th class="px-3 py-2 text-center text-[9px] font-bold text-gray-500 uppercase">M${i}</th>`;
+    }
+    hdr += '</tr>';
+    thead.innerHTML = hdr;
+
+    // Build rows
+    tbody.innerHTML = cohorts.map(c => {
+      let row = `<td class="px-3 py-2 text-[10px] font-bold text-white whitespace-nowrap">${c.cohort_month}</td>`;
+      row += `<td class="px-3 py-2 text-center text-[10px] font-mono text-gray-400">${c.total_users}</td>`;
+      c.retention.forEach(r => {
+        const pct = r.rate;
+        let bg = "bg-red-500/20 text-red-400";
+        if (pct >= 30) bg = "bg-green-500/20 text-green-400";
+        else if (pct >= 10) bg = "bg-yellow-500/20 text-yellow-400";
+        row += `<td class="px-3 py-2 text-center"><span class="text-[9px] font-bold px-2 py-0.5 rounded ${bg}">${pct.toFixed(0)}%</span></td>`;
+      });
+      // Fill empty cells
+      for (let i = c.retention.length; i < maxM; i++) {
+        row += '<td class="px-3 py-2 text-center text-[10px] text-gray-700">—</td>';
+      }
+      return `<tr class="border-t border-white/5 hover:bg-white/[0.02]">${row}</tr>`;
+    }).join("");
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="20" class="px-4 py-8 text-center text-red-400">${err.message}</td></tr>`;
+  }
+}
+
+async function loadForecast() {
+  const days = $("fc-days")?.value || 30;
+  // Show loading
+  ["fc-proj-revenue", "fc-proj-cost", "fc-proj-profit", "fc-confidence"].forEach(id => { if ($(id)) $(id).textContent = "..."; });
+
+  try {
+    const res = await api(`/admin/forecast?days=${days}`);
+    const d = res.data || {};
+    const proj = d.projections || {};
+    const rev = d.revenue || {};
+    const comm = d.commission || {};
+    const reg = d.registrations || {};
+    const ftd = d.ftd || {};
+
+    // Projection cards (monthly projections from current pace)
+    if ($("fc-proj-revenue")) $("fc-proj-revenue").textContent = fmtMoney(proj.month_revenue || 0);
+    if ($("fc-proj-cost")) $("fc-proj-cost").textContent = fmtMoney(proj.month_commission || 0);
+    if ($("fc-proj-profit")) {
+      const profit = proj.month_profit || 0;
+      $("fc-proj-profit").textContent = fmtMoney(profit);
+      $("fc-proj-profit").className = $("fc-proj-profit").className.replace(/text-(red|green|emerald|white)-\d+/g, '');
+      $("fc-proj-profit").classList.add(profit >= 0 ? "text-emerald-400" : "text-red-400");
+    }
+    if ($("fc-confidence")) {
+      const conf = rev.confidence || 0;
+      $("fc-confidence").textContent = conf.toFixed(0) + "%";
+      $("fc-confidence").className = $("fc-confidence").className.replace(/text-(red|green|emerald|yellow|white)-\d+/g, '');
+      $("fc-confidence").classList.add(conf >= 70 ? "text-emerald-400" : conf >= 40 ? "text-yellow-400" : "text-red-400");
+    }
+
+    // Trend metrics
+    if ($("fc-rev-trend")) $("fc-rev-trend").textContent = rev.trend ? fmtMoney(rev.trend) + "/day" : "—";
+    if ($("fc-rev-avg")) $("fc-rev-avg").textContent = rev.avg ? fmtMoney(rev.avg) + "/day" : "—";
+    if ($("fc-reg-trend")) $("fc-reg-trend").textContent = reg.trend ? reg.trend.toFixed(2) + "/day" : "—";
+    if ($("fc-ftd-trend")) $("fc-ftd-trend").textContent = ftd.trend ? ftd.trend.toFixed(2) + "/day" : "—";
+
+    // Build Highcharts — historical + forecast
+    const historical = d.historical || [];
+    // Build forecast line data from revenue forecast
+    const revForecastLine = rev.forecast || [];
+    const commForecastLine = comm.forecast || [];
+
+    renderForecastChart(historical, revForecastLine, commForecastLine, days);
+  } catch (err) {
+    if ($("fc-proj-revenue")) $("fc-proj-revenue").textContent = "Error";
+    console.error("Forecast error:", err);
+  }
+}
+
+function renderForecastChart(historical, revForecast, commForecast, days) {
+  const el = $("forecast-chart");
+  if (!el || typeof Highcharts === "undefined") return;
+
+  const historicalRevenue = historical.map(d => [new Date(d.date).getTime(), parseFloat(d.revenue) || 0]);
+  const historicalCost = historical.map(d => [new Date(d.date).getTime(), parseFloat(d.commission) || 0]);
+
+  // Connect forecast to last historical point
+  const lastHistDate = historical.length ? new Date(historical[historical.length - 1].date).getTime() : Date.now();
+  const lastHistRev = historicalRevenue.length ? historicalRevenue[historicalRevenue.length - 1][1] : 0;
+  const lastHistCost = historicalCost.length ? historicalCost[historicalCost.length - 1][1] : 0;
+
+  const forecastRevData = [[lastHistDate, lastHistRev], ...revForecast.map(d => [new Date(d.date).getTime(), d.value || 0])];
+  const forecastCostData = [[lastHistDate, lastHistCost], ...commForecast.map(d => [new Date(d.date).getTime(), d.value || 0])];
+
+  if (forecastChart) forecastChart.destroy();
+
+  forecastChart = Highcharts.chart(el, {
+    chart: { type: "areaspline", backgroundColor: "transparent", height: 350, style: { fontFamily: "Inter, sans-serif" } },
+    title: { text: null },
+    credits: { enabled: false },
+    xAxis: {
+      type: "datetime",
+      gridLineColor: "rgba(255,255,255,0.03)",
+      labels: { style: { color: "#6b7280", fontSize: "9px" } },
+      plotLines: historicalRevenue.length ? [{
+        value: historicalRevenue[historicalRevenue.length - 1][0],
+        color: "rgba(255,255,255,0.15)", width: 1, dashStyle: "Dash",
+        label: { text: "Today", style: { color: "#9ca3af", fontSize: "9px" }, rotation: 0, y: 15 }
+      }] : []
+    },
+    yAxis: {
+      title: { text: null },
+      gridLineColor: "rgba(255,255,255,0.03)",
+      labels: { style: { color: "#6b7280", fontSize: "9px" }, formatter() { return "$" + Highcharts.numberFormat(this.value, 0, ".", ","); } }
+    },
+    tooltip: {
+      shared: true, backgroundColor: "#1a1a2e", borderColor: "rgba(255,255,255,0.1)",
+      style: { color: "#e5e7eb", fontSize: "10px" },
+      pointFormatter() { return `<span style="color:${this.color}">●</span> ${this.series.name}: <b>$${Highcharts.numberFormat(this.y, 0, ".", ",")}</b><br/>`; }
+    },
+    legend: { itemStyle: { color: "#9ca3af", fontSize: "9px" }, itemHoverStyle: { color: "#fff" } },
+    plotOptions: { areaspline: { marker: { enabled: false }, lineWidth: 2 } },
+    series: [
+      {
+        name: "Revenue (Actual)", data: historicalRevenue,
+        color: "#8b5cf6", fillColor: { linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 }, stops: [[0, "rgba(139,92,246,0.2)"], [1, "rgba(139,92,246,0)"]] }
+      },
+      {
+        name: "Revenue (Forecast)", data: forecastRevData,
+        color: "#8b5cf6", dashStyle: "Dash", fillColor: { linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 }, stops: [[0, "rgba(139,92,246,0.08)"], [1, "rgba(139,92,246,0)"]] }
+      },
+      {
+        name: "Cost (Actual)", data: historicalCost,
+        color: "#f59e0b", fillColor: { linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 }, stops: [[0, "rgba(245,158,11,0.1)"], [1, "rgba(245,158,11,0)"]] }
+      },
+      {
+        name: "Cost (Forecast)", data: forecastCostData,
+        color: "#f59e0b", dashStyle: "Dash", fillColor: { linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 }, stops: [[0, "rgba(245,158,11,0.04)"], [1, "rgba(245,158,11,0)"]] }
+      }
+    ]
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// SETUP TUTORIAL MODALS
+// ══════════════════════════════════════════════════════
+
+const TUTORIALS = {
+  telegram: {
+    title: "Telegram Setup",
+    subtitle: "Configure Telegram bot notifications for admin & affiliates",
+    icon: `<svg class="w-5 h-5 text-blue-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.07-.2c-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.42-1.43-.88.03-.24.37-.49 1.02-.74 3.98-1.73 6.64-2.88 7.97-3.44 3.79-1.58 4.58-1.86 5.09-1.87.11 0 .37.03.54.17.14.12.18.28.2.45-.01.06.01.24 0 .38z"/></svg>`,
+    color: "blue",
+    body: `
+      <div class="space-y-5">
+        <div class="bg-blue-500/5 border border-blue-500/10 rounded-xl p-4">
+          <p class="text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-1">Overview</p>
+          <p class="text-xs text-gray-400">Telegram bots send instant notifications to your group or private chat when events happen (new registrations, FTDs, deposits).</p>
+        </div>
+
+        <div>
+          <p class="text-[11px] font-bold text-white mb-3">Step 1 — Create a Telegram Bot</p>
+          <ol class="list-decimal list-inside space-y-2 text-[11px] text-gray-400">
+            <li>Open Telegram and search for <span class="font-mono text-blue-400">@BotFather</span></li>
+            <li>Send the command <code class="bg-white/5 px-1.5 py-0.5 rounded text-[10px] font-mono text-white">/newbot</code></li>
+            <li>Choose a name (e.g. <span class="text-white">TFXS Notifications</span>)</li>
+            <li>Choose a username ending in <code class="bg-white/5 px-1.5 py-0.5 rounded text-[10px] font-mono text-white">bot</code> (e.g. <span class="font-mono text-white">tfxs_notif_bot</span>)</li>
+            <li>BotFather will give you an <span class="text-yellow-400 font-bold">API Token</span> — copy it</li>
+          </ol>
+        </div>
+
+        <div>
+          <p class="text-[11px] font-bold text-white mb-3">Step 2 — Get Your Chat ID</p>
+          <ol class="list-decimal list-inside space-y-2 text-[11px] text-gray-400">
+            <li>Create a Telegram Group (or use an existing one)</li>
+            <li>Add your newly created bot to the group</li>
+            <li>Send any message in the group</li>
+            <li>Visit: <code class="bg-white/5 px-1.5 py-0.5 rounded text-[10px] font-mono text-white break-all">https://api.telegram.org/bot&lt;YOUR_TOKEN&gt;/getUpdates</code></li>
+            <li>Look for <code class="bg-white/5 px-1.5 py-0.5 rounded text-[10px] font-mono text-white">"chat":{"id": -123456789}</code> — that negative number is your <span class="text-yellow-400 font-bold">Chat ID</span></li>
+          </ol>
+        </div>
+
+        <div>
+          <p class="text-[11px] font-bold text-white mb-3">Step 3 — Configure in TFXS</p>
+          <ol class="list-decimal list-inside space-y-2 text-[11px] text-gray-400">
+            <li>Paste the <span class="text-yellow-400">Bot Token</span> in the "Bot Token" field below</li>
+            <li>Paste the <span class="text-yellow-400">Chat IDs</span> into the respective fields (Registrations, Deposits, General)</li>
+            <li>You can use different groups for each event type, or one group for all</li>
+            <li>Click <span class="text-white font-bold">Test</span> to send a test message</li>
+            <li>Click <span class="text-white font-bold">Save</span> to apply</li>
+          </ol>
+        </div>
+
+        <div class="bg-yellow-500/5 border border-yellow-500/10 rounded-xl p-4">
+          <p class="text-[10px] font-bold text-yellow-400 uppercase tracking-wider mb-1">💡 Pro Tip</p>
+          <p class="text-[11px] text-gray-400">You can set up separate groups for <span class="text-white">Registrations</span>, <span class="text-white">FTDs/Deposits</span>, and <span class="text-white">General Alerts</span> to keep your notifications organized. Use the same bot token but different chat IDs.</p>
+        </div>
+      </div>`
+  },
+
+  discord: {
+    title: "Discord Setup",
+    subtitle: "Send notifications to a Discord channel via webhooks",
+    icon: `<svg class="w-5 h-5 text-indigo-400" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>`,
+    color: "indigo",
+    body: `
+      <div class="space-y-5">
+        <div class="bg-indigo-500/5 border border-indigo-500/10 rounded-xl p-4">
+          <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-wider mb-1">Overview</p>
+          <p class="text-xs text-gray-400">Discord Webhooks let you send automated messages to any channel. No bot setup required — just create a webhook URL and paste it in.</p>
+        </div>
+
+        <div>
+          <p class="text-[11px] font-bold text-white mb-3">Step 1 — Create a Webhook in Discord</p>
+          <ol class="list-decimal list-inside space-y-2 text-[11px] text-gray-400">
+            <li>Open your Discord server</li>
+            <li>Right-click the channel where you want notifications → <span class="text-white">Edit Channel</span></li>
+            <li>Go to <span class="text-white">Integrations</span> → <span class="text-white">Webhooks</span></li>
+            <li>Click <span class="text-white font-bold">New Webhook</span></li>
+            <li>Give it a name (e.g. <span class="text-white">TFXS Alerts</span>)</li>
+            <li>Click <span class="text-indigo-400 font-bold">Copy Webhook URL</span></li>
+          </ol>
+        </div>
+
+        <div>
+          <p class="text-[11px] font-bold text-white mb-3">Step 2 — Add to TFXS</p>
+          <ol class="list-decimal list-inside space-y-2 text-[11px] text-gray-400">
+            <li>Go to <span class="text-white">Integrations → Outgoing Webhooks</span></li>
+            <li>Click <span class="text-white font-bold">+ Add Webhook</span></li>
+            <li>Set the URL to your Discord webhook URL</li>
+            <li>Choose which events to forward (registrations, FTDs, etc.)</li>
+            <li>Save — notifications will appear in your Discord channel</li>
+          </ol>
+        </div>
+
+        <div class="bg-indigo-500/5 border border-indigo-500/10 rounded-xl p-4">
+          <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-wider mb-1">📝 Webhook URL Format</p>
+          <code class="text-[10px] font-mono text-indigo-300 break-all">https://discord.com/api/webhooks/1234567890/abcdefg...</code>
+        </div>
+
+        <div class="bg-yellow-500/5 border border-yellow-500/10 rounded-xl p-4">
+          <p class="text-[10px] font-bold text-yellow-400 uppercase tracking-wider mb-1">💡 Pro Tip</p>
+          <p class="text-[11px] text-gray-400">Create separate channels (#registrations, #ftds, #alerts) and use different webhooks for each to keep things organized.</p>
+        </div>
+      </div>`
+  },
+
+  slack: {
+    title: "Slack Setup",
+    subtitle: "Send notifications to a Slack channel via incoming webhooks",
+    icon: `<svg class="w-5 h-5 text-green-400" viewBox="0 0 24 24" fill="currentColor"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/></svg>`,
+    color: "green",
+    body: `
+      <div class="space-y-5">
+        <div class="bg-green-500/5 border border-green-500/10 rounded-xl p-4">
+          <p class="text-[10px] font-bold text-green-400 uppercase tracking-wider mb-1">Overview</p>
+          <p class="text-xs text-gray-400">Slack Incoming Webhooks let you post messages to any Slack channel. Create a webhook in your Slack workspace and TFXS will send notifications there.</p>
+        </div>
+
+        <div>
+          <p class="text-[11px] font-bold text-white mb-3">Step 1 — Create a Slack App</p>
+          <ol class="list-decimal list-inside space-y-2 text-[11px] text-gray-400">
+            <li>Go to <span class="font-mono text-green-400">api.slack.com/apps</span> and click <span class="text-white font-bold">Create New App</span></li>
+            <li>Select <span class="text-white">From scratch</span></li>
+            <li>Name it (e.g. <span class="text-white">TFXS Notifications</span>) and choose your workspace</li>
+            <li>Click <span class="text-white font-bold">Create App</span></li>
+          </ol>
+        </div>
+
+        <div>
+          <p class="text-[11px] font-bold text-white mb-3">Step 2 — Enable Incoming Webhooks</p>
+          <ol class="list-decimal list-inside space-y-2 text-[11px] text-gray-400">
+            <li>In your app settings, go to <span class="text-white">Incoming Webhooks</span></li>
+            <li>Toggle <span class="text-white font-bold">Activate Incoming Webhooks</span> to ON</li>
+            <li>Click <span class="text-white font-bold">Add New Webhook to Workspace</span></li>
+            <li>Select the channel for notifications</li>
+            <li>Click <span class="text-white font-bold">Allow</span></li>
+            <li>Copy the <span class="text-green-400 font-bold">Webhook URL</span></li>
+          </ol>
+        </div>
+
+        <div>
+          <p class="text-[11px] font-bold text-white mb-3">Step 3 — Add to TFXS</p>
+          <ol class="list-decimal list-inside space-y-2 text-[11px] text-gray-400">
+            <li>Go to <span class="text-white">Integrations → Outgoing Webhooks</span></li>
+            <li>Click <span class="text-white font-bold">+ Add Webhook</span></li>
+            <li>Paste the Slack webhook URL</li>
+            <li>Select which events to send</li>
+            <li>Save — done!</li>
+          </ol>
+        </div>
+
+        <div class="bg-green-500/5 border border-green-500/10 rounded-xl p-4">
+          <p class="text-[10px] font-bold text-green-400 uppercase tracking-wider mb-1">📝 Webhook URL Format</p>
+          <code class="text-[10px] font-mono text-green-300 break-all">https://hooks.slack.com/services/T.../B.../...</code>
+        </div>
+      </div>`
+  },
+
+  whatsapp: {
+    title: "WhatsApp Setup",
+    subtitle: "Send notifications via the WhatsApp Business API",
+    icon: `<svg class="w-5 h-5 text-emerald-400" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`,
+    color: "emerald",
+    body: `
+      <div class="space-y-5">
+        <div class="bg-emerald-500/5 border border-emerald-500/10 rounded-xl p-4">
+          <p class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider mb-1">Overview</p>
+          <p class="text-xs text-gray-400">WhatsApp Business API lets you send automated messages. You can use a provider like <span class="text-white font-bold">Twilio</span>, <span class="text-white font-bold">MessageBird</span>, or <span class="text-white font-bold">Meta's Cloud API</span> directly.</p>
+        </div>
+
+        <div>
+          <p class="text-[11px] font-bold text-white mb-3">Option A — Using Twilio (Easiest)</p>
+          <ol class="list-decimal list-inside space-y-2 text-[11px] text-gray-400">
+            <li>Sign up at <span class="font-mono text-emerald-400">twilio.com</span></li>
+            <li>In console, go to <span class="text-white">Messaging → Try it out → Send a WhatsApp message</span></li>
+            <li>Follow the sandbox setup (send a code to the Twilio WhatsApp number)</li>
+            <li>Note your <span class="text-yellow-400 font-bold">Account SID</span>, <span class="text-yellow-400 font-bold">Auth Token</span>, and <span class="text-yellow-400 font-bold">From number</span></li>
+            <li>Use the outgoing webhook in TFXS to forward events to a middleware (e.g. Zapier or a small function) that calls the Twilio API</li>
+          </ol>
+        </div>
+
+        <div>
+          <p class="text-[11px] font-bold text-white mb-3">Option B — Using Meta Cloud API (Free tier)</p>
+          <ol class="list-decimal list-inside space-y-2 text-[11px] text-gray-400">
+            <li>Go to <span class="font-mono text-emerald-400">developers.facebook.com</span> → Create App → Business type</li>
+            <li>Add <span class="text-white">WhatsApp</span> product to your app</li>
+            <li>In WhatsApp → Getting Started, you'll get a <span class="text-yellow-400 font-bold">temporary access token</span></li>
+            <li>Note the <span class="text-yellow-400">Phone Number ID</span> and <span class="text-yellow-400">Token</span></li>
+            <li>Set up a middleware (Zapier/n8n/custom function) to receive TFXS webhooks and forward to the WhatsApp API</li>
+          </ol>
+        </div>
+
+        <div>
+          <p class="text-[11px] font-bold text-white mb-3">Step 3 — Connect to TFXS</p>
+          <ol class="list-decimal list-inside space-y-2 text-[11px] text-gray-400">
+            <li>Go to <span class="text-white">Integrations → Outgoing Webhooks</span></li>
+            <li>Create a webhook pointing to your middleware URL</li>
+            <li>The middleware receives events and sends WhatsApp messages via the API</li>
+          </ol>
+        </div>
+
+        <div class="bg-yellow-500/5 border border-yellow-500/10 rounded-xl p-4">
+          <p class="text-[10px] font-bold text-yellow-400 uppercase tracking-wider mb-1">💡 Quick Alternative — Zapier</p>
+          <p class="text-[11px] text-gray-400">Use <span class="text-white font-bold">Zapier</span> or <span class="text-white font-bold">Make.com</span> as a middleware: Trigger = Webhook (paste URL in TFXS outgoing webhooks), Action = Send WhatsApp via Twilio/Meta. No code required!</p>
+        </div>
+      </div>`
+  },
+
+  email: {
+    title: "Email Setup",
+    subtitle: "Email notifications are built-in and ready to use",
+    icon: `<svg class="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>`,
+    color: "amber",
+    body: `
+      <div class="space-y-5">
+        <div class="bg-amber-500/5 border border-amber-500/10 rounded-xl p-4">
+          <p class="text-[10px] font-bold text-amber-400 uppercase tracking-wider mb-1">Overview</p>
+          <p class="text-xs text-gray-400">Email notifications are already built into TFXS. No external setup required — just configure which events trigger emails and who receives them.</p>
+        </div>
+
+        <div>
+          <p class="text-[11px] font-bold text-white mb-3">How It Works</p>
+          <ol class="list-decimal list-inside space-y-2 text-[11px] text-gray-400">
+            <li>Go to the <span class="text-white">Notifications</span> tab (you're here!)</li>
+            <li>Scroll to the <span class="text-white">Email Notifications</span> section</li>
+            <li>Enter the admin email address for alerts</li>
+            <li>Toggle which events trigger emails:
+              <ul class="list-disc list-inside ml-4 mt-1 space-y-1">
+                <li>New registrations</li>
+                <li>First time deposits</li>
+                <li>Payout requests</li>
+                <li>KYC submissions</li>
+              </ul>
+            </li>
+            <li>Click <span class="text-white font-bold">Save</span></li>
+          </ol>
+        </div>
+
+        <div class="bg-green-500/5 border border-green-500/10 rounded-xl p-4">
+          <p class="text-[10px] font-bold text-green-400 uppercase tracking-wider mb-1">✅ No Extra Setup</p>
+          <p class="text-[11px] text-gray-400">Emails are sent automatically through the TFXS backend mail service. Just make sure your email address is correct and check your spam folder for the first message.</p>
+        </div>
+      </div>`
+  }
+};
+
+function openTutorial(platform) {
+  const t = TUTORIALS[platform];
+  if (!t) return;
+  const modal = $("tutorial-modal");
+  if (!modal) return;
+
+  $("tut-title").textContent = t.title;
+  $("tut-subtitle").textContent = t.subtitle;
+  $("tut-icon").innerHTML = t.icon;
+  $("tut-icon").className = `w-10 h-10 rounded-xl flex items-center justify-center bg-${t.color}-500/10 border border-${t.color}-500/20`;
+  $("tut-body").innerHTML = t.body;
+
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+}
+
+function closeTutorial() {
+  const modal = $("tutorial-modal");
+  if (!modal) return;
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+}
