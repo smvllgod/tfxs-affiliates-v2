@@ -168,6 +168,24 @@
              <p class="text-gray-400 mt-2 font-light" data-i18n="set.subtitle">Customise your profile and update payment preferences.</p>
         </header>
 
+        <!-- Tab Navigation -->
+        <div class="flex gap-1 bg-white/5 p-1 rounded-xl border border-white/5 w-fit">
+            <button id="tab-btn-general" onclick="switchSettingsTab('general')" class="px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 bg-brand-500/20 text-brand-500 border border-brand-500/30">
+                <span class="flex items-center gap-2">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    General
+                </span>
+            </button>
+            <button id="tab-btn-notifications" onclick="switchSettingsTab('notifications')" class="px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 text-gray-500 hover:text-gray-300 hover:bg-white/5">
+                <span class="flex items-center gap-2">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                    Notifications
+                </span>
+            </button>
+        </div>
+
+        <!-- ═══ GENERAL SETTINGS TAB ═══ -->
+        <div id="tab-general">
         <div class="glass-panel p-8 rounded-2xl border border-white/5">
             
             <!-- Avatar Selection -->
@@ -307,8 +325,15 @@
                 </div>
             </div>
 
+        </div><!-- end glass-panel -->
+        </div><!-- end tab-general -->
+
+        <!-- ═══ NOTIFICATIONS TAB ═══ -->
+        <div id="tab-notifications" class="hidden">
+        <div class="glass-panel p-8 rounded-2xl border border-white/5">
+
             <!-- ═══════ TELEGRAM NOTIFICATIONS ═══════ -->
-            <div class="mt-10 border-t border-white/5 pt-10" id="telegram-section">
+            <div id="telegram-section">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
                         <svg class="w-4 h-4 text-blue-400" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
@@ -761,8 +786,15 @@
                 </div>
             </div>
 
+        </div><!-- end glass-panel -->
+        </div><!-- end tab-notifications -->
+
+        <!-- ═══ KYC & PASSWORD (part of General tab) ═══ -->
+        <div id="tab-general-extra">
+        <div class="glass-panel p-8 rounded-2xl border border-white/5">
+
             <!-- KYC Verification Section -->
-            <div class="mt-10 border-t border-white/5 pt-10" id="kyc-section">
+            <div id="kyc-section">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
                         <svg class="w-4 h-4 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
@@ -845,13 +877,41 @@
              <div class="mt-8 pt-6 border-t border-white/5 flex justify-end">
                 <button id="save-settings" class="btn-gradient px-8 py-3 rounded-xl shadow-lg shadow-brand-500/20 text-xs font-bold text-white uppercase tracking-wider hover:opacity-90 transition transform active:scale-95" data-i18n="set.saveChanges">Save Changes</button>
             </div>
-        </div>
+        </div><!-- end glass-panel -->
+        </div><!-- end tab-general-extra -->
 
     </main>
     <script src="js/theme.js"></script>
     <script src="js/i18n.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/api.js"></script>
+    <script>
+        // ── Settings Tab Switching ──
+        function switchSettingsTab(tab) {
+            const tabGeneral = document.getElementById('tab-general');
+            const tabGeneralExtra = document.getElementById('tab-general-extra');
+            const tabNotifications = document.getElementById('tab-notifications');
+            const btnGeneral = document.getElementById('tab-btn-general');
+            const btnNotifications = document.getElementById('tab-btn-notifications');
+
+            const activeClasses = 'bg-brand-500/20 text-brand-500 border border-brand-500/30';
+            const inactiveClasses = 'text-gray-500 hover:text-gray-300 hover:bg-white/5';
+
+            if (tab === 'general') {
+                tabGeneral.classList.remove('hidden');
+                tabGeneralExtra.classList.remove('hidden');
+                tabNotifications.classList.add('hidden');
+                btnGeneral.className = 'px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 ' + activeClasses;
+                btnNotifications.className = 'px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 ' + inactiveClasses;
+            } else {
+                tabGeneral.classList.add('hidden');
+                tabGeneralExtra.classList.add('hidden');
+                tabNotifications.classList.remove('hidden');
+                btnNotifications.className = 'px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 ' + activeClasses;
+                btnGeneral.className = 'px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 ' + inactiveClasses;
+            }
+        }
+    </script>
     <script>
         // --- KYC Doc Type Custom Dropdown ---
         (function() {
