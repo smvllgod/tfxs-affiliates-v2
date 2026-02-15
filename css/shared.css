@@ -21,23 +21,23 @@ html { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparen
 /* ── Halo glow ─────────────────────────────────────────────── */
 .halo-bg {
   position: fixed;
-  top: -40%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 1400px;
-  height: 1400px;
-  background: radial-gradient(circle, rgba(220,38,38,0.18) 0%, rgba(220,38,38,0.10) 20%, rgba(220,38,38,0.04) 40%, transparent 70%);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse 120% 60% at 50% -10%, rgba(220,38,38,0.16) 0%, rgba(220,38,38,0.08) 25%, rgba(220,38,38,0.03) 50%, transparent 75%);
   z-index: 0;
   pointer-events: none;
 }
 
 /* ── Glass panels ──────────────────────────────────────────── */
 .glass-panel {
-  background: rgba(255,255,255,0.02);
+  background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: 1rem;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
 }
 .glass-panel-hover:hover {
   background: rgba(255,255,255,0.04);
@@ -235,7 +235,7 @@ html { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparen
 .light-theme html { background-color: #f5f5f7 !important; }
 
 .light-theme .halo-bg {
-  background: radial-gradient(circle, rgba(220,38,38,0.18) 0%, rgba(220,38,38,0.10) 20%, rgba(220,38,38,0.04) 40%, transparent 70%) !important;
+  background: radial-gradient(ellipse 120% 60% at 50% -10%, rgba(220,38,38,0.10) 0%, rgba(220,38,38,0.05) 25%, rgba(220,38,38,0.02) 50%, transparent 75%) !important;
 }
 
 /* Glass panels */
