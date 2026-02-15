@@ -2935,6 +2935,60 @@ async function testTelegram(type) {
   }
 }
 
+async function testDiscord() {
+  const webhookUrl = $("discord-webhook-url")?.value.trim();
+  const statusEl = $("discord-test-status");
+  if (!webhookUrl) { toast("Enter a Discord webhook URL first", "err"); return; }
+  if (statusEl) { statusEl.textContent = "Sending..."; statusEl.className = "text-[9px] text-yellow-400"; }
+  try {
+    await api("/admin/notification-settings/test-discord", {
+      method: "POST",
+      body: JSON.stringify({ webhook_url: webhookUrl })
+    });
+    if (statusEl) { statusEl.textContent = "✔ Sent!"; statusEl.className = "text-[9px] text-green-400"; }
+    setTimeout(() => { if (statusEl) statusEl.textContent = ""; }, 4000);
+  } catch (err) {
+    if (statusEl) { statusEl.textContent = "✘ Failed"; statusEl.className = "text-[9px] text-red-400"; }
+  }
+}
+
+async function testSlack() {
+  const webhookUrl = $("slack-webhook-url")?.value.trim();
+  const statusEl = $("slack-test-status");
+  if (!webhookUrl) { toast("Enter a Slack webhook URL first", "err"); return; }
+  if (statusEl) { statusEl.textContent = "Sending..."; statusEl.className = "text-[9px] text-yellow-400"; }
+  try {
+    await api("/admin/notification-settings/test-slack", {
+      method: "POST",
+      body: JSON.stringify({ webhook_url: webhookUrl })
+    });
+    if (statusEl) { statusEl.textContent = "✔ Sent!"; statusEl.className = "text-[9px] text-green-400"; }
+    setTimeout(() => { if (statusEl) statusEl.textContent = ""; }, 4000);
+  } catch (err) {
+    if (statusEl) { statusEl.textContent = "✘ Failed"; statusEl.className = "text-[9px] text-red-400"; }
+  }
+}
+
+async function testWhatsApp() {
+  const apiUrl = $("whatsapp-api-url")?.value.trim();
+  const apiKey = $("whatsapp-api-key")?.value.trim();
+  const phone = $("whatsapp-phone")?.value.trim();
+  const statusEl = $("whatsapp-test-status");
+  if (!apiUrl) { toast("Enter a WhatsApp API URL first", "err"); return; }
+  if (!phone) { toast("Enter a phone number first", "err"); return; }
+  if (statusEl) { statusEl.textContent = "Sending..."; statusEl.className = "text-[9px] text-yellow-400"; }
+  try {
+    await api("/admin/notification-settings/test-whatsapp", {
+      method: "POST",
+      body: JSON.stringify({ api_url: apiUrl, api_key: apiKey, phone })
+    });
+    if (statusEl) { statusEl.textContent = "✔ Sent!"; statusEl.className = "text-[9px] text-green-400"; }
+    setTimeout(() => { if (statusEl) statusEl.textContent = ""; }, 4000);
+  } catch (err) {
+    if (statusEl) { statusEl.textContent = "✘ Failed"; statusEl.className = "text-[9px] text-red-400"; }
+  }
+}
+
 async function adminDiscoverTgGroups() {
   const token = $("tg-bot-token")?.value.trim();
   if (!token) { toast("Enter a bot token first", "err"); return; }

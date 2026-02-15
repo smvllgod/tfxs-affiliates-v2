@@ -2020,6 +2020,8 @@
 
             // Fetch contact info from backend
             async function loadContactInfo() {
+                // Admin doesn't need "Contact Affiliate Manager"
+                if (localStorage.getItem('is_admin') === 'true') return;
                 try {
                     const apiGet = window.TFXS_API?.apiGet;
                     if (!apiGet) return;
@@ -2520,7 +2522,7 @@
                 dataLabels: { enabled: true, formatter: v => '$' + v, style: { fontSize: isMobileBar ? '9px' : '10px', colors: [document.documentElement.classList.contains('light-theme') ? '#374151' : '#fff'] } },
                 xaxis: {
                     categories: barLabels,
-                    labels: { style: { colors: '#71717a', fontSize: isMobileBar ? '9px' : '10px' }, formatter: v => '$' + v }
+                    labels: { style: { colors: '#71717a', fontSize: isMobileBar ? '9px' : '10px' }, formatter: function(val) { return typeof val === 'number' ? ('$' + val.toLocaleString()) : val; } }
                 },
                 yaxis: { labels: { style: { colors: document.documentElement.classList.contains('light-theme') ? '#6b7280' : '#d4d4d8', fontSize: isMobileBar ? '10px' : '11px' }, maxWidth: isMobileBar ? 60 : 160 } },
                 grid: { borderColor: document.documentElement.classList.contains('light-theme') ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.05)', strokeDashArray: 4 },

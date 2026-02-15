@@ -833,18 +833,18 @@
                 <div class="flex items-center gap-3">
                     <div class="custom-select relative" data-onchange="loadKycSubmissions()">
                         <button type="button" data-cs-btn class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-xs bg-white/5 border border-white/10 text-white hover:border-white/20 transition">
-                            <span data-cs-label>Pending Review</span>
+                            <span data-cs-label>All Submissions</span>
                             <svg class="w-3 h-3 text-gray-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>
                         <div data-cs-dd class="hidden absolute left-0 right-0 mt-1 rounded-xl bg-[#1a1a1a] border border-white/10 shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
                             <div data-cs-opts>
-                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="">All</div>
-                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="pending">Pending Review</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="">All Submissions</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="pending">Pending Review</div>
                                 <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="approved">Approved</div>
                                 <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="rejected">Rejected</div>
                             </div>
                         </div>
-                        <input type="hidden" id="kyc-status-filter" value="pending">
+                        <input type="hidden" id="kyc-status-filter" value="">
                     </div>
                     <button onclick="loadKycSubmissions()" class="text-[10px] font-bold text-brand-500 hover:text-white transition uppercase tracking-wider">Refresh</button>
                 </div>
@@ -943,7 +943,7 @@
         <div id="tab-notifications" class="tab-content hidden">
             <div class="mb-6">
                 <h3 class="text-sm font-bold text-white mb-1">Notification Channels</h3>
-                <p class="text-xs text-gray-500">Configure how you receive admin alerts for new registrations and deposits.</p>
+                <p class="text-xs text-gray-500">Configure notification channels for all admin alerts — registrations, deposits, payouts, KYC, commissions, and more.</p>
             </div>
 
             <!-- ── SETUP GUIDES ── -->
@@ -1193,6 +1193,13 @@
                         <div>
                             <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1 block">Webhook URL</label>
                             <input type="url" id="discord-webhook-url" class="form-input text-xs px-3 py-2.5 rounded-lg w-full font-mono" placeholder="https://discord.com/api/webhooks/...">
+                            <div class="flex items-center gap-2 mt-2">
+                                <button onclick="testDiscord()" class="text-[9px] font-bold text-indigo-400 hover:text-indigo-300 transition uppercase tracking-wider flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                    Send Test
+                                </button>
+                                <span id="discord-test-status" class="text-[9px] text-gray-600"></span>
+                            </div>
                             <p class="text-[8px] text-gray-600 mt-1">Go to Server Settings → Integrations → Webhooks → New Webhook → Copy URL</p>
                         </div>
                         <div>
@@ -1229,6 +1236,13 @@
                         <div>
                             <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1 block">Webhook URL</label>
                             <input type="url" id="slack-webhook-url" class="form-input text-xs px-3 py-2.5 rounded-lg w-full font-mono" placeholder="https://hooks.slack.com/services/...">
+                            <div class="flex items-center gap-2 mt-2">
+                                <button onclick="testSlack()" class="text-[9px] font-bold text-green-400 hover:text-green-300 transition uppercase tracking-wider flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                    Send Test
+                                </button>
+                                <span id="slack-test-status" class="text-[9px] text-gray-600"></span>
+                            </div>
                             <p class="text-[8px] text-gray-600 mt-1">Go to api.slack.com → Apps → Create App → Incoming Webhooks → Activate → Copy URL</p>
                         </div>
                         <div>
@@ -1278,6 +1292,13 @@
                         <div>
                             <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1 block">Phone Number</label>
                             <input type="tel" id="whatsapp-phone" class="form-input text-xs px-3 py-2.5 rounded-lg w-full font-mono" placeholder="+1234567890">
+                            <div class="flex items-center gap-2 mt-2">
+                                <button onclick="testWhatsApp()" class="text-[9px] font-bold text-emerald-400 hover:text-emerald-300 transition uppercase tracking-wider flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                    Send Test
+                                </button>
+                                <span id="whatsapp-test-status" class="text-[9px] text-gray-600"></span>
+                            </div>
                             <p class="text-[8px] text-gray-600 mt-1">Destination phone number to receive alerts</p>
                         </div>
                         <div>
