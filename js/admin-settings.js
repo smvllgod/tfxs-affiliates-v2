@@ -43,7 +43,7 @@ async function loadCurrencyRates() {
   try {
     const res = await fetch(API + "/api/currencies");
     const data = await res.json();
-    if (data.ok) currencyRates = data.data || {};
+    if (data.ok && data.data) currencyRates = data.data.rates || {};
   } catch (_) {}
   // Restore saved currency
   const sel = $("currency-select");
@@ -269,7 +269,7 @@ async function loadActiveTab() {
   const active = document.querySelector(".admin-tab.active")?.dataset.tab;
   if (active === "affiliates") await loadAffiliates();
   else if (active === "deals") await loadDeals();
-  else if (active === "conversions") await loadConversions();
+  else if (active === "conversions") { await loadConversions(); loadAutoApproveState(); }
   else if (active === "payouts") await loadPayouts();
   else if (active === "kyc") await loadKycSubmissions();
   else if (active === "users") await loadUsers();
@@ -643,6 +643,56 @@ async function toggleAffTelegramUnlock() {
   } catch (e) { /* error already toasted by api() */ }
 }
 
+// ── Per-Affiliate Channel Unlock (Discord, Slack, WhatsApp, Email) ──
+let _affChannelStates = { discord: false, slack: false, whatsapp: false, email: false };
+
+function renderAffChannelUnlock(channel) {
+  const btn = $(`aff-${channel}-lock-btn`);
+  const icon = $(`aff-${channel}-lock-icon`);
+  const label = $(`aff-${channel}-lock-label`);
+  if (!btn || !icon || !label) return;
+  const unlocked = _affChannelStates[channel];
+  const colors = { discord: "indigo", slack: "green", whatsapp: "emerald", email: "amber" };
+  const col = colors[channel] || "gray";
+  const names = { discord: "Discord", slack: "Slack", whatsapp: "WhatsApp", email: "Email" };
+  if (unlocked) {
+    btn.className = `flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border bg-${col}-600/20 border-${col}-500/40 text-${col}-400 hover:bg-${col}-600/30`;
+    icon.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>`;
+    label.textContent = `${names[channel]} Enabled`;
+  } else {
+    btn.className = "flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border bg-gray-600/20 border-gray-500/40 text-gray-400 hover:bg-gray-600/30";
+    icon.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
+    label.textContent = `${names[channel]} Locked`;
+  }
+}
+
+async function loadAffChannelStates(afpCode) {
+  try {
+    const res = await api(`/api/settings?affiliate_id=${afpCode}`);
+    const d = res?.data || {};
+    _affChannelStates.discord = d.discord_unlocked === true || d.discord_unlocked === "true";
+    _affChannelStates.slack = d.slack_unlocked === true || d.slack_unlocked === "true";
+    _affChannelStates.whatsapp = d.whatsapp_unlocked === true || d.whatsapp_unlocked === "true";
+    _affChannelStates.email = d.email_unlocked === true || d.email_unlocked === "true";
+  } catch (_) {}
+  ["discord", "slack", "whatsapp", "email"].forEach(renderAffChannelUnlock);
+}
+
+async function toggleAffChannelUnlock(channel) {
+  if (!_affTelegramAffId) return;
+  const newVal = !_affChannelStates[channel];
+  try {
+    await api(`/admin/affiliates/${_affTelegramAffId}/channel-unlock`, {
+      method: "PATCH",
+      body: JSON.stringify({ channel, unlocked: newVal })
+    });
+    _affChannelStates[channel] = newVal;
+    renderAffChannelUnlock(channel);
+    const names = { discord: "Discord", slack: "Slack", whatsapp: "WhatsApp", email: "Email" };
+    toast(newVal ? `${names[channel]} enabled for affiliate` : `${names[channel]} locked for affiliate`, "ok");
+  } catch (e) { toast("Failed: " + (e.message || ""), "err"); }
+}
+
 function openAffModal(data) {
   affDealChips = [];
   if (data) {
@@ -664,6 +714,12 @@ function openAffModal(data) {
     const tgRow = $("aff-telegram-row");
     if (tgRow) { tgRow.classList.remove("hidden"); }
     loadAffTelegramState(data.id, data.afp);
+    // Other channel unlocks (Discord, Slack, WhatsApp, Email)
+    ["discord", "slack", "whatsapp", "email"].forEach(ch => {
+      const row = $(`aff-${ch}-row`);
+      if (row) row.classList.remove("hidden");
+    });
+    loadAffChannelStates(data.afp);
     // Payment settings
     const payRow = $("aff-payment-row");
     if (payRow) { payRow.classList.remove("hidden"); }
@@ -1043,6 +1099,25 @@ function toggleUnlinkedFilter() {
     }
   }
   loadConversions(1);
+}
+
+// ── Auto-Approve Toggle ──
+async function loadAutoApproveState() {
+  try {
+    const res = await api("/admin/auto-approve");
+    const toggle = $("auto-approve-toggle");
+    if (toggle) toggle.checked = res.enabled || false;
+  } catch (_) {}
+}
+async function toggleAutoApprove(enabled) {
+  try {
+    await api("/admin/auto-approve", { method: "PUT", body: JSON.stringify({ enabled }) });
+    toast(enabled ? "Auto-approve enabled — new conversions will be auto-approved" : "Auto-approve disabled — new conversions stay pending");
+  } catch (err) {
+    toast("Failed: " + err.message, "err");
+    const toggle = $("auto-approve-toggle");
+    if (toggle) toggle.checked = !enabled;
+  }
 }
 
 async function loadConversions(page) {
@@ -2652,6 +2727,9 @@ async function loadNotificationSettings() {
 
     const tg = channels.find(c => c.channel === "telegram") || { enabled: false, config: {}, events: [] };
     const email = channels.find(c => c.channel === "email") || { enabled: false, config: {}, events: [] };
+    const discord = channels.find(c => c.channel === "discord") || { enabled: false, config: {}, events: [] };
+    const slack = channels.find(c => c.channel === "slack") || { enabled: false, config: {}, events: [] };
+    const whatsapp = channels.find(c => c.channel === "whatsapp") || { enabled: false, config: {}, events: [] };
 
     // Telegram
     $("tg-enabled").checked = tg.enabled;
@@ -2679,6 +2757,35 @@ async function loadNotificationSettings() {
     $("email-evt-payout").checked = (email.events || []).includes("payout_request");
     $("email-evt-kyc").checked = (email.events || []).includes("kyc_submitted");
     $("email-evt-commission").checked = (email.events || []).includes("commission");
+
+    // Discord
+    $("discord-enabled").checked = discord.enabled;
+    if ($("discord-webhook-url")) $("discord-webhook-url").value = discord.config?.webhook_url || "";
+    $("discord-evt-reg").checked = (discord.events || []).includes("registration");
+    $("discord-evt-dep").checked = (discord.events || []).includes("deposit");
+    $("discord-evt-signup").checked = (discord.events || []).includes("affiliate_signup");
+    $("discord-evt-payout").checked = (discord.events || []).includes("payout_request");
+    $("discord-evt-commission").checked = (discord.events || []).includes("commission");
+
+    // Slack
+    $("slack-enabled").checked = slack.enabled;
+    if ($("slack-webhook-url")) $("slack-webhook-url").value = slack.config?.webhook_url || "";
+    $("slack-evt-reg").checked = (slack.events || []).includes("registration");
+    $("slack-evt-dep").checked = (slack.events || []).includes("deposit");
+    $("slack-evt-signup").checked = (slack.events || []).includes("affiliate_signup");
+    $("slack-evt-payout").checked = (slack.events || []).includes("payout_request");
+    $("slack-evt-commission").checked = (slack.events || []).includes("commission");
+
+    // WhatsApp
+    $("whatsapp-enabled").checked = whatsapp.enabled;
+    if ($("whatsapp-api-url")) $("whatsapp-api-url").value = whatsapp.config?.api_url || "";
+    if ($("whatsapp-api-key")) $("whatsapp-api-key").value = whatsapp.config?.api_key || "";
+    if ($("whatsapp-phone")) $("whatsapp-phone").value = whatsapp.config?.phone || "";
+    $("whatsapp-evt-reg").checked = (whatsapp.events || []).includes("registration");
+    $("whatsapp-evt-dep").checked = (whatsapp.events || []).includes("deposit");
+    $("whatsapp-evt-signup").checked = (whatsapp.events || []).includes("affiliate_signup");
+    $("whatsapp-evt-payout").checked = (whatsapp.events || []).includes("payout_request");
+    $("whatsapp-evt-commission").checked = (whatsapp.events || []).includes("commission");
 
     _notifSettingsLoaded = true;
     loading.classList.add("hidden");
@@ -2715,6 +2822,30 @@ async function saveNotificationSettings() {
     if ($("email-evt-kyc").checked) emailEvents.push("kyc_submitted");
     if ($("email-evt-commission").checked) emailEvents.push("commission");
 
+    // Discord events
+    const discordEvents = [];
+    if ($("discord-evt-reg")?.checked) discordEvents.push("registration");
+    if ($("discord-evt-dep")?.checked) discordEvents.push("deposit");
+    if ($("discord-evt-signup")?.checked) discordEvents.push("affiliate_signup");
+    if ($("discord-evt-payout")?.checked) discordEvents.push("payout_request");
+    if ($("discord-evt-commission")?.checked) discordEvents.push("commission");
+
+    // Slack events
+    const slackEvents = [];
+    if ($("slack-evt-reg")?.checked) slackEvents.push("registration");
+    if ($("slack-evt-dep")?.checked) slackEvents.push("deposit");
+    if ($("slack-evt-signup")?.checked) slackEvents.push("affiliate_signup");
+    if ($("slack-evt-payout")?.checked) slackEvents.push("payout_request");
+    if ($("slack-evt-commission")?.checked) slackEvents.push("commission");
+
+    // WhatsApp events
+    const whatsappEvents = [];
+    if ($("whatsapp-evt-reg")?.checked) whatsappEvents.push("registration");
+    if ($("whatsapp-evt-dep")?.checked) whatsappEvents.push("deposit");
+    if ($("whatsapp-evt-signup")?.checked) whatsappEvents.push("affiliate_signup");
+    if ($("whatsapp-evt-payout")?.checked) whatsappEvents.push("payout_request");
+    if ($("whatsapp-evt-commission")?.checked) whatsappEvents.push("commission");
+
     const payload = {
       channels: [
         {
@@ -2736,6 +2867,32 @@ async function saveNotificationSettings() {
             admin_email: $("notif-admin-email").value.trim()
           },
           events: emailEvents
+        },
+        {
+          channel: "discord",
+          enabled: $("discord-enabled").checked,
+          config: {
+            webhook_url: $("discord-webhook-url")?.value.trim() || ""
+          },
+          events: discordEvents
+        },
+        {
+          channel: "slack",
+          enabled: $("slack-enabled").checked,
+          config: {
+            webhook_url: $("slack-webhook-url")?.value.trim() || ""
+          },
+          events: slackEvents
+        },
+        {
+          channel: "whatsapp",
+          enabled: $("whatsapp-enabled").checked,
+          config: {
+            api_url: $("whatsapp-api-url")?.value.trim() || "",
+            api_key: $("whatsapp-api-key")?.value.trim() || "",
+            phone: $("whatsapp-phone")?.value.trim() || ""
+          },
+          events: whatsappEvents
         }
       ]
     };
@@ -3221,8 +3378,8 @@ async function loadCohort() {
 
     // Build rows
     tbody.innerHTML = cohorts.map(c => {
-      let row = `<td class="px-3 py-2 text-[10px] font-bold text-white whitespace-nowrap">${c.cohort_month}</td>`;
-      row += `<td class="px-3 py-2 text-center text-[10px] font-mono text-gray-400">${c.total_users}</td>`;
+      let row = `<td class="px-3 py-2 text-[10px] font-bold text-white whitespace-nowrap">${c.month}</td>`;
+      row += `<td class="px-3 py-2 text-center text-[10px] font-mono text-gray-400">${c.registered}</td>`;
       c.retention.forEach(r => {
         const pct = r.rate;
         let bg = "bg-red-500/20 text-red-400";
@@ -3318,7 +3475,7 @@ function renderForecastChart(historical, revForecast, commForecast, days) {
       plotLines: historicalRevenue.length ? [{
         value: historicalRevenue[historicalRevenue.length - 1][0],
         color: "rgba(255,255,255,0.15)", width: 1, dashStyle: "Dash",
-        label: { text: "Today", style: { color: "#9ca3af", fontSize: "9px" }, rotation: 0, y: 15 }
+        label: { text: "Today", style: { color: "#9ca3af", fontSize: "9px" }, rotation: 0, align: "left", x: 4, y: -5 }
       }] : []
     },
     yAxis: {

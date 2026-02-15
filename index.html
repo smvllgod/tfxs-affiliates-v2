@@ -2485,12 +2485,15 @@
             // Commission per country (bar) — only Commission/QCPA events
             const countryComm = {};
             const countryRegions = {};
+            const isAdmin = localStorage.getItem('is_admin') === 'true';
             earnings.filter(e => e.type === 'Commission' || e.type === 'QCPA').forEach(e => {
                 const user = database.registrations.find(u => u.userId === e.userId);
                 const cName = (user && user.country) ? user.country.name : 'Unknown';
                 const cCode = (user && user.country) ? user.country.code : '';
                 const cFlag = (user && user.country) ? user.country.flag : '🌐';
-                countryComm[cName] = (countryComm[cName] || 0) + (e.commission_amount || e.amount || 0);
+                // Admin sees raw broker revenue; affiliate sees their commission
+                const amt = isAdmin ? (e.raw_commission || e.commission_amount || e.amount || 0) : (e.commission_amount || e.amount || 0);
+                countryComm[cName] = (countryComm[cName] || 0) + amt;
                 if (!countryRegions[cName]) countryRegions[cName] = { region: getRegion(cCode), flag: cFlag, code: cCode };
             });
 
@@ -2508,7 +2511,7 @@
             });
 
             const barOpts = {
-                series: [{ name: 'Commission', data: barData }],
+                series: [{ name: isAdmin ? 'Revenue' : 'Commission', data: barData }],
                 chart: { type: 'bar', height: isMobileBar ? 240 : 280, background: 'transparent', fontFamily: 'JetBrains Mono, monospace', toolbar: { show: false } },
                 colors: barColors,
                 plotOptions: {
@@ -2543,7 +2546,7 @@
 
             if (countryBarInstance) {
                 countryBarInstance.updateOptions({
-                    series: [{ name: 'Commission', data: barData }],
+                    series: [{ name: isAdmin ? 'Revenue' : 'Commission', data: barData }],
                     xaxis: { categories: barLabels },
                     colors: barColors
                 });

@@ -81,10 +81,24 @@ html { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparen
 /* ── Select ────────────────────────────────────────────────── */
 .form-select {
   appearance: none;
+  background-color: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #fff;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
   padding-right: 2rem;
+}
+.form-select option {
+  background: #1a1a1a;
+  color: #e5e7eb;
+}
+.form-select:focus {
+  outline: none;
+  border-color: rgba(220,38,38,0.5);
+  box-shadow: 0 0 0 3px rgba(220,38,38,0.1);
 }
 
 /* ── Buttons ───────────────────────────────────────────────── */
