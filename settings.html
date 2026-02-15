@@ -489,6 +489,278 @@
                 </div>
             </div>
 
+            <!-- ═══════ DISCORD NOTIFICATIONS ═══════ -->
+            <div class="mt-8 border-t border-white/5 pt-8" id="discord-section">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                        <svg class="w-4 h-4 text-indigo-400" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+                        Discord Notifications
+                    </h3>
+                    <div id="discord-status-badge"></div>
+                </div>
+                <!-- LOCKED -->
+                <div id="discord-locked-state" class="rounded-2xl p-6 border border-white/5 bg-white/[0.02]">
+                    <div class="flex flex-col items-center text-center py-6">
+                        <div class="w-16 h-16 rounded-2xl bg-gray-500/10 border border-gray-500/20 flex items-center justify-center mb-4">
+                            <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </div>
+                        <h4 class="text-sm font-bold text-gray-400 mb-2">Discord Not Available</h4>
+                        <p class="text-xs text-gray-600 max-w-sm">Discord notifications are not enabled for your account yet. Contact your account manager to unlock this feature.</p>
+                        <div class="mt-4 flex items-center gap-2 text-[10px] text-gray-600">
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                            <span>Requires admin activation</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- UNLOCKED -->
+                <div id="discord-unlocked-state" class="hidden">
+                    <div class="rounded-2xl p-6 border border-indigo-500/10 bg-indigo-500/[0.03]">
+                        <div class="flex items-center gap-3 mb-5">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-indigo-400" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-white">Discord Webhook</h4>
+                                <p class="text-[10px] text-gray-500">Receive alerts in your Discord server</p>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1 block">Webhook URL</label>
+                                <input type="text" id="aff-discord-webhook" class="form-input text-xs px-3 py-2.5 rounded-lg w-full font-mono" placeholder="https://discord.com/api/webhooks/...">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-2 block">Notify me about</label>
+                                <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="aff-discord-evt-commission" checked class="rounded"><span class="text-xs text-gray-300">💰 Commissions</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="aff-discord-evt-payout" checked class="rounded"><span class="text-xs text-gray-300">💸 Payouts</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="aff-discord-evt-registration" class="rounded"><span class="text-xs text-gray-300">👤 Registrations</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="aff-discord-evt-deposit" class="rounded"><span class="text-xs text-gray-300">🏦 Deposits</span></label>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 pt-2 border-t border-white/5">
+                                <button onclick="testChannelNotification('discord')" class="text-[9px] font-bold text-indigo-400 hover:text-indigo-300 transition uppercase tracking-wider flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                    Send Test
+                                </button>
+                                <span id="aff-discord-test-status" class="text-[9px] text-gray-600"></span>
+                                <div class="flex-1"></div>
+                                <button onclick="saveChannelSettings('discord')" class="btn-gradient px-4 py-2 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    Save Discord
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════ SLACK NOTIFICATIONS ═══════ -->
+            <div class="mt-8 border-t border-white/5 pt-8" id="slack-section">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                        <svg class="w-4 h-4 text-green-400" viewBox="0 0 24 24" fill="currentColor"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/></svg>
+                        Slack Notifications
+                    </h3>
+                    <div id="slack-status-badge"></div>
+                </div>
+                <!-- LOCKED -->
+                <div id="slack-locked-state" class="rounded-2xl p-6 border border-white/5 bg-white/[0.02]">
+                    <div class="flex flex-col items-center text-center py-6">
+                        <div class="w-16 h-16 rounded-2xl bg-gray-500/10 border border-gray-500/20 flex items-center justify-center mb-4">
+                            <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </div>
+                        <h4 class="text-sm font-bold text-gray-400 mb-2">Slack Not Available</h4>
+                        <p class="text-xs text-gray-600 max-w-sm">Slack notifications are not enabled for your account yet. Contact your account manager to unlock this feature.</p>
+                        <div class="mt-4 flex items-center gap-2 text-[10px] text-gray-600">
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                            <span>Requires admin activation</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- UNLOCKED -->
+                <div id="slack-unlocked-state" class="hidden">
+                    <div class="rounded-2xl p-6 border border-green-500/10 bg-green-500/[0.03]">
+                        <div class="flex items-center gap-3 mb-5">
+                            <div class="w-10 h-10 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-green-400" viewBox="0 0 24 24" fill="currentColor"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313z"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-white">Slack Webhook</h4>
+                                <p class="text-[10px] text-gray-500">Receive alerts in your Slack workspace</p>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1 block">Webhook URL</label>
+                                <input type="text" id="aff-slack-webhook" class="form-input text-xs px-3 py-2.5 rounded-lg w-full font-mono" placeholder="https://hooks.slack.com/services/...">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-2 block">Notify me about</label>
+                                <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="aff-slack-evt-commission" checked class="rounded"><span class="text-xs text-gray-300">💰 Commissions</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="aff-slack-evt-payout" checked class="rounded"><span class="text-xs text-gray-300">💸 Payouts</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="aff-slack-evt-registration" class="rounded"><span class="text-xs text-gray-300">👤 Registrations</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="aff-slack-evt-deposit" class="rounded"><span class="text-xs text-gray-300">🏦 Deposits</span></label>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 pt-2 border-t border-white/5">
+                                <button onclick="testChannelNotification('slack')" class="text-[9px] font-bold text-green-400 hover:text-green-300 transition uppercase tracking-wider flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                    Send Test
+                                </button>
+                                <span id="aff-slack-test-status" class="text-[9px] text-gray-600"></span>
+                                <div class="flex-1"></div>
+                                <button onclick="saveChannelSettings('slack')" class="btn-gradient px-4 py-2 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    Save Slack
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════ WHATSAPP NOTIFICATIONS ═══════ -->
+            <div class="mt-8 border-t border-white/5 pt-8" id="whatsapp-section">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                        <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        WhatsApp Notifications
+                    </h3>
+                    <div id="whatsapp-status-badge"></div>
+                </div>
+                <!-- LOCKED -->
+                <div id="whatsapp-locked-state" class="rounded-2xl p-6 border border-white/5 bg-white/[0.02]">
+                    <div class="flex flex-col items-center text-center py-6">
+                        <div class="w-16 h-16 rounded-2xl bg-gray-500/10 border border-gray-500/20 flex items-center justify-center mb-4">
+                            <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </div>
+                        <h4 class="text-sm font-bold text-gray-400 mb-2">WhatsApp Not Available</h4>
+                        <p class="text-xs text-gray-600 max-w-sm">WhatsApp notifications are not enabled for your account yet. Contact your account manager to unlock this feature.</p>
+                        <div class="mt-4 flex items-center gap-2 text-[10px] text-gray-600">
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                            <span>Requires admin activation</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- UNLOCKED -->
+                <div id="whatsapp-unlocked-state" class="hidden">
+                    <div class="rounded-2xl p-6 border border-emerald-500/10 bg-emerald-500/[0.03]">
+                        <div class="flex items-center gap-3 mb-5">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-emerald-400" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-white">WhatsApp API</h4>
+                                <p class="text-[10px] text-gray-500">Receive alerts on your phone via WhatsApp</p>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1 block">API URL</label>
+                                <input type="text" id="aff-whatsapp-api-url" class="form-input text-xs px-3 py-2.5 rounded-lg w-full font-mono" placeholder="https://api.whatsapp.com/...">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1 block">API Key</label>
+                                <input type="password" id="aff-whatsapp-api-key" class="form-input text-xs px-3 py-2.5 rounded-lg w-full font-mono" placeholder="Your API key (optional)">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1 block">Phone Number</label>
+                                <input type="text" id="aff-whatsapp-phone" class="form-input text-xs px-3 py-2.5 rounded-lg w-full font-mono" placeholder="+1234567890">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-2 block">Notify me about</label>
+                                <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="aff-whatsapp-evt-commission" checked class="rounded"><span class="text-xs text-gray-300">💰 Commissions</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="aff-whatsapp-evt-payout" checked class="rounded"><span class="text-xs text-gray-300">💸 Payouts</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="aff-whatsapp-evt-registration" class="rounded"><span class="text-xs text-gray-300">👤 Registrations</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="aff-whatsapp-evt-deposit" class="rounded"><span class="text-xs text-gray-300">🏦 Deposits</span></label>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 pt-2 border-t border-white/5">
+                                <button onclick="testChannelNotification('whatsapp')" class="text-[9px] font-bold text-emerald-400 hover:text-emerald-300 transition uppercase tracking-wider flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                    Send Test
+                                </button>
+                                <span id="aff-whatsapp-test-status" class="text-[9px] text-gray-600"></span>
+                                <div class="flex-1"></div>
+                                <button onclick="saveChannelSettings('whatsapp')" class="btn-gradient px-4 py-2 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    Save WhatsApp
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════ EMAIL NOTIFICATIONS ═══════ -->
+            <div class="mt-8 border-t border-white/5 pt-8" id="email-section">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                        <svg class="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        Email Notifications
+                    </h3>
+                    <div id="email-status-badge"></div>
+                </div>
+                <!-- LOCKED -->
+                <div id="email-locked-state" class="rounded-2xl p-6 border border-white/5 bg-white/[0.02]">
+                    <div class="flex flex-col items-center text-center py-6">
+                        <div class="w-16 h-16 rounded-2xl bg-gray-500/10 border border-gray-500/20 flex items-center justify-center mb-4">
+                            <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </div>
+                        <h4 class="text-sm font-bold text-gray-400 mb-2">Email Alerts Not Available</h4>
+                        <p class="text-xs text-gray-600 max-w-sm">Email notifications are not enabled for your account yet. Contact your account manager to unlock this feature.</p>
+                        <div class="mt-4 flex items-center gap-2 text-[10px] text-gray-600">
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                            <span>Requires admin activation</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- UNLOCKED -->
+                <div id="email-unlocked-state" class="hidden">
+                    <div class="rounded-2xl p-6 border border-amber-500/10 bg-amber-500/[0.03]">
+                        <div class="flex items-center gap-3 mb-5">
+                            <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-white">Email Alerts</h4>
+                                <p class="text-[10px] text-gray-500">Receive notifications to your inbox</p>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1 block">Email Address</label>
+                                <input type="email" id="aff-email-address" class="form-input text-xs px-3 py-2.5 rounded-lg w-full font-mono" placeholder="you@example.com">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-2 block">Notify me about</label>
+                                <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="aff-email-evt-commission" checked class="rounded"><span class="text-xs text-gray-300">💰 Commissions</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="aff-email-evt-payout" checked class="rounded"><span class="text-xs text-gray-300">💸 Payouts</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="aff-email-evt-registration" class="rounded"><span class="text-xs text-gray-300">👤 Registrations</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="aff-email-evt-deposit" class="rounded"><span class="text-xs text-gray-300">🏦 Deposits</span></label>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 pt-2 border-t border-white/5">
+                                <button onclick="testChannelNotification('email')" class="text-[9px] font-bold text-amber-400 hover:text-amber-300 transition uppercase tracking-wider flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                    Send Test
+                                </button>
+                                <span id="aff-email-test-status" class="text-[9px] text-gray-600"></span>
+                                <div class="flex-1"></div>
+                                <button onclick="saveChannelSettings('email')" class="btn-gradient px-4 py-2 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    Save Email
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- KYC Verification Section -->
             <div class="mt-10 border-t border-white/5 pt-10" id="kyc-section">
                 <div class="flex items-center justify-between mb-6">
@@ -700,6 +972,11 @@
                         loadAutoPayoutState(s);
                         // Telegram state
                         loadAffiliateTelegramState();
+                        // Other notification channels
+                        loadChannelState('discord');
+                        loadChannelState('slack');
+                        loadChannelState('whatsapp');
+                        loadChannelState('email');
                     }
                 }).catch(err => {
                     console.warn("[Settings] Could not load saved settings:", err.message);
@@ -1217,6 +1494,114 @@
 
         function closeTelegramTutorial() {
             document.getElementById('telegram-tutorial-modal')?.classList.add('hidden');
+        }
+
+        // ═══════ GENERIC CHANNEL FUNCTIONS (Discord, Slack, WhatsApp, Email) ═══════
+
+        const CHANNEL_FIELD_MAP = {
+            discord: { fields: ['webhook_url'], inputs: { webhook_url: 'aff-discord-webhook' } },
+            slack: { fields: ['webhook_url'], inputs: { webhook_url: 'aff-slack-webhook' } },
+            whatsapp: { fields: ['api_url', 'api_key', 'phone_number'], inputs: { api_url: 'aff-whatsapp-api-url', api_key: 'aff-whatsapp-api-key', phone_number: 'aff-whatsapp-phone' } },
+            email: { fields: ['email_address'], inputs: { email_address: 'aff-email-address' } }
+        };
+
+        async function loadChannelState(channel) {
+            const API = window.TFXS_API;
+            if (!API) return;
+            try {
+                const res = await API.apiGet(`/api/channel-settings/${channel}`);
+                if (!res || !res.ok) return;
+                const d = res.data || {};
+                const locked = document.getElementById(`${channel}-locked-state`);
+                const unlocked = document.getElementById(`${channel}-unlocked-state`);
+                const badge = document.getElementById(`${channel}-status-badge`);
+
+                const colors = { discord: 'indigo', slack: 'green', whatsapp: 'emerald', email: 'amber' };
+                const color = colors[channel] || 'blue';
+
+                if (d.unlocked) {
+                    if (locked) locked.classList.add('hidden');
+                    if (unlocked) unlocked.classList.remove('hidden');
+                    if (badge) badge.innerHTML = `<span class="text-[9px] font-bold px-2 py-1 rounded-full bg-${color}-500/20 text-${color}-400 border border-${color}-500/20 uppercase">Enabled</span>`;
+                    // Fill fields
+                    const map = CHANNEL_FIELD_MAP[channel];
+                    if (map) {
+                        map.fields.forEach(f => {
+                            const el = document.getElementById(map.inputs[f]);
+                            if (el && d[f]) el.value = d[f];
+                        });
+                    }
+                    // Events
+                    const events = d.events || ['commission', 'payout_processed'];
+                    const prefix = `aff-${channel}-evt-`;
+                    const evtMap = { commission: 'commission', payout: 'payout_processed', registration: 'registration', deposit: 'deposit' };
+                    Object.keys(evtMap).forEach(key => {
+                        const el = document.getElementById(prefix + key);
+                        if (el) el.checked = events.includes(evtMap[key]);
+                    });
+                } else {
+                    if (locked) locked.classList.remove('hidden');
+                    if (unlocked) unlocked.classList.add('hidden');
+                    if (badge) badge.innerHTML = '<span class="text-[9px] font-bold px-2 py-1 rounded-full bg-gray-500/20 text-gray-500 border border-gray-500/20 uppercase">Locked</span>';
+                }
+            } catch (err) {
+                console.warn(`[${channel}] load error:`, err.message);
+            }
+        }
+
+        async function saveChannelSettings(channel) {
+            const API = window.TFXS_API;
+            if (!API) return;
+            const map = CHANNEL_FIELD_MAP[channel];
+            if (!map) return;
+            const body = { enabled: true, events: [] };
+            // Collect field values
+            map.fields.forEach(f => {
+                const el = document.getElementById(map.inputs[f]);
+                if (el) body[f] = el.value.trim();
+            });
+            // Collect events
+            const prefix = `aff-${channel}-evt-`;
+            const evtMap = { commission: 'commission', payout: 'payout_processed', registration: 'registration', deposit: 'deposit' };
+            Object.keys(evtMap).forEach(key => {
+                const el = document.getElementById(prefix + key);
+                if (el && el.checked) body.events.push(evtMap[key]);
+            });
+            try {
+                const res = await API.apiSend('PUT', `/api/channel-settings/${channel}`, body);
+                if (res?.ok) {
+                    if (typeof showToast === 'function') showToast(`${channel.charAt(0).toUpperCase() + channel.slice(1)} settings saved!`, 'success');
+                } else {
+                    throw new Error(res?.error || 'Save failed');
+                }
+            } catch (err) {
+                if (typeof showToast === 'function') showToast(err.message || 'Could not save', 'error');
+            }
+        }
+
+        async function testChannelNotification(channel) {
+            const API = window.TFXS_API;
+            if (!API) return;
+            const map = CHANNEL_FIELD_MAP[channel];
+            if (!map) return;
+            const body = {};
+            map.fields.forEach(f => {
+                const el = document.getElementById(map.inputs[f]);
+                if (el) body[f] = el.value.trim();
+            });
+            const statusEl = document.getElementById(`aff-${channel}-test-status`);
+            if (statusEl) { statusEl.textContent = 'Sending...'; statusEl.className = 'text-[9px] text-yellow-400'; }
+            try {
+                const res = await API.apiSend('POST', `/api/channel-settings/${channel}/test`, body);
+                if (res?.ok) {
+                    if (statusEl) { statusEl.textContent = '✔ Sent!'; statusEl.className = 'text-[9px] text-green-400'; }
+                    setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 4000);
+                } else {
+                    throw new Error(res?.error || 'Test failed');
+                }
+            } catch (err) {
+                if (statusEl) { statusEl.textContent = '✘ ' + (err.message || 'Failed'); statusEl.className = 'text-[9px] text-red-400'; }
+            }
         }
 
         // --- KYC Logic ---

@@ -319,7 +319,7 @@
       const evType = (ev.event_type || "unknown");
       let displayAmt = 0;
       if (evType === "ftd") displayAmt = parseFloat(ev.deposit_amount) || 0;
-      else if (evType === "commission") displayAmt = parseFloat(ev.commission_amount) || 0;
+      else if (evType === "commission") displayAmt = IS_ADMIN ? (parseFloat(ev.raw_commission) || parseFloat(ev.commission_amount) || 0) : (parseFloat(ev.commission_amount) || 0);
       // QCPA shows $0 — it's a KPI-only event, not money
       const amount = `$${displayAmt.toFixed(2)}`;
       const type = evType.replace("_", " ").toUpperCase();
@@ -399,6 +399,8 @@
         amount: e.event_type === "ftd" ? parseFloat(e.deposit_amount) || 0 : (e.event_type === "commission" ? parseFloat(e.commission_amount) || 0 : 0),
         deposit_amount: parseFloat(e.deposit_amount) || 0,
         commission_amount: e.event_type === "commission" ? parseFloat(e.commission_amount) || 0 : 0,
+        raw_commission: parseFloat(e.raw_commission) || parseFloat(e.commission_amount) || 0,
+        broker: e.broker || null,
         type: e.event_type === "ftd" ? "FTD" : e.event_type === "qualified_cpa" ? "QCPA" : e.event_type === "commission" ? "Commission" : "Registration",
         created: e.occurred_at,
         country: resolveCountry(e.country),

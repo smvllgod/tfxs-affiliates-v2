@@ -1803,13 +1803,13 @@
                  
                  // Amount column logic:
                  // - FTD: show deposit amount
-                 // - Commission/QCPA: show commission amount
+                 // - Commission/QCPA: admin sees raw_commission (broker revenue), affiliate sees commission_amount
                  // - Registration: show $0.00
                  let displayAmount = 0;
                  if (tx.type === "FTD") {
                      displayAmount = tx.deposit_amount || tx.amount || 0;
                  } else if (tx.type === "Commission" || tx.type === "QCPA") {
-                     displayAmount = tx.commission_amount || tx.amount || 0;
+                     displayAmount = isAdminView ? (tx.raw_commission || tx.commission_amount || tx.amount || 0) : (tx.commission_amount || tx.amount || 0);
                  }
 
                  const rawStatus = tx.status || "pending";
@@ -2522,7 +2522,7 @@
                 dataLabels: { enabled: true, formatter: v => '$' + v, style: { fontSize: isMobileBar ? '9px' : '10px', colors: [document.documentElement.classList.contains('light-theme') ? '#374151' : '#fff'] } },
                 xaxis: {
                     categories: barLabels,
-                    labels: { style: { colors: '#71717a', fontSize: isMobileBar ? '9px' : '10px' }, formatter: function(val) { return typeof val === 'number' ? ('$' + val.toLocaleString()) : val; } }
+                    labels: { show: true, style: { colors: '#71717a', fontSize: isMobileBar ? '9px' : '10px' } }
                 },
                 yaxis: { labels: { style: { colors: document.documentElement.classList.contains('light-theme') ? '#6b7280' : '#d4d4d8', fontSize: isMobileBar ? '10px' : '11px' }, maxWidth: isMobileBar ? 60 : 160 } },
                 grid: { borderColor: document.documentElement.classList.contains('light-theme') ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.05)', strokeDashArray: 4 },
