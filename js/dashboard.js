@@ -123,7 +123,7 @@
       payoutBtn.addEventListener("click", () => { window.location.href = "/admin-settings#payouts"; });
     }
 
-    // 2. Add "GLOBAL OVERVIEW" label above balance
+    // 2. Add "GLOBAL OVERVIEW" label above balance + change "My Balance" to "Total Revenue"
     const balanceEl = document.getElementById("balance-display");
     if (balanceEl) {
       const tag = document.createElement("div");
@@ -131,6 +131,8 @@
       tag.innerHTML = '<svg class="w-3 h-3 inline mr-0.5 -mt-px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> GLOBAL OVERVIEW';
       balanceEl.parentElement.insertBefore(tag, balanceEl);
     }
+    const balLabel = document.querySelector('[data-i18n="dash.myBalance"]');
+    if (balLabel) balLabel.textContent = "Total Revenue";
 
     // 3. Add "Affiliate" column header to transactions table
     const thead = document.querySelector("#transactions-tbody")?.closest("table")?.querySelector("thead tr");
@@ -155,9 +157,11 @@
     const bizSection = document.getElementById("admin-business-section");
     if (bizSection) bizSection.classList.remove("hidden");
 
-    // 6. Show backfill button
+    // 6. Show backfill buttons
     const backfillBtn = document.getElementById("backfill-btn");
     if (backfillBtn) backfillBtn.classList.remove("hidden");
+    const backfillUnlinkedBtn = document.getElementById("backfill-unlinked-btn");
+    if (backfillUnlinkedBtn) backfillUnlinkedBtn.classList.remove("hidden");
 
     // 7. Replace KPI labels for admin
     const commLabel = document.querySelector('[data-i18n="dash.commission"]');
@@ -547,6 +551,29 @@
     }
     if (btn) {
       btn.innerHTML = '<svg class="w-3 h-3 inline mr-1 -mt-px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Backfill Historical';
+      btn.disabled = false;
+    }
+  };
+
+  // ── Admin: Backfill unlinked conversions from webhook logs ─
+  window.backfillUnlinked = async function() {
+    const btn = document.getElementById("backfill-unlinked-btn");
+    if (btn) { btn.textContent = "Processing..."; btn.disabled = true; }
+    try {
+      const res = await apiSend("POST", "/admin/backfill-unlinked", {});
+      if (res?.ok) {
+        if (typeof showToast === "function") showToast(res.message || "Backfill complete!", "success");
+        else alert(res.message || "Done");
+        loadLiveData().catch(() => {});
+      } else {
+        throw new Error(res?.error || "Failed");
+      }
+    } catch (err) {
+      if (typeof showToast === "function") showToast(err.message || "Backfill failed", "error");
+      else alert("Error: " + err.message);
+    }
+    if (btn) {
+      btn.innerHTML = '<svg class="w-3 h-3 inline mr-1 -mt-px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg> Backfill Unlinked';
       btn.disabled = false;
     }
   };

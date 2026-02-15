@@ -642,10 +642,16 @@
                         <svg class="w-4 h-4 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                         <h3 class="text-sm font-bold text-white uppercase tracking-wider">Affiliate Performance</h3>
                     </div>
-                    <button id="backfill-btn" onclick="backfillRawCommission()" class="text-[9px] font-bold uppercase px-3 py-1.5 rounded-lg bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border border-white/10 transition hidden">
-                        <svg class="w-3 h-3 inline mr-1 -mt-px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                        Backfill Historical
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <button id="backfill-btn" onclick="backfillRawCommission()" class="text-[9px] font-bold uppercase px-3 py-1.5 rounded-lg bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border border-white/10 transition hidden">
+                            <svg class="w-3 h-3 inline mr-1 -mt-px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                            Backfill Historical
+                        </button>
+                        <button id="backfill-unlinked-btn" onclick="backfillUnlinked()" class="text-[9px] font-bold uppercase px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-400 hover:text-amber-300 hover:bg-amber-500/20 border border-amber-500/20 transition hidden">
+                            <svg class="w-3 h-3 inline mr-1 -mt-px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+                            Backfill Unlinked
+                        </button>
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
@@ -1157,43 +1163,78 @@
                         const currentMonth = b.current_month_earnings || 0;
                         const lastMonth = b.last_month_earnings || 0;
                         const isSameMonth = b.same_month === true;
+                        const isAdminView = localStorage.getItem('is_admin') === 'true';
 
-                        // My Balance: dynamic based on schedule type
-                        // Same-month: available already includes current month (payable = totalEarned)
-                        // Following-month: available = previous months unpaid, so add currentMonth
-                        const myBalance = isSameMonth ? available : (available + currentMonth);
+                        // Admin: show raw_revenue as balance; Affiliate: show commission balance
+                        let myBalance;
+                        if (isAdminView && b.raw_revenue !== undefined) {
+                            myBalance = b.raw_revenue;
+                        } else {
+                            myBalance = isSameMonth ? available : (available + currentMonth);
+                        }
 
                         document.getElementById('balance-display').textContent = formatCurrency(myBalance);
-                        document.getElementById('popup-available').textContent = formatCurrency(available);
-                        document.getElementById('popup-lifetime').textContent = formatCurrency(lifetime);
-                        document.getElementById('popup-paid').textContent = formatCurrency(paid);
 
-                        // Dynamic labels based on schedule mode
-                        const accruingRow = document.getElementById('popup-accruing-row');
-                        const accruingDivider = document.getElementById('popup-accruing-divider');
-                        const accruingEl = document.getElementById('popup-accruing');
-                        const availableSub = document.getElementById('popup-available-sub');
-
-                        if (isSameMonth) {
-                            // Same-month: show current month in accruing row, available = everything minus paid
+                        // Admin: override popup with business metrics
+                        if (isAdminView && b.raw_revenue !== undefined) {
+                            document.getElementById('popup-available').textContent = formatCurrency(b.raw_revenue);
+                            const availLabel = document.querySelector('#popup-available')?.closest('.flex-1')?.querySelector('.text-gray-500');
+                            if (availLabel) availLabel.textContent = 'Total Revenue';
+                            const availSub = document.getElementById('popup-available-sub');
+                            if (availSub) availSub.textContent = 'Broker revenue total';
+                            // Accruing row → Affiliate Cost
+                            const accruingRow = document.getElementById('popup-accruing-row');
+                            const accruingDivider = document.getElementById('popup-accruing-divider');
                             if (accruingRow) accruingRow.style.display = '';
                             if (accruingDivider) accruingDivider.style.display = '';
-                            if (accruingEl) accruingEl.textContent = formatCurrency(currentMonth);
                             const accruingLabel = document.getElementById('popup-accruing-label');
-                            if (accruingLabel) accruingLabel.textContent = 'This Month Earned';
+                            if (accruingLabel) accruingLabel.textContent = 'Affiliate Cost';
                             const accruingSub = document.getElementById('popup-accruing-sub');
-                            if (accruingSub) accruingSub.textContent = 'Immediately payable';
-                            if (availableSub) availableSub.textContent = 'After withdrawals';
+                            if (accruingSub) accruingSub.textContent = 'Owed to affiliates';
+                            const accruingEl = document.getElementById('popup-accruing');
+                            if (accruingEl) { accruingEl.textContent = formatCurrency(b.affiliate_cost || 0); accruingEl.className = 'text-sm font-bold text-red-400 font-mono'; }
+                            // Lifetime → Net Profit
+                            document.getElementById('popup-lifetime').textContent = formatCurrency(b.net_profit || 0);
+                            const lifetimeLabel = document.querySelector('#popup-lifetime')?.closest('.flex-1')?.querySelector('.text-gray-500');
+                            if (lifetimeLabel) lifetimeLabel.textContent = 'Net Profit';
+                            const lifetimeEl = document.getElementById('popup-lifetime');
+                            if (lifetimeEl) lifetimeEl.className = (b.net_profit || 0) >= 0 ? 'text-sm font-bold text-emerald-400 font-mono' : 'text-sm font-bold text-red-400 font-mono';
+                            // Paid → Margin
+                            document.getElementById('popup-paid').textContent = (b.margin || 0).toFixed(1) + '%';
+                            const paidLabel2 = document.getElementById('popup-paid-label');
+                            if (paidLabel2) paidLabel2.textContent = 'Margin';
                         } else {
-                            // Following-month: show current month accruing
-                            if (accruingRow) accruingRow.style.display = '';
-                            if (accruingDivider) accruingDivider.style.display = '';
-                            if (accruingEl) accruingEl.textContent = formatCurrency(currentMonth);
-                            const accruingLabel = document.getElementById('popup-accruing-label');
-                            if (accruingLabel) accruingLabel.textContent = 'Current Month';
-                            const accruingSub = document.getElementById('popup-accruing-sub');
-                            if (accruingSub) accruingSub.textContent = 'Earning this month';
-                            if (availableSub) availableSub.textContent = 'Last month (unpaid)';
+                            document.getElementById('popup-available').textContent = formatCurrency(available);
+                            document.getElementById('popup-lifetime').textContent = formatCurrency(lifetime);
+                            document.getElementById('popup-paid').textContent = formatCurrency(paid);
+                        }
+
+                        // Dynamic labels based on schedule mode (affiliates only — admin uses business metrics above)
+                        if (!isAdminView || b.raw_revenue === undefined) {
+                            const accruingRow = document.getElementById('popup-accruing-row');
+                            const accruingDivider = document.getElementById('popup-accruing-divider');
+                            const accruingEl = document.getElementById('popup-accruing');
+                            const availableSub = document.getElementById('popup-available-sub');
+
+                            if (isSameMonth) {
+                                if (accruingRow) accruingRow.style.display = '';
+                                if (accruingDivider) accruingDivider.style.display = '';
+                                if (accruingEl) accruingEl.textContent = formatCurrency(currentMonth);
+                                const accruingLabel = document.getElementById('popup-accruing-label');
+                                if (accruingLabel) accruingLabel.textContent = 'This Month Earned';
+                                const accruingSub = document.getElementById('popup-accruing-sub');
+                                if (accruingSub) accruingSub.textContent = 'Immediately payable';
+                                if (availableSub) availableSub.textContent = 'After withdrawals';
+                            } else {
+                                if (accruingRow) accruingRow.style.display = '';
+                                if (accruingDivider) accruingDivider.style.display = '';
+                                if (accruingEl) accruingEl.textContent = formatCurrency(currentMonth);
+                                const accruingLabel = document.getElementById('popup-accruing-label');
+                                if (accruingLabel) accruingLabel.textContent = 'Current Month';
+                                const accruingSub = document.getElementById('popup-accruing-sub');
+                                if (accruingSub) accruingSub.textContent = 'Earning this month';
+                                if (availableSub) availableSub.textContent = 'Last month (unpaid)';
+                            }
                         }
 
                         // Payout draws from 'available' (same-month: includes current; following: previous months only)
