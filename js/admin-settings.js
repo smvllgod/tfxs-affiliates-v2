@@ -1198,6 +1198,8 @@ function onConvTypeChange() {
   const brokerRow = $("conv-broker-row");
   const depositRow = $("conv-deposit-row");
   const commissionRow = $("conv-commission-row");
+  const dealRow = $("conv-deal-row");
+  const rawCommRow = $("conv-raw-commission-row");
   const prereqLabel = $("conv-uid-prereq");
   const validMsg = $("conv-validation-msg");
   if (validMsg) { validMsg.classList.add("hidden"); validMsg.textContent = ""; }
@@ -1209,6 +1211,8 @@ function onConvTypeChange() {
   if (brokerRow) brokerRow.classList.remove("hidden");
   if (depositRow) depositRow.classList.add("hidden");
   if (commissionRow) commissionRow.classList.add("hidden");
+  if (dealRow) dealRow.classList.add("hidden");
+  if (rawCommRow) rawCommRow.classList.add("hidden");
 
   if (type === "registration") {
     // Free user ID, show country + broker, no deposit/commission
@@ -1226,12 +1230,18 @@ function onConvTypeChange() {
     if (prereqLabel) prereqLabel.textContent = "(must have FTD)";
     if (countryRow) countryRow.classList.add("hidden");
   } else if (type === "commission") {
-    // Search existing user (must have QFTD), show commission
+    // Search existing user (must have QFTD), show commission + deal + raw_commission
     if (uidFree) uidFree.classList.add("hidden");
     if (uidSearch) uidSearch.classList.remove("hidden");
     if (prereqLabel) prereqLabel.textContent = "(must have QFTD)";
     if (countryRow) countryRow.classList.add("hidden");
     if (commissionRow) commissionRow.classList.remove("hidden");
+    if (dealRow) dealRow.classList.remove("hidden");
+    if (rawCommRow) rawCommRow.classList.remove("hidden");
+    // Keep broker visible for commission (to resolve deal)
+    if (brokerRow) brokerRow.classList.remove("hidden");
+    // Populate deal dropdown
+    populateConvDealDropdown();
   }
 }
 
@@ -1290,6 +1300,48 @@ function selectConvUser(userId, country, deposit) {
   }
 }
 
+// ── Deal dropdown for commission conversion ───────────
+async function populateConvDealDropdown() {
+  const dealSel = $("conv-deal");
+  if (!dealSel) return;
+  dealSel.innerHTML = '<option value="">No deal (manual commission)</option>';
+  try {
+    const res = await api("/api/deals");
+    if (res.ok && res.data) {
+      res.data.forEach(d => {
+        const tierInfo = d.tiers && d.tiers.length ? ` (${d.tiers.length} tiers)` : d.cpa_amount ? ` ($${d.cpa_amount})` : '';
+        dealSel.innerHTML += `<option value="${d.id}" data-broker="${esc(d.broker || '')}" data-cpa="${d.cpa_amount || 0}">${esc(d.broker || '')} — ${esc(d.name || 'Unnamed')}${tierInfo}</option>`;
+      });
+    }
+  } catch (e) { console.warn("Failed to load deals for conv modal:", e); }
+
+  // When deal is selected, auto-fill broker and show deal info
+  dealSel.onchange = function() {
+    const opt = dealSel.selectedOptions[0];
+    if (opt && opt.dataset.broker) {
+      const brokerSel = $("conv-broker");
+      if (brokerSel) {
+        // Set broker dropdown to matching value
+        for (let i = 0; i < brokerSel.options.length; i++) {
+          if (brokerSel.options[i].value === opt.dataset.broker) {
+            brokerSel.selectedIndex = i;
+            break;
+          }
+        }
+      }
+    }
+    const info = $("conv-deal-info");
+    if (info) {
+      if (opt && opt.value) {
+        info.classList.remove("hidden");
+        info.textContent = `Deal will auto-calculate affiliate commission based on tier. Broker Revenue = what admin earns from CellXpert.`;
+      } else {
+        info.classList.add("hidden");
+      }
+    }
+  };
+}
+
 function openConvModal(data) {
   // Populate broker dropdown from allBrokers
   const brokerSel = $("conv-broker");
@@ -1327,12 +1379,15 @@ function openConvModal(data) {
     $("conv-afp-input").value = "";
     $("conv-afp-value").value = "";
     setCustomSelectValue("conv-event-type", "registration");
-    setCustomSelectValue("conv-form-status", "pending");
+    setCustomSelectValue("conv-form-status", "approved");
     $("conv-user-id").value = "";
     if ($("conv-user-search")) $("conv-user-search").value = "";
     $("conv-country").value = "";
     $("conv-deposit").value = "";
     $("conv-commission").value = "";
+    if ($("conv-raw-commission")) $("conv-raw-commission").value = "";
+    if ($("conv-deal")) $("conv-deal").value = "";
+    if ($("conv-deal-info")) $("conv-deal-info").classList.add("hidden");
     if (brokerSel) brokerSel.value = "";
     // Default date to now via Flatpickr
     if ($("conv-date")) {
@@ -1363,6 +1418,14 @@ async function submitConversion() {
     deposit_amount: Number($("conv-deposit").value) || 0,
     commission_amount: Number($("conv-commission").value) || 0,
   };
+  // Raw commission (broker revenue) for admin tracking
+  if ($("conv-raw-commission") && Number($("conv-raw-commission").value) > 0) {
+    body.raw_commission = Number($("conv-raw-commission").value);
+  }
+  // Deal ID for auto-calculation
+  if ($("conv-deal") && $("conv-deal").value) {
+    body.deal_id = $("conv-deal").value;
+  }
   // Add custom date (from Flatpickr or raw value)
   if ($("conv-date")) {
     const fp = $("conv-date")._flatpickr;

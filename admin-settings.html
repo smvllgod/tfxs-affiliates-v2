@@ -1912,17 +1912,17 @@
                     <div><label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Status</label>
                         <div class="custom-select relative w-full">
                             <button type="button" data-cs-btn class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg text-sm bg-white/5 border border-white/10 text-white hover:border-white/20 transition">
-                                <span data-cs-label>Pending</span>
+                                <span data-cs-label>Approved</span>
                                 <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                             </button>
                             <div data-cs-dd class="hidden absolute left-0 right-0 mt-1 rounded-xl bg-[#1a1a1a] border border-white/10 shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
                                 <div data-cs-opts>
-                                    <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="pending">Pending</div>
-                                    <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="approved">Approved</div>
+                                    <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="pending">Pending</div>
+                                    <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="approved">Approved</div>
                                     <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="rejected">Rejected</div>
                                 </div>
                             </div>
-                            <input type="hidden" id="conv-form-status" value="pending">
+                            <input type="hidden" id="conv-form-status" value="approved">
                         </div>
                     </div>
                 </div>
@@ -1944,7 +1944,7 @@
                 <!-- Country (registration + ftd) -->
                 <div id="conv-country-row" class="grid grid-cols-2 gap-3">
                     <div><label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Country (ISO)</label><input type="text" id="conv-country" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" placeholder="FR" maxlength="2"></div>
-                    <div id=\"conv-broker-row\"><label class=\"text-[10px] text-gray-500 uppercase tracking-widest block mb-1\">Broker *</label><select id=\"conv-broker\" class=\"form-input w-full px-3 py-2.5 rounded-lg text-sm\"><option value=\"\">Select a broker...</option></select></div>
+                    <div id="conv-broker-row"><label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Broker *</label><select id="conv-broker" class="form-input w-full px-3 py-2.5 rounded-lg text-sm"><option value="">Select a broker...</option></select></div>
                 </div>
                 <!-- Date (always shown) -->
                 <div>
@@ -1955,6 +1955,17 @@
                 <div id="conv-deposit-row" class="hidden">
                     <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Deposit Amount $</label>
                     <input type="number" id="conv-deposit" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" step="0.01" placeholder="0.00">
+                </div>
+                <!-- Deal selection (commission only) -->
+                <div id="conv-deal-row" class="hidden">
+                    <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Apply Deal <span class="text-gray-600">(auto-calculates affiliate commission)</span></label>
+                    <select id="conv-deal" class="form-input w-full px-3 py-2.5 rounded-lg text-sm"><option value="">No deal (manual commission)</option></select>
+                    <p id="conv-deal-info" class="text-[10px] text-gray-500 mt-1 hidden"></p>
+                </div>
+                <!-- Raw commission = broker revenue for admin (commission only) -->
+                <div id="conv-raw-commission-row" class="hidden">
+                    <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Broker Revenue $ <span class="text-gray-600">(raw CellXpert commission)</span></label>
+                    <input type="number" id="conv-raw-commission" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" step="0.01" placeholder="0.00">
                 </div>
                 <!-- Commission (commission only) -->
                 <div id="conv-commission-row" class="hidden">

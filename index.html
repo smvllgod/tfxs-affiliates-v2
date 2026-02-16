@@ -1098,7 +1098,7 @@
 
             // ── Fetch accurate KPIs from backend with date range ──
             const API = window.TFXS_API;
-            let totalCommission = 0, totalRegs = 0, ftDs = 0, qftDs = 0, totalDeposit = 0;
+            let totalCommission = 0, totalRegs = 0, ftDs = 0, qftDs = 0, totalDeposit = 0, totalNetDeposit = 0;
             let backendKPIs = false;
             if (API && typeof API.fetchSummary === 'function') {
                 try {
@@ -1113,6 +1113,7 @@
                         ftDs = s.ftd || 0;
                         qftDs = s.qualified_cpa || 0;
                         totalDeposit = s.total_deposit || 0;
+                        totalNetDeposit = s.total_net_deposit || 0;
                         backendKPIs = true;
 
                         // Admin business KPIs
@@ -1145,8 +1146,8 @@
                 totalDeposit = filteredRegs.reduce((acc, reg) => acc + (reg.firstDeposit || 0), 0);
             }
 
-            const roiFormula = window._tfxsRoiFormula || "deposit_div_commission";
-            const roi = window.calculateROI ? window.calculateROI(roiFormula, totalDeposit, totalCommission) : (totalCommission > 0 ? (totalDeposit / totalCommission).toFixed(2) : "0.00");
+            const roiFormula = window._tfxsRoiFormula || "net_deposit_div_commission";
+            const roi = window.calculateROI ? window.calculateROI(roiFormula, totalDeposit, totalCommission, totalNetDeposit) : (totalCommission > 0 ? (totalNetDeposit / totalCommission).toFixed(2) : "0.00");
 
             // Update DOM with animated counters
             const commEl = document.getElementById('kpi-commission');

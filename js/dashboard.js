@@ -195,13 +195,13 @@
   }
 
   // ── ROI formula calculator ──────────────────────────────
-  function calculateROI(formula, totalDeposit, totalCommission) {
+  function calculateROI(formula, totalDeposit, totalCommission, totalNetDeposit) {
+    const netDep = totalNetDeposit || totalDeposit; // fallback if net_deposit not available
     switch (formula) {
       case "deposit_div_commission":
         return totalCommission > 0 ? (totalDeposit / totalCommission).toFixed(2) : "0.00";
       case "net_deposit_div_commission":
-        // net deposit not available — falls back to total deposit
-        return totalCommission > 0 ? (totalDeposit / totalCommission).toFixed(2) : "0.00";
+        return totalCommission > 0 ? (netDep / totalCommission).toFixed(2) : "0.00";
       case "commission_div_deposit":
         return totalDeposit > 0 ? (totalCommission / totalDeposit).toFixed(2) : "0.00";
       case "commission_div_deposit_pct":
@@ -211,7 +211,7 @@
       case "fixed_ratio":
         return totalCommission > 0 ? (totalDeposit / totalCommission).toFixed(2) : "0.00";
       default:
-        return totalCommission > 0 ? (totalDeposit / totalCommission).toFixed(2) : "0.00";
+        return totalCommission > 0 ? (netDep / totalCommission).toFixed(2) : "0.00";
     }
   }
   // Expose globally for index.html sparkline/KPI calcs
@@ -258,7 +258,7 @@
       updateKPI("kpi-qftd", s.qualified_cpa);
 
       // ROI calculation using real deposit data + formula
-      const roi = calculateROI(_roiFormula, s.total_deposit || 0, s.total_commission || 0);
+      const roi = calculateROI(_roiFormula, s.total_deposit || 0, s.total_commission || 0, s.total_net_deposit || 0);
       updateKPI("kpi-roi", parseFloat(roi), v => v.toFixed(2));
 
       // ── Admin business KPIs ──
@@ -281,6 +281,7 @@
 
       // Expose total_deposit for index.html calculations
       window._tfxsTotalDeposit = s.total_deposit || 0;
+      window._tfxsTotalNetDeposit = s.total_net_deposit || 0;
       window._tfxsRoiFormula = _roiFormula;
 
       // ── Update transactions table ──

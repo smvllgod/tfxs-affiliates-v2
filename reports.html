@@ -401,7 +401,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="p-4 border-t border-white/5 flex items-center justify-between text-xs relative">
+            <div class="p-4 border-t border-white/5 flex items-center justify-between text-xs relative z-20">
                  <div class="flex items-center gap-2">
                      <span class="text-gray-400" data-i18n="rep.itemsPerPage">Items per page:</span>
                      <div id="ipp-reg-wrapper" class="custom-select relative">
@@ -1107,10 +1107,12 @@
             
             let totalDeposits = 0;
             let totalCommissions = 0;
+            let totalNetDeposits = 0;
 
             data.forEach(row => {
                 totalDeposits += row.firstDeposit || 0;
                 totalCommissions += row.commission || 0;
+                totalNetDeposits += parseFloat(row.net_deposits) || 0;
 
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-white/5 transition-colors';
@@ -1144,19 +1146,19 @@
                     <td class="px-4 py-4 text-gray-300 text-center font-mono">${vol}</td>
                     <td class="px-4 py-4 text-gray-300 text-center">${positions}</td>
                     <td class="px-4 py-4 text-brand-500 font-bold text-center">${row.commission > 0 ? formatCurrency(row.commission) : '—'}</td>
-                    <td class="px-4 py-4 text-center"><span class="bg-${statusColor}-500/10 text-${statusColor}-400 px-2 py-0.5 rounded border border-${statusColor}-500/20 text-[10px]">${statusText}</span></td>
+                    <td class="px-4 py-4 text-center"><span class="${statusText === 'approved' ? 'bg-green-500/10 text-green-400 border-green-500/20' : statusText === 'Qualified' ? 'bg-green-500/10 text-green-400 border-green-500/20' : statusText === 'Active' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : statusText === 'rejected' ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-gray-500/10 text-gray-400 border-gray-500/20'} px-2 py-0.5 rounded border text-[10px]">${statusText}</span></td>
                 `;
                 tbody.appendChild(tr);
             });
 
-            // Total Row
+            // Total Row — use full filtered totals from parent scope
             const colSpan = IS_ADMIN ? 8 : 7;
             const totalRow = document.createElement('tr');
-            totalRow.className = 'bg-white/5 font-bold border-t border-white/10 sticky bottom-0 backdrop-blur-sm';
+            totalRow.className = 'bg-white/5 font-bold border-t border-white/10';
             totalRow.innerHTML = `
-                <td class="px-4 py-4 text-white text-left uppercase tracking-wider text-[10px] text-gray-400" colspan="${colSpan}">Total</td>
+                <td class="px-4 py-4 text-white text-left uppercase tracking-wider text-[10px]" colspan="${colSpan}">TOTAL</td>
                 <td class="px-4 py-4 text-white text-center">${formatCurrency(totalDeposits)}</td>
-                <td class="px-4 py-4"></td>
+                <td class="px-4 py-4 text-gray-300 text-center">${totalNetDeposits > 0 ? formatCurrency(totalNetDeposits) : '—'}</td>
                 <td class="px-4 py-4"></td>
                 <td class="px-4 py-4"></td>
                 <td class="px-4 py-4"></td>
