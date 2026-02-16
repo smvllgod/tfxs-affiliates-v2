@@ -1161,12 +1161,16 @@
                 tbody.appendChild(tr);
             });
 
-            // Total Row
-            const colSpan = IS_ADMIN ? 9 : 8;
+            // Total Row — use individual empty cells instead of colspan for precise alignment
             const totalRow = document.createElement('tr');
             totalRow.className = 'bg-white/5 font-bold border-t border-white/10';
+            const emptyCells = IS_ADMIN
+                ? `<td class="px-4 py-4 text-white text-left uppercase tracking-wider text-[10px]">TOTAL</td>` +
+                  `<td class="px-4 py-4"></td>`.repeat(7)   // Country→FTD Date (7 empty)
+                : `<td class="px-4 py-4 text-white text-left uppercase tracking-wider text-[10px]">TOTAL</td>` +
+                  `<td class="px-4 py-4"></td>`.repeat(6);  // User ID→FTD Date (6 empty)
             totalRow.innerHTML = `
-                <td class="px-4 py-4 text-white text-left uppercase tracking-wider text-[10px]" colspan="${colSpan}">TOTAL</td>
+                ${emptyCells}
                 <td class="px-4 py-4 text-white text-center">${formatCurrency(totalDeposits)}</td>
                 <td class="px-4 py-4 text-gray-300 text-center">${totalNetDeposits > 0 ? formatCurrency(totalNetDeposits) : '—'}</td>
                 <td class="px-4 py-4"></td>
