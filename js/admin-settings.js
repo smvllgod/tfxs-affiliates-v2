@@ -1151,7 +1151,7 @@ function renderConvPage(page) {
   const tbody = $("conv-tbody");
 
   if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="10" class="px-3 py-12 text-center text-gray-600">No conversions found</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="13" class="px-3 py-12 text-center text-gray-600">No conversions found</td></tr>`;
     $("conv-pagination").innerHTML = "";
     return;
   }
@@ -1167,16 +1167,20 @@ function renderConvPage(page) {
     actions += `<button onclick="openOverride('${r.id}', ${Number(r.commission_amount || 0)})" class="text-amber-400 hover:text-amber-300 mr-1" title="Override"><svg class="w-3.5 h-3.5 inline" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`;
     actions += `<button onclick="openConvModal(${JSON.stringify(r).replace(/"/g, '&quot;')})" class="text-blue-400 hover:text-blue-300 mr-1" title="Edit"><svg class="w-3.5 h-3.5 inline" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>`;
     actions += `<button onclick="deleteConversion('${r.id}')" class="text-red-400 hover:text-red-300" title="Delete"><svg class="w-3.5 h-3.5 inline" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>`;
+    const srcBadge = r.source_platform ? `<span class="text-[9px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">${esc(r.source_platform).toUpperCase()}</span>` : '<span class="text-gray-600">—</span>';
     return `
     <tr class="border-t border-white/5 hover:bg-white/[0.02] transition">
       <td class="px-2 py-2.5 text-center"><input type="checkbox" ${checked} onchange="toggleConvSelect('${r.id}', this.checked)" class="cursor-pointer"></td>
       <td class="px-3 py-2.5 text-gray-500">${fmtDate(r.occurred_at || r.created_at)}</td>
       <td class="px-3 py-2.5 font-mono text-[10px] font-bold">${r.affiliate_code === "__UNLINKED__" ? '<span class="text-amber-400 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded text-[9px]">⚠ NO AFP</span>' : '<span class="text-brand-500">' + esc(r.affiliate_code) + '</span>'}</td>
       <td class="px-3 py-2.5 text-gray-300">${esc(r.event_type)}</td>
-      <td class="px-3 py-2.5 text-white">${esc(r.user_id || "—")}</td>
+      <td class="px-3 py-2.5 text-white text-[10px]">${esc(r.user_id || "—")}</td>
+      <td class="px-3 py-2.5 text-gray-300 text-[10px]">${esc(r.customer_name || "—")}</td>
+      <td class="px-3 py-2.5 text-gray-400 text-[10px]">${esc(r.broker || "—")}</td>
       <td class="px-3 py-2.5 text-gray-400">${esc(r.country || "—")}</td>
       <td class="px-3 py-2.5 text-right font-mono text-gray-300">$${Number(r.deposit_amount || 0).toFixed(2)}</td>
       <td class="px-3 py-2.5 text-right font-mono text-green-400 font-bold">$${Number(r.commission_amount || 0).toFixed(2)}</td>
+      <td class="px-3 py-2.5">${srcBadge}</td>
       <td class="px-3 py-2.5 text-center">${statusBadge(st)}</td>
       <td class="px-3 py-2.5 text-right whitespace-nowrap">${actions}</td>
     </tr>`;
