@@ -381,12 +381,19 @@
                 <table class="w-full">
                     <thead class="bg-white/5 text-[10px] uppercase text-gray-500 font-mono">
                         <tr>
-                            <th class="px-6 py-4 font-semibold tracking-wider text-left" data-i18n="rep.country">Country</th>
-                            <th class="px-6 py-4 font-semibold tracking-wider text-center" data-i18n="rep.userId">User ID</th>
-                            <th class="px-6 py-4 font-semibold tracking-wider text-center">Broker</th>
-                            <th class="px-6 py-4 font-semibold tracking-wider text-center" data-i18n="rep.created">Created</th>
-                            <th class="px-6 py-4 font-semibold tracking-wider text-center" data-i18n="rep.firstDeposit">First Deposit</th>
-                            <th class="px-6 py-4 font-semibold tracking-wider text-center" data-i18n="rep.commission">Commission</th>
+                            <th class="px-4 py-4 font-semibold tracking-wider text-left" data-i18n="rep.country">Country</th>
+                            <th class="px-4 py-4 font-semibold tracking-wider text-center" data-i18n="rep.userId">User ID</th>
+                            <th class="px-4 py-4 font-semibold tracking-wider text-center">Customer</th>
+                            <th class="px-4 py-4 font-semibold tracking-wider text-center">Account</th>
+                            <th class="px-4 py-4 font-semibold tracking-wider text-center">Broker</th>
+                            <th class="px-4 py-4 font-semibold tracking-wider text-center" data-i18n="rep.created">Created</th>
+                            <th class="px-4 py-4 font-semibold tracking-wider text-center" data-i18n="rep.firstDeposit">First Deposit</th>
+                            <th class="px-4 py-4 font-semibold tracking-wider text-center">Net Deposits</th>
+                            <th class="px-4 py-4 font-semibold tracking-wider text-center">Lots</th>
+                            <th class="px-4 py-4 font-semibold tracking-wider text-center">Volume</th>
+                            <th class="px-4 py-4 font-semibold tracking-wider text-center">Positions</th>
+                            <th class="px-4 py-4 font-semibold tracking-wider text-center" data-i18n="rep.commission">Commission</th>
+                            <th class="px-4 py-4 font-semibold tracking-wider text-center">Status</th>
                         </tr>
                     </thead>
                     <tbody class="text-xs divide-y divide-white/5 font-mono" id="registrations-table-body">
@@ -859,7 +866,7 @@
 
             if (regSearchVal) {
                 filteredRegs = filteredRegs.filter(r => {
-                    const haystack = [r.userId, r.country?.name, r.country?.code, r.broker, new Date(r.date).toLocaleDateString()].join(' ').toLowerCase();
+                    const haystack = [r.userId, r.country?.name, r.country?.code, r.broker, r.customer_name, r.account_id, new Date(r.date).toLocaleDateString()].join(' ').toLowerCase();
                     return haystack.includes(regSearchVal);
                 });
             }
@@ -1108,33 +1115,53 @@
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-white/5 transition-colors';
                 tr.dataset.userid = row.userId;
-                const affCell = IS_ADMIN ? `<td class="px-6 py-4 font-mono text-brand-500">${row.affiliate_code || '—'}</td>` : '';
+                const affCell = IS_ADMIN ? `<td class="px-4 py-4 font-mono text-brand-500">${row.affiliate_code || '—'}</td>` : '';
                 const brokerName = row.broker || '—';
+                const custName = row.customer_name || '—';
+                const acctId = row.account_id || '—';
+                const lots = row.lot_amount ? parseFloat(row.lot_amount).toFixed(2) : '—';
+                const vol = row.volume ? parseFloat(row.volume).toFixed(2) : '—';
+                const positions = row.position_count || '—';
+                const netDep = row.net_deposits ? formatCurrency(parseFloat(row.net_deposits)) : '—';
+                const statusText = row.status || '—';
+                const statusColor = statusText === 'Qualified' ? 'green' : statusText === 'Active' ? 'blue' : 'gray';
                 tr.innerHTML = `
                     ${affCell}
-                    <td class="px-6 py-4 text-left">
+                    <td class="px-4 py-4 text-left">
                         <div class="flex items-center gap-2">
                             <span class="text-white">${row.country.name}</span> 
                             <span class="text-[10px] text-gray-500">${row.country.code}</span>
                         </div>
                     </td>
-                    <td class="px-6 py-4 text-gray-300 text-center">${row.userId}</td>
-                    <td class="px-6 py-4 text-center"><span class="bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded border border-purple-500/20 text-[10px]">${brokerName}</span></td>
-                    <td class="px-6 py-4 text-gray-400 text-center text-[10px] uppercase font-mono">${new Date(row.date).toLocaleDateString()}</td>
-                    <td class="px-6 py-4 text-white text-center">${row.firstDeposit > 0 ? formatCurrency(row.firstDeposit) : '-'}</td>
-                    <td class="px-6 py-4 text-brand-500 font-bold text-center">${row.commission > 0 ? formatCurrency(row.commission) : '-'}</td>
+                    <td class="px-4 py-4 text-gray-300 text-center">${row.userId}</td>
+                    <td class="px-4 py-4 text-gray-300 text-center text-[11px]">${custName}</td>
+                    <td class="px-4 py-4 text-gray-400 text-center font-mono text-[10px]">${acctId}</td>
+                    <td class="px-4 py-4 text-center"><span class="bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded border border-purple-500/20 text-[10px]">${brokerName}</span></td>
+                    <td class="px-4 py-4 text-gray-400 text-center text-[10px] uppercase font-mono">${new Date(row.date).toLocaleDateString()}</td>
+                    <td class="px-4 py-4 text-white text-center">${row.firstDeposit > 0 ? formatCurrency(row.firstDeposit) : '—'}</td>
+                    <td class="px-4 py-4 text-gray-300 text-center">${netDep}</td>
+                    <td class="px-4 py-4 text-gray-300 text-center font-mono">${lots}</td>
+                    <td class="px-4 py-4 text-gray-300 text-center font-mono">${vol}</td>
+                    <td class="px-4 py-4 text-gray-300 text-center">${positions}</td>
+                    <td class="px-4 py-4 text-brand-500 font-bold text-center">${row.commission > 0 ? formatCurrency(row.commission) : '—'}</td>
+                    <td class="px-4 py-4 text-center"><span class="bg-${statusColor}-500/10 text-${statusColor}-400 px-2 py-0.5 rounded border border-${statusColor}-500/20 text-[10px]">${statusText}</span></td>
                 `;
                 tbody.appendChild(tr);
             });
 
             // Total Row
-            const colSpan = IS_ADMIN ? 5 : 4;
+            const colSpan = IS_ADMIN ? 8 : 7;
             const totalRow = document.createElement('tr');
             totalRow.className = 'bg-white/5 font-bold border-t border-white/10 sticky bottom-0 backdrop-blur-sm';
             totalRow.innerHTML = `
-                <td class="px-6 py-4 text-white text-left uppercase tracking-wider text-[10px] text-gray-400" colspan="${colSpan}">Total</td>
-                <td class="px-6 py-4 text-white text-center">${formatCurrency(totalDeposits)}</td>
-                <td class="px-6 py-4 text-brand-500 text-center">${formatCurrency(totalCommissions)}</td>
+                <td class="px-4 py-4 text-white text-left uppercase tracking-wider text-[10px] text-gray-400" colspan="${colSpan}">Total</td>
+                <td class="px-4 py-4 text-white text-center">${formatCurrency(totalDeposits)}</td>
+                <td class="px-4 py-4"></td>
+                <td class="px-4 py-4"></td>
+                <td class="px-4 py-4"></td>
+                <td class="px-4 py-4"></td>
+                <td class="px-4 py-4 text-brand-500 text-center">${formatCurrency(totalCommissions)}</td>
+                <td class="px-4 py-4"></td>
             `;
             tbody.appendChild(totalRow);
         }
@@ -1196,11 +1223,11 @@
                             return d >= startDate && d <= endDate;
                         });
                         const headers = IS_ADMIN
-                            ? ['Affiliate', 'Country', 'Country Code', 'User ID', 'Created', 'First Deposit', 'Commission', 'Status']
-                            : ['Country', 'Country Code', 'User ID', 'Created', 'First Deposit', 'Commission', 'Status'];
+                            ? ['Affiliate', 'Country', 'Country Code', 'User ID', 'Customer', 'Account', 'Broker', 'Created', 'First Deposit', 'Net Deposits', 'Lots', 'Volume', 'Positions', 'Commission', 'Status']
+                            : ['Country', 'Country Code', 'User ID', 'Customer', 'Account', 'Broker', 'Created', 'First Deposit', 'Net Deposits', 'Lots', 'Volume', 'Positions', 'Commission', 'Status'];
                         const rows = filtered.map(r => IS_ADMIN
-                            ? [r.affiliate_code || '', r.country.name, r.country.code, r.userId, r.date, r.firstDeposit, r.commission, r.status]
-                            : [r.country.name, r.country.code, r.userId, r.date, r.firstDeposit, r.commission, r.status]);
+                            ? [r.affiliate_code || '', r.country.name, r.country.code, r.userId, r.customer_name || '', r.account_id || '', r.broker || '', r.date, r.firstDeposit, r.net_deposits || 0, r.lot_amount || 0, r.volume || 0, r.position_count || 0, r.commission, r.status || '']
+                            : [r.country.name, r.country.code, r.userId, r.customer_name || '', r.account_id || '', r.broker || '', r.date, r.firstDeposit, r.net_deposits || 0, r.lot_amount || 0, r.volume || 0, r.position_count || 0, r.commission, r.status || '']);
                         exportTableToCSV('registrations_report.csv', headers, rows);
                     } else {
                         const filtered = database.earnings.filter(e => {

@@ -112,14 +112,41 @@
           date: e.occurred_at,
           firstDeposit: 0,
           commission: 0,
-          status: "Active",
+          status: e.status || "Active",
           affiliate_code: e.affiliate_code || "",
-          broker: e.broker || ""
+          broker: e.broker || "",
+          customer_name: "",
+          account_id: "",
+          lot_amount: 0,
+          volume: 0,
+          position_count: 0,
+          net_deposits: 0,
+          deposit_count: 0,
+          first_deposit_date: "",
+          qualification_date: "",
+          roi: 0
         };
       }
       const u = userMap[uid];
       // Use registration date as the primary date
-      if (e.event_type === "registration") u.date = e.occurred_at;
+      if (e.event_type === "registration") {
+        u.date = e.occurred_at;
+        // Enrichment fields come from the registration row
+        u.customer_name = e.customer_name || u.customer_name;
+        u.account_id = e.account_id || u.account_id;
+        u.lot_amount = parseFloat(e.lot_amount) || u.lot_amount;
+        u.volume = parseFloat(e.volume) || u.volume;
+        u.position_count = parseInt(e.position_count) || u.position_count;
+        u.net_deposits = parseFloat(e.net_deposits) || u.net_deposits;
+        u.deposit_count = parseInt(e.deposit_count) || u.deposit_count;
+        u.first_deposit_date = e.first_deposit_date || u.first_deposit_date;
+        u.qualification_date = e.qualification_date || u.qualification_date;
+        u.roi = parseFloat(e.roi) || u.roi;
+        u.status = e.status || u.status;
+      }
+      // Also pick up customer_name/account_id from any event type (they're enriched on all rows)
+      if (!u.customer_name && e.customer_name) u.customer_name = e.customer_name;
+      if (!u.account_id && e.account_id) u.account_id = e.account_id;
       // FTD: set deposit amount
       if (e.event_type === "ftd") u.firstDeposit = parseFloat(e.deposit_amount) || 0;
       // Only 'commission' event carries money (QCPA is KPI-only, $0)
