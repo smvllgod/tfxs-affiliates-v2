@@ -220,9 +220,19 @@
   // ── Main data loader ────────────────────────────────────
   async function loadLiveData() {
     try {
+      // Read current date range from dashboard date picker (if available)
+      let fromDate = null, toDate = null;
+      const picker = window.dashboardDatePicker;
+      if (picker && picker.selectedDates && picker.selectedDates.length >= 1) {
+        const sd = picker.selectedDates[0];
+        const ed = picker.selectedDates[1] || picker.selectedDates[0];
+        fromDate = sd.toISOString().substring(0, 10);
+        toDate = ed.toISOString().substring(0, 10);
+      }
+
       // Fetch summary + latest events + ROI settings in parallel
       const [summaryRes, eventsRes, roiRes] = await Promise.all([
-        fetchSummary(affiliateId),
+        fetchSummary(affiliateId, fromDate, toDate),
         fetchEvents(affiliateId),
         fetchRoiSettings(affiliateId).catch(() => null)
       ]);

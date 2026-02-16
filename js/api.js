@@ -99,11 +99,13 @@ async function fetchBrokers() {
 }
 
 /** KPI summary: { registrations, ftd, qualified_cpa, total_commission } */
-async function fetchSummary(affiliateId) {
+async function fetchSummary(affiliateId, from, to) {
   const params = [];
   if (affiliateId) params.push(`affiliate_id=${encodeURIComponent(affiliateId)}`);
   const broker = getSelectedBroker();
   if (broker) params.push(`broker=${encodeURIComponent(broker)}`);
+  if (from) params.push(`from=${from}`);
+  if (to) params.push(`to=${to}`);
   const qs = params.length ? `?${params.join('&')}` : '';
   return apiGet(`/api/summary${qs}`);
 }
