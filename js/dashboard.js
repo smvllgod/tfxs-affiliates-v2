@@ -250,7 +250,9 @@
 
       // ── Update KPIs ──
       const s = summaryRes.data;
-      updateKPI("kpi-commission", s.total_commission, v => formatCurrency(v));
+      // Admin: commission KPI shows raw CellXpert revenue; affiliate: deal-based
+      const commKPIValue = (IS_ADMIN && s.raw_revenue !== undefined) ? s.raw_revenue : s.total_commission;
+      updateKPI("kpi-commission", commKPIValue, v => formatCurrency(v));
       updateKPI("kpi-registrations", s.registrations);
       updateKPI("kpi-ftd", s.ftd);
       updateKPI("kpi-qftd", s.qualified_cpa);

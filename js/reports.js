@@ -85,19 +85,29 @@
   function injectLiveData(events) {
     if (!window.db) return;
 
+    const isAdmin = localStorage.getItem('is_admin') === 'true';
+
     const liveEarnings = events
-      .filter(e => e.event_type === "commission" && parseFloat(e.commission_amount) > 0)
-      .map((e, i) => ({
-        id: `live-rpt-${e.id || i}`,
-        userId: e.user_id || `user-${i}`,
-        amount: parseFloat(e.commission_amount),
-        type: "Commission",
-        created: e.occurred_at,
-        country: resolveCountry(e.country),
-        affiliate_code: e.affiliate_code || "",
-        afp: e.affiliate_code || "",
-        broker: e.broker || ""
-      }));
+      .filter(e => e.event_type === "commission" && (parseFloat(e.commission_amount) > 0 || parseFloat(e.raw_commission) > 0))
+      .map((e, i) => {
+        // Admin sees raw CellXpert commissions; affiliate sees deal-based
+        const amt = isAdmin
+          ? (parseFloat(e.raw_commission) || parseFloat(e.commission_amount) || 0)
+          : (parseFloat(e.commission_amount) || 0);
+        return {
+          id: `live-rpt-${e.id || i}`,
+          userId: e.user_id || `user-${i}`,
+          amount: amt,
+          raw_commission: parseFloat(e.raw_commission) || parseFloat(e.commission_amount) || 0,
+          commission_amount: parseFloat(e.commission_amount) || 0,
+          type: "Commission",
+          created: e.occurred_at,
+          country: resolveCountry(e.country),
+          affiliate_code: e.affiliate_code || "",
+          afp: e.affiliate_code || "",
+          broker: e.broker || ""
+        };
+      });
 
     // ── Build ONE row per user_id for Registration Report ──
     // Merge registration + FTD + commission events into a single row
@@ -151,7 +161,10 @@
       if (e.event_type === "ftd") u.firstDeposit = parseFloat(e.deposit_amount) || 0;
       // Only 'commission' event carries money (QCPA is KPI-only, $0)
       if (e.event_type === "commission") {
-        u.commission += parseFloat(e.commission_amount) || 0;
+        // Admin sees raw CellXpert commissions; affiliate sees deal-based
+        u.commission += isAdmin
+          ? (parseFloat(e.raw_commission) || parseFloat(e.commission_amount) || 0)
+          : (parseFloat(e.commission_amount) || 0);
       }
     });
     const liveRegs = Object.values(userMap);

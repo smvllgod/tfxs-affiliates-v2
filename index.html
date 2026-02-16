@@ -1106,7 +1106,9 @@
                     const summaryRes = await API.fetchSummary(affiliateId, fromStr, toStr);
                     if (summaryRes && summaryRes.ok && summaryRes.data) {
                         const s = summaryRes.data;
-                        totalCommission = s.total_commission || 0;
+                        // Admin: commission KPI shows raw CellXpert revenue; affiliate: deal-based commission
+                        const isAdminView = localStorage.getItem('is_admin') === 'true';
+                        totalCommission = (isAdminView && s.raw_revenue !== undefined) ? s.raw_revenue : (s.total_commission || 0);
                         totalRegs = s.registrations || 0;
                         ftDs = s.ftd || 0;
                         qftDs = s.qualified_cpa || 0;
@@ -1165,6 +1167,7 @@
 
             // Update Chart — use reports endpoint for accurate daily data
             let chartUpdated = false;
+            let apiCountries = null;
             if (API && typeof API.fetchReports === 'function') {
                 try {
                     const affiliateId = API.getAffiliateId ? API.getAffiliateId() : null;
@@ -1180,6 +1183,8 @@
                         });
                         updateChart(chartEarnings, chartRegs, startDate, endDate);
                         chartUpdated = true;
+                        // Capture pre-aggregated country data from backend
+                        if (reportsRes.data.countries) apiCountries = reportsRes.data.countries;
                     }
                 } catch (e) {
                     console.warn('[TFXS] Reports fetch for chart failed:', e.message);
@@ -1203,8 +1208,8 @@
             // Update Sparklines (7-day trailing from DB, not filtered)
             updateSparklines();
 
-            // Update Country Charts
-            updateCountryCharts(filteredRegs, filteredEarnings);
+            // Update Country Charts — use backend pre-aggregated data when available
+            updateCountryCharts(filteredRegs, filteredEarnings, apiCountries);
 
             // Populate country filter dropdown (once)
             populateCountryFilter();
@@ -1321,15 +1326,9 @@
                         // Store lifetime total for globe modal
                         window._lifetimeEarned = lifetime;
 
-                        // ── Commission KPI shows total_earned from backend (NOT available balance) ──
-                        // BUT: when a broker filter is active, keep the broker-filtered value from fetchSummary
-                        const activeBrokerFilter = API.getSelectedBroker ? API.getSelectedBroker() : '';
-                        if (!activeBrokerFilter) {
-                            const commKpi = document.getElementById('kpi-commission');
-                            if (commKpi) {
-                                animateValue(commKpi, 0, lifetime, 900, v => formatCurrency(v));
-                            }
-                        }
+                        // ── Commission KPI: already set from date-filtered /api/summary above ──
+                        // Do NOT override with lifetime total_earned — that ignores date range
+                        // The balance card shows lifetime totals; KPIs show date-filtered values
 
                         // Next payout date (affiliates only) / Active affiliates count (admins)
                         const isAdmin = localStorage.getItem('is_admin') === 'true';
@@ -2533,7 +2532,7 @@
             });
         });
 
-        function updateCountryCharts(regs, earnings) {
+        function updateCountryCharts(regs, earnings, apiCountries) {
             const database = window.db;
             if (!database) return;
 
@@ -2547,20 +2546,31 @@
                 renderDonutDrillDown(regs, currentDonutView);
             }
 
-            // Commission per country (bar) — only Commission/QCPA events
+            // Commission per country (bar chart)
             const countryComm = {};
             const countryRegions = {};
             const isAdmin = localStorage.getItem('is_admin') === 'true';
-            earnings.filter(e => e.type === 'Commission' || e.type === 'QCPA').forEach(e => {
-                const user = database.registrations.find(u => u.userId === e.userId);
-                const cName = (user && user.country) ? user.country.name : 'Unknown';
-                const cCode = (user && user.country) ? user.country.code : '';
-                const cFlag = (user && user.country) ? user.country.flag : '🌐';
-                // Admin sees raw broker revenue; affiliate sees their commission
-                const amt = isAdmin ? (e.raw_commission || e.commission_amount || e.amount || 0) : (e.commission_amount || e.amount || 0);
-                countryComm[cName] = (countryComm[cName] || 0) + amt;
-                if (!countryRegions[cName]) countryRegions[cName] = { region: getRegion(cCode), flag: cFlag, code: cCode };
-            });
+
+            // Prefer backend pre-aggregated country data (covers ALL records, not just 50)
+            if (apiCountries && apiCountries.length > 0) {
+                const rc = window.TFXS_API && window.TFXS_API.resolveCountry ? window.TFXS_API.resolveCountry : (c => ({ name: c || 'Unknown', code: '', flag: '🌐' }));
+                apiCountries.forEach(c => {
+                    const resolved = rc(c.country);
+                    countryComm[resolved.name] = c.commission || 0;
+                    if (!countryRegions[resolved.name]) countryRegions[resolved.name] = { region: getRegion(resolved.code), flag: resolved.flag, code: resolved.code };
+                });
+            } else {
+                // Fallback: aggregate from local earnings (limited to 50 events)
+                earnings.filter(e => e.type === 'Commission' || e.type === 'QCPA').forEach(e => {
+                    const user = database.registrations.find(u => u.userId === e.userId);
+                    const cName = (user && user.country) ? user.country.name : 'Unknown';
+                    const cCode = (user && user.country) ? user.country.code : '';
+                    const cFlag = (user && user.country) ? user.country.flag : '🌐';
+                    const amt = isAdmin ? (e.raw_commission || e.commission_amount || e.amount || 0) : (e.commission_amount || e.amount || 0);
+                    countryComm[cName] = (countryComm[cName] || 0) + amt;
+                    if (!countryRegions[cName]) countryRegions[cName] = { region: getRegion(cCode), flag: cFlag, code: cCode };
+                });
+            }
 
             const barCategories = Object.keys(countryComm).sort((a, b) => countryComm[b] - countryComm[a]).slice(0, 10);
             const barData = barCategories.map(c => countryComm[c]);
