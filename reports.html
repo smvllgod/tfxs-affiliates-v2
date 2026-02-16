@@ -387,11 +387,14 @@
                             <th class="px-4 py-4 font-semibold tracking-wider text-center">Account</th>
                             <th class="px-4 py-4 font-semibold tracking-wider text-center">Broker</th>
                             <th class="px-4 py-4 font-semibold tracking-wider text-center" data-i18n="rep.created">Created</th>
+                            <th class="px-4 py-4 font-semibold tracking-wider text-center">FTD Date</th>
                             <th class="px-4 py-4 font-semibold tracking-wider text-center" data-i18n="rep.firstDeposit">First Deposit</th>
                             <th class="px-4 py-4 font-semibold tracking-wider text-center">Net Deposits</th>
+                            <th class="px-4 py-4 font-semibold tracking-wider text-center">Dep. Count</th>
                             <th class="px-4 py-4 font-semibold tracking-wider text-center">Lots</th>
                             <th class="px-4 py-4 font-semibold tracking-wider text-center">Volume</th>
                             <th class="px-4 py-4 font-semibold tracking-wider text-center">Positions</th>
+                            <th class="px-4 py-4 font-semibold tracking-wider text-center">Qualification</th>
                             <th class="px-4 py-4 font-semibold tracking-wider text-center" data-i18n="rep.commission">Commission</th>
                             <th class="px-4 py-4 font-semibold tracking-wider text-center">Status</th>
                         </tr>
@@ -1109,6 +1112,8 @@
             let totalCommissions = 0;
             let totalNetDeposits = 0;
 
+            const fmtDate = (v) => { if (!v) return '—'; const d = new Date(v); return isNaN(d.getTime()) ? '—' : d.toLocaleDateString(); };
+
             data.forEach(row => {
                 totalDeposits += row.firstDeposit || 0;
                 totalCommissions += row.commission || 0;
@@ -1125,8 +1130,10 @@
                 const vol = row.volume ? parseFloat(row.volume).toFixed(2) : '—';
                 const positions = row.position_count || '—';
                 const netDep = row.net_deposits ? formatCurrency(parseFloat(row.net_deposits)) : '—';
+                const depCount = row.deposit_count || '—';
+                const ftdDate = fmtDate(row.first_deposit_date);
+                const qualDate = fmtDate(row.qualification_date);
                 const statusText = row.status || '—';
-                const statusColor = statusText === 'Qualified' ? 'green' : statusText === 'Active' ? 'blue' : 'gray';
                 tr.innerHTML = `
                     ${affCell}
                     <td class="px-4 py-4 text-left">
@@ -1140,25 +1147,30 @@
                     <td class="px-4 py-4 text-gray-400 text-center font-mono text-[10px]">${acctId}</td>
                     <td class="px-4 py-4 text-center"><span class="bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded border border-purple-500/20 text-[10px]">${brokerName}</span></td>
                     <td class="px-4 py-4 text-gray-400 text-center text-[10px] uppercase font-mono">${new Date(row.date).toLocaleDateString()}</td>
+                    <td class="px-4 py-4 text-gray-400 text-center text-[10px] font-mono">${ftdDate}</td>
                     <td class="px-4 py-4 text-white text-center">${row.firstDeposit > 0 ? formatCurrency(row.firstDeposit) : '—'}</td>
                     <td class="px-4 py-4 text-gray-300 text-center">${netDep}</td>
+                    <td class="px-4 py-4 text-gray-300 text-center font-mono">${depCount}</td>
                     <td class="px-4 py-4 text-gray-300 text-center font-mono">${lots}</td>
                     <td class="px-4 py-4 text-gray-300 text-center font-mono">${vol}</td>
                     <td class="px-4 py-4 text-gray-300 text-center">${positions}</td>
+                    <td class="px-4 py-4 text-gray-400 text-center text-[10px] font-mono">${qualDate}</td>
                     <td class="px-4 py-4 text-brand-500 font-bold text-center">${row.commission > 0 ? formatCurrency(row.commission) : '—'}</td>
                     <td class="px-4 py-4 text-center"><span class="${statusText === 'approved' ? 'bg-green-500/10 text-green-400 border-green-500/20' : statusText === 'Qualified' ? 'bg-green-500/10 text-green-400 border-green-500/20' : statusText === 'Active' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : statusText === 'rejected' ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-gray-500/10 text-gray-400 border-gray-500/20'} px-2 py-0.5 rounded border text-[10px]">${statusText}</span></td>
                 `;
                 tbody.appendChild(tr);
             });
 
-            // Total Row — use full filtered totals from parent scope
-            const colSpan = IS_ADMIN ? 8 : 7;
+            // Total Row
+            const colSpan = IS_ADMIN ? 9 : 8;
             const totalRow = document.createElement('tr');
             totalRow.className = 'bg-white/5 font-bold border-t border-white/10';
             totalRow.innerHTML = `
                 <td class="px-4 py-4 text-white text-left uppercase tracking-wider text-[10px]" colspan="${colSpan}">TOTAL</td>
                 <td class="px-4 py-4 text-white text-center">${formatCurrency(totalDeposits)}</td>
                 <td class="px-4 py-4 text-gray-300 text-center">${totalNetDeposits > 0 ? formatCurrency(totalNetDeposits) : '—'}</td>
+                <td class="px-4 py-4"></td>
+                <td class="px-4 py-4"></td>
                 <td class="px-4 py-4"></td>
                 <td class="px-4 py-4"></td>
                 <td class="px-4 py-4"></td>
@@ -1225,11 +1237,11 @@
                             return d >= startDate && d <= endDate;
                         });
                         const headers = IS_ADMIN
-                            ? ['Affiliate', 'Country', 'Country Code', 'User ID', 'Customer', 'Account', 'Broker', 'Created', 'First Deposit', 'Net Deposits', 'Lots', 'Volume', 'Positions', 'Commission', 'Status']
-                            : ['Country', 'Country Code', 'User ID', 'Customer', 'Account', 'Broker', 'Created', 'First Deposit', 'Net Deposits', 'Lots', 'Volume', 'Positions', 'Commission', 'Status'];
+                            ? ['Affiliate', 'Country', 'Country Code', 'User ID', 'Customer', 'Account', 'Broker', 'Created', 'FTD Date', 'First Deposit', 'Net Deposits', 'Dep Count', 'Lots', 'Volume', 'Positions', 'Qualification', 'Commission', 'Status']
+                            : ['Country', 'Country Code', 'User ID', 'Customer', 'Account', 'Broker', 'Created', 'FTD Date', 'First Deposit', 'Net Deposits', 'Dep Count', 'Lots', 'Volume', 'Positions', 'Qualification', 'Commission', 'Status'];
                         const rows = filtered.map(r => IS_ADMIN
-                            ? [r.affiliate_code || '', r.country.name, r.country.code, r.userId, r.customer_name || '', r.account_id || '', r.broker || '', r.date, r.firstDeposit, r.net_deposits || 0, r.lot_amount || 0, r.volume || 0, r.position_count || 0, r.commission, r.status || '']
-                            : [r.country.name, r.country.code, r.userId, r.customer_name || '', r.account_id || '', r.broker || '', r.date, r.firstDeposit, r.net_deposits || 0, r.lot_amount || 0, r.volume || 0, r.position_count || 0, r.commission, r.status || '']);
+                            ? [r.affiliate_code || '', r.country.name, r.country.code, r.userId, r.customer_name || '', r.account_id || '', r.broker || '', r.date, r.first_deposit_date || '', r.firstDeposit, r.net_deposits || 0, r.deposit_count || 0, r.lot_amount || 0, r.volume || 0, r.position_count || 0, r.qualification_date || '', r.commission, r.status || '']
+                            : [r.country.name, r.country.code, r.userId, r.customer_name || '', r.account_id || '', r.broker || '', r.date, r.first_deposit_date || '', r.firstDeposit, r.net_deposits || 0, r.deposit_count || 0, r.lot_amount || 0, r.volume || 0, r.position_count || 0, r.qualification_date || '', r.commission, r.status || '']);
                         exportTableToCSV('registrations_report.csv', headers, rows);
                     } else {
                         const filtered = database.earnings.filter(e => {

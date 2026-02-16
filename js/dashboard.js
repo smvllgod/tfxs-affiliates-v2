@@ -390,18 +390,47 @@
           commission: 0,
           status: "Active",
           affiliate_code: e.affiliate_code || "",
-          event_type: e.event_type
+          event_type: e.event_type,
+          // Enrichment fields (from registration row)
+          broker: null,
+          customer_name: null,
+          account_id: null,
+          lot_amount: null,
+          volume: null,
+          position_count: null,
+          net_deposits: null,
+          deposit_count: null,
+          first_deposit_date: null,
+          qualification_date: null,
         };
       }
       const u = userMap[uid];
       // Use earliest date (registration date)
-      if (e.event_type === "registration") u.date = e.occurred_at;
+      if (e.event_type === "registration") {
+        u.date = e.occurred_at;
+        // Pull enrichment fields from registration row
+        if (e.lot_amount != null)          u.lot_amount = e.lot_amount;
+        if (e.volume != null)              u.volume = e.volume;
+        if (e.position_count != null)      u.position_count = e.position_count;
+        if (e.net_deposits != null)        u.net_deposits = e.net_deposits;
+        if (e.deposit_count != null)       u.deposit_count = e.deposit_count;
+        if (e.first_deposit_date)          u.first_deposit_date = e.first_deposit_date;
+        if (e.qualification_date)          u.qualification_date = e.qualification_date;
+        if (e.customer_name)               u.customer_name = e.customer_name;
+        if (e.account_id)                  u.account_id = e.account_id;
+        if (e.broker)                      u.broker = e.broker;
+        if (e.status)                      u.status = e.status;
+      }
       // FTD: set deposit amount
       if (e.event_type === "ftd") u.firstDeposit = parseFloat(e.deposit_amount) || 0;
       // Only 'commission' event carries money (QCPA is KPI-only)
       if (e.event_type === "commission") {
         u.commission += parseFloat(e.commission_amount) || 0;
       }
+      // Fallback: pick broker/customer from any event if not set yet
+      if (!u.broker && e.broker) u.broker = e.broker;
+      if (!u.customer_name && e.customer_name) u.customer_name = e.customer_name;
+      if (!u.account_id && e.account_id) u.account_id = e.account_id;
     });
     const liveRegs = Object.values(userMap);
 
