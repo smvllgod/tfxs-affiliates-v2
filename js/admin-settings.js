@@ -1180,7 +1180,7 @@ function renderConvPage(page) {
       <td class="px-3 py-2.5 text-gray-400 text-[10px]">${esc(r.broker || "—")}</td>
       <td class="px-3 py-2.5 text-gray-400">${esc(r.country || "—")}</td>
       <td class="px-3 py-2.5 text-right font-mono text-gray-300">$${Number(r.deposit_amount || 0).toFixed(2)}</td>
-      <td class="px-3 py-2.5 text-right font-mono font-bold">${(() => { const rawC = Number(r.raw_commission || 0); const affC = Number(r.commission_amount || 0); if (rawC > 0 && rawC !== affC && affC > 0) return '<span class="text-green-400">$' + rawC.toFixed(2) + '</span><br><span class="text-[9px] text-amber-400/70" title="Affiliate cost">aff: $' + affC.toFixed(2) + '</span>'; return '<span class="text-green-400">$' + (rawC || affC).toFixed(2) + '</span>'; })()}</td>
+      <td class="px-3 py-2.5 text-right font-mono font-bold">${(() => { if (r.event_type === 'qualified_cpa') return '<span class="text-gray-500">$0.00</span>'; const rawC = Number(r.raw_commission || 0); const affC = Number(r.commission_amount || 0); if (rawC > 0 && rawC !== affC && affC > 0) return '<span class="text-green-400">$' + rawC.toFixed(2) + '</span><br><span class="text-[9px] text-amber-400/70" title="Affiliate cost">aff: $' + affC.toFixed(2) + '</span>'; return '<span class="text-green-400">$' + (rawC || affC).toFixed(2) + '</span>'; })()}</td>
       <td class="px-3 py-2.5">${srcBadge}</td>
       <td class="px-3 py-2.5 text-center">${statusBadge(st)}</td>
       <td class="px-3 py-2.5 text-right whitespace-nowrap">${actions}</td>

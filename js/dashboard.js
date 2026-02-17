@@ -442,7 +442,8 @@
         amount: e.event_type === "ftd" ? parseFloat(e.deposit_amount) || 0 : (e.event_type === "commission" ? parseFloat(e.commission_amount) || 0 : 0),
         deposit_amount: parseFloat(e.deposit_amount) || 0,
         commission_amount: e.event_type === "commission" ? parseFloat(e.commission_amount) || 0 : 0,
-        raw_commission: parseFloat(e.raw_commission) || parseFloat(e.commission_amount) || 0,
+        // QCPA never carries money — force raw_commission to 0 for non-commission events
+        raw_commission: e.event_type === "commission" ? (parseFloat(e.raw_commission) || parseFloat(e.commission_amount) || 0) : 0,
         broker: e.broker || null,
         type: e.event_type === "ftd" ? "FTD" : e.event_type === "qualified_cpa" ? "QCPA" : e.event_type === "commission" ? "Commission" : "Registration",
         created: e.occurred_at,

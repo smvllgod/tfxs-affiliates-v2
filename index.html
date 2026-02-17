@@ -387,6 +387,15 @@
                                     <p class="text-sm font-bold text-white font-mono" id="popup-paid">$0.00</p>
                                 </div>
                             </div>
+                            <div class="h-[1px] bg-white/5" id="popup-paid-aff-divider" style="display:none"></div>
+                            <div class="flex items-center gap-3" id="popup-paid-aff-row" style="display:none">
+                                <div class="w-7 h-7 rounded-lg bg-purple-500/10 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg></div>
+                                <div class="flex-1">
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-wider">Total Paid to Affiliates</p>
+                                    <p class="text-sm font-bold text-purple-400 font-mono" id="popup-paid-aff">$0.00</p>
+                                    <p class="text-[8px] text-gray-600" id="popup-paid-aff-sub">Completed payouts</p>
+                                </div>
+                            </div>
                             <div class="h-[1px] bg-white/5"></div>
                             <div class="flex items-center gap-3" id="popup-last-row">
                                 <div class="w-7 h-7 rounded-lg bg-blue-500/10 flex items-center justify-center" id="popup-last-icon"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>
@@ -1269,6 +1278,13 @@
                             document.getElementById('popup-paid').textContent = (_sd.margin || 0).toFixed(1) + '%';
                             const paidLabel2 = document.getElementById('popup-paid-label');
                             if (paidLabel2) paidLabel2.textContent = 'Margin';
+                            // Total Paid to Affiliates (admin only)
+                            const paidAffRow = document.getElementById('popup-paid-aff-row');
+                            const paidAffDivider = document.getElementById('popup-paid-aff-divider');
+                            const paidAffEl = document.getElementById('popup-paid-aff');
+                            if (paidAffRow) paidAffRow.style.display = '';
+                            if (paidAffDivider) paidAffDivider.style.display = '';
+                            if (paidAffEl) paidAffEl.textContent = formatCurrency(paid || 0);
                         } else {
                             document.getElementById('popup-available').textContent = formatCurrency(available);
                             document.getElementById('popup-lifetime').textContent = formatCurrency(lifetime);
@@ -1409,6 +1425,7 @@
             });
 
             // Add earnings — distinguish FTD vs Commission vs QCPA by event type
+            const _isAdmin = localStorage.getItem(BRAND._lsKey('is_admin')) === 'true';
             earnings.filter(e => e.type === 'Commission' || e.type === 'FTD' || e.type === 'QCPA').forEach(e => {
                 let country = 'Unknown', flag = '🌍', countryCode = '';
                 if(database) {
@@ -1418,6 +1435,15 @@
                 // QCPA is a KPI status event (no money), Commission is money, FTD is deposit
                 const evType = e.type === 'Commission' ? 'comm' : (e.type === 'FTD' ? 'ftd' : (e.type === 'QCPA' ? 'qcpa' : null));
                 if (!evType) return;
+                // Commission amount: admin sees raw broker commission, affiliate sees deal-based commission
+                // QCPA: ALWAYS $0 — never carries money regardless of DB values
+                let evAmount = 0;
+                if (e.type === 'Commission') {
+                    evAmount = _isAdmin ? (e.raw_commission || e.commission_amount || e.amount || 0) : (e.commission_amount || e.amount || 0);
+                } else if (e.type === 'FTD') {
+                    evAmount = e.deposit_amount || e.amount || 0;
+                }
+                // QCPA stays at 0
                 events.push({
                     type: evType,
                     date: new Date(e.created),
@@ -1425,7 +1451,7 @@
                     flag: flag,
                     countryCode: countryCode,
                     userId: e.userId,
-                    amount: e.type === 'Commission' ? (e.commission_amount || e.amount || 0) : (e.type === 'FTD' ? (e.deposit_amount || e.amount || 0) : 0)
+                    amount: evAmount
                 });
             });
 
@@ -1863,14 +1889,16 @@
                  
                  // Amount column logic:
                  // - FTD: show deposit amount
-                 // - Commission/QCPA: admin sees raw_commission (broker revenue), affiliate sees commission_amount
+                 // - Commission: admin sees raw_commission (broker revenue), affiliate sees commission_amount
+                 // - QCPA: ALWAYS $0 — it's a KPI-only event, never carries money
                  // - Registration: show $0.00
                  let displayAmount = 0;
                  if (tx.type === "FTD") {
                      displayAmount = tx.deposit_amount || tx.amount || 0;
-                 } else if (tx.type === "Commission" || tx.type === "QCPA") {
+                 } else if (tx.type === "Commission") {
                      displayAmount = isAdminView ? (tx.raw_commission || tx.commission_amount || tx.amount || 0) : (tx.commission_amount || tx.amount || 0);
                  }
+                 // QCPA intentionally stays at 0 — not grouped with Commission
 
                  const rawStatus = tx.status || "pending";
                  const statusConfig = {
