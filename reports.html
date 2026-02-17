@@ -1482,7 +1482,8 @@
                 const amount = parseFloat(p.amount || 0);
                 if (p.status === 'paid') totalPaid += amount;
                 if (p.status === 'pending' || p.status === 'approved') totalPending += amount;
-                const method = CRYPTO_LABELS[p.payment_method] || p.payment_method || '—';
+                const isSelfW = p.wallet_address === 'Admin self-withdrawal';
+                const method = isSelfW ? '🏦 ' + (CRYPTO_LABELS[p.payment_method] || p.payment_method || 'Self-Withdrawal') : (CRYPTO_LABELS[p.payment_method] || p.payment_method || '—');
                 const statusColors = {
                     pending: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20',
                     approved: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
@@ -1627,7 +1628,8 @@
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(40, 40, 40);
-        doc.text('Affiliate Commission Payout', 25, boxY);
+        const isSelfWithdraw = p.wallet_address === 'Admin self-withdrawal';
+        doc.text(isSelfWithdraw ? 'Commission Withdrawal (Self)' : 'Affiliate Commission Payout', 25, boxY);
         const method = CRYPTO_LABELS[p.payment_method] || p.payment_method || '—';
         doc.text(method, 95, boxY);
         doc.setFont('helvetica', 'bold');

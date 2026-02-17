@@ -774,6 +774,34 @@
                 </div>
             </div>
 
+            <!-- Admin Self-Withdrawal Card -->
+            <div class="glass-panel rounded-xl p-5 mb-6 border border-emerald-500/20 bg-emerald-500/[0.03]">
+                <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-1 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    My Commissions
+                </h3>
+                <p class="text-[9px] text-gray-600 mb-4">Mark your own commission withdrawals here to keep your balance accurate. Auto-approved instantly.</p>
+                <div class="flex flex-wrap items-end gap-4">
+                    <div class="flex-1 min-w-[140px]">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div>
+                                <p class="text-[9px] text-gray-500 uppercase tracking-widest">Available Balance</p>
+                                <p class="text-xl font-bold font-mono text-emerald-400" id="admin-self-balance">$0.00</p>
+                            </div>
+                            <div class="h-8 w-[1px] bg-white/10"></div>
+                            <div>
+                                <p class="text-[9px] text-gray-500 uppercase tracking-widest">Total Withdrawn</p>
+                                <p class="text-xl font-bold font-mono text-gray-400" id="admin-self-withdrawn">$0.00</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="openAdminSelfWithdrawModal()" class="px-5 py-2.5 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 transition-colors flex items-center gap-2 shadow-lg shadow-emerald-600/20">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        Mark Withdrawal
+                    </button>
+                </div>
+            </div>
+
             <div class="flex flex-wrap items-center justify-between mb-4 gap-3">
                 <div class="flex items-center gap-3">
                     <div class="afp-search-wrap relative">
@@ -2041,6 +2069,64 @@
     </div>
 
     <!-- Override Commission Modal -->
+
+    <!-- Admin Self-Withdrawal Modal -->
+    <div id="self-withdraw-modal" class="modal-overlay fixed inset-0 z-[9999] hidden flex items-center justify-center">
+        <div class="glass-panel rounded-2xl p-6 w-full max-w-md mx-4 border border-emerald-500/20">
+            <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-2 flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Mark Withdrawal
+            </h3>
+            <p class="text-[9px] text-gray-500 mb-5">Record a withdrawal from your broker dashboard. Auto-approved instantly.</p>
+            <div class="p-3 rounded-lg bg-emerald-500/[0.06] border border-emerald-500/15 mb-5">
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] text-gray-400 uppercase tracking-wider">Available Balance</span>
+                    <span class="text-lg font-bold font-mono text-emerald-400" id="sw-available">$0.00</span>
+                </div>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Withdrawal Amount</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-mono">$</span>
+                        <input type="number" id="sw-amount" class="form-input w-full pl-7 pr-3 py-2.5 rounded-lg text-sm font-mono" step="0.01" min="1" placeholder="0.00">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Payment Method</label>
+                    <div class="custom-select relative w-full">
+                        <button type="button" data-cs-btn class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg text-sm bg-white/5 border border-white/10 text-white hover:border-white/20 transition">
+                            <span data-cs-label>CellXpert Withdrawal</span>
+                            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div data-cs-dd class="hidden absolute left-0 right-0 mt-1 rounded-xl bg-[#1a1a1a] border border-white/10 shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
+                            <div data-cs-opts>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="CellXpert Withdrawal">CellXpert Withdrawal</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="Bank Transfer">Bank Transfer</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="USDT-TRC20">USDT — TRC-20</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="USDT-BEP20">USDT — BEP-20</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="BTC-Native">BTC — Native</div>
+                                <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="Other">Other</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="sw-method" value="CellXpert Withdrawal">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Note <span class="text-gray-600">(optional)</span></label>
+                    <textarea id="sw-note" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" rows="2" placeholder="e.g. Withdrawn from VantageFX CellXpert..."></textarea>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button onclick="submitAdminSelfWithdraw()" class="flex-1 py-2.5 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 transition-colors flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    Confirm Withdrawal
+                </button>
+                <button onclick="closeModal('self-withdraw-modal')" class="flex-1 py-2.5 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-wider border border-white/10 hover:bg-white/5 transition">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <div id="override-modal" class="modal-overlay fixed inset-0 z-[9999] hidden flex items-center justify-center">
         <div class="glass-panel rounded-2xl p-6 w-full max-w-sm mx-4">
             <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-5">Override Commission</h3>

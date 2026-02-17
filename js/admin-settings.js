@@ -271,7 +271,7 @@ async function loadActiveTab() {
   if (active === "affiliates") await loadAffiliates();
   else if (active === "deals") await loadDeals();
   else if (active === "conversions") { await loadConversions(); loadAutoApproveState(); }
-  else if (active === "payouts") await loadPayouts();
+  else if (active === "payouts") { await loadPayouts(); loadAdminSelfBalance(); }
   else if (active === "kyc") await loadKycSubmissions();
   else if (active === "users") await loadUsers();
   else if (active === "audit") await loadAudit();
@@ -1592,11 +1592,15 @@ function renderPayPage(page) {
       actions += `<button onclick="payoutAction('${r.id}','cancel')" class="text-red-400 hover:text-red-300 mr-1 text-[10px] font-bold uppercase">Cancel</button>`;
     }
     actions += `<button onclick="deletePayout('${r.id}')" class="text-gray-500 hover:text-red-400 text-[10px] font-bold uppercase">Del</button>`;
+    const isSelfW = r.wallet_address === "Admin self-withdrawal";
+    const afpDisplay = isSelfW
+      ? `<span class="text-emerald-400 font-bold">${esc(r.affiliate_id || r.affiliate_code)}</span> <span class="text-[8px] bg-emerald-500/15 text-emerald-400 px-1 py-0.5 rounded border border-emerald-500/20 ml-1">SELF</span>`
+      : `<span class="text-brand-500 font-bold">${esc(r.affiliate_id || r.affiliate_code)}</span>`;
     return `
-    <tr class="border-t border-white/5 hover:bg-white/[0.02] transition">
+    <tr class="border-t border-white/5 hover:bg-white/[0.02] transition ${isSelfW ? 'bg-emerald-500/[0.02]' : ''}">
       <td class="px-2 py-3 text-center"><input type="checkbox" ${checked} onchange="togglePaySelect('${r.id}', this.checked)" class="cursor-pointer"></td>
       <td class="px-4 py-3 text-gray-500">${fmtDate(r.requested_at || r.created_at)}</td>
-      <td class="px-4 py-3 font-mono text-brand-500 text-[10px] font-bold">${esc(r.affiliate_id || r.affiliate_code)}</td>
+      <td class="px-4 py-3 font-mono text-[10px]">${afpDisplay}</td>
       <td class="px-4 py-3 text-right font-mono text-white font-bold">${fmtMoney(r.amount)}</td>
       <td class="px-4 py-3 text-gray-400 whitespace-nowrap"><span class="text-[10px] font-bold text-white">${esc(CRYPTO_LABELS[r.payment_method] || r.payment_method || r.currency || "—")}</span></td>
       <td class="px-4 py-3 text-gray-500 font-mono text-[10px] truncate max-w-[160px]" title="${esc(r.wallet_address || '')}">${esc(r.wallet_address || "—")}</td>
@@ -1740,6 +1744,81 @@ async function bulkPayAction(action) {
   selectedPayIds.clear();
   updatePayBulkBar();
   loadPayouts(payCurrentPage); loadStats();
+}
+
+// ══════════════════════════════════════════════════════
+// ADMIN SELF-WITHDRAWAL
+// ══════════════════════════════════════════════════════
+
+let _adminSelfBalance = 0;
+let _adminSelfWithdrawn = 0;
+
+async function loadAdminSelfBalance() {
+  try {
+    const jwt = localStorage.getItem(BRAND._lsKey("jwt"));
+    const afp = localStorage.getItem(BRAND._lsKey("affiliate_id"));
+    if (!afp) return;
+    // Fetch summary to get balance
+    const res = await api(`/api/summary?affiliate_id=${encodeURIComponent(afp)}`);
+    if (res.ok) {
+      const s = res.data || res;
+      _adminSelfBalance = parseFloat(s.available || s.balance || 0);
+      _adminSelfWithdrawn = parseFloat(s.paid || 0);
+    }
+  } catch (_) {}
+  const balEl = $("admin-self-balance");
+  const wdEl = $("admin-self-withdrawn");
+  if (balEl) balEl.textContent = "$" + _adminSelfBalance.toFixed(2);
+  if (wdEl) wdEl.textContent = "$" + _adminSelfWithdrawn.toFixed(2);
+}
+
+function openAdminSelfWithdrawModal() {
+  const avEl = $("sw-available");
+  if (avEl) avEl.textContent = "$" + _adminSelfBalance.toFixed(2);
+  const amtEl = $("sw-amount");
+  if (amtEl) amtEl.value = "";
+  const noteEl = $("sw-note");
+  if (noteEl) noteEl.value = "";
+  setCustomSelectValue("sw-method", "CellXpert Withdrawal");
+  openModal("self-withdraw-modal");
+}
+
+async function submitAdminSelfWithdraw() {
+  const amount = parseFloat($("sw-amount")?.value);
+  if (!amount || amount <= 0) return toast("Enter a valid amount", "warn");
+  if (amount > _adminSelfBalance) return toast(`Insufficient balance. Available: $${_adminSelfBalance.toFixed(2)}`, "warn");
+
+  if (!await tfxsConfirm(`Mark withdrawal of $${amount.toFixed(2)} from your commissions?`, {
+    title: "Confirm Withdrawal",
+    okText: "Confirm",
+    variant: "warning"
+  })) return;
+
+  try {
+    const body = {
+      amount,
+      payment_method: $("sw-method")?.value || "CellXpert Withdrawal",
+      note: $("sw-note")?.value?.trim() || null
+    };
+    const res = await api("/admin/self-withdrawal", {
+      method: "POST",
+      body: JSON.stringify(body)
+    });
+    if (res.ok) {
+      toast("✅ Withdrawal recorded — balance updated", "ok");
+      closeModal("self-withdraw-modal");
+      _adminSelfBalance = parseFloat(res.available || 0);
+      _adminSelfWithdrawn += amount;
+      const balEl = $("admin-self-balance");
+      const wdEl = $("admin-self-withdrawn");
+      if (balEl) balEl.textContent = "$" + _adminSelfBalance.toFixed(2);
+      if (wdEl) wdEl.textContent = "$" + _adminSelfWithdrawn.toFixed(2);
+      loadPayouts();
+      loadStats();
+    }
+  } catch (e) {
+    toast(e.message || "Withdrawal failed", "warn");
+  }
 }
 
 // ══════════════════════════════════════════════════════
