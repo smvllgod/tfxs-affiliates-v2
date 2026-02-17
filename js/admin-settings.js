@@ -1757,12 +1757,23 @@ async function loadAdminSelfBalance() {
   try {
     const afp = localStorage.getItem(BRAND._lsKey("affiliate_id"));
     if (!afp) return;
-    // Use payout/balance endpoint which returns available balance and total_paid
-    const res = await api(`/api/payout/balance?affiliate_id=${encodeURIComponent(afp)}`);
+    // Global admin view (no affiliate_id) → get net_profit = raw_revenue - affiliate_cost
+    const res = await api(`/api/payout/balance`);
     if (res.ok) {
       const s = res.data || res;
-      _adminSelfBalance = parseFloat(s.available || 0);
-      _adminSelfWithdrawn = parseFloat(s.total_paid || 0);
+      const netProfit = parseFloat(s.net_profit || 0);
+      // Admin's own self-withdrawals — fetch payouts for admin AFP
+      let adminWithdrawn = 0;
+      try {
+        const payRes = await api(`/api/payout/history?affiliate_id=${encodeURIComponent(afp)}`);
+        if (payRes.ok) {
+          (payRes.data || []).forEach(p => {
+            if (p.status === 'paid') adminWithdrawn += parseFloat(p.amount || 0);
+          });
+        }
+      } catch (_) {}
+      _adminSelfWithdrawn = adminWithdrawn;
+      _adminSelfBalance = Math.max(0, netProfit - adminWithdrawn);
     }
   } catch (_) {}
   const balEl = $("admin-self-balance");
