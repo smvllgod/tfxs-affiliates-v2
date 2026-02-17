@@ -1165,7 +1165,7 @@ function renderConvPage(page) {
       actions += `<button onclick="convAction('${r.id}','approve')" class="text-green-400 hover:text-green-300 mr-1" title="Approve">✓</button>`;
       actions += `<button onclick="convAction('${r.id}','reject')" class="text-red-400 hover:text-red-300 mr-1" title="Reject">✗</button>`;
     }
-    actions += `<button onclick="openOverride('${r.id}', ${Number(r.commission_amount || 0)})" class="text-amber-400 hover:text-amber-300 mr-1" title="Override"><svg class="w-3.5 h-3.5 inline" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`;
+    actions += `<button onclick="openOverride('${r.id}', ${Number(r.raw_commission || r.commission_amount || 0)})" class="text-amber-400 hover:text-amber-300 mr-1" title="Override commission"><svg class="w-3.5 h-3.5 inline" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`;
     actions += `<button onclick="openConvModal(${JSON.stringify(r).replace(/"/g, '&quot;')})" class="text-blue-400 hover:text-blue-300 mr-1" title="Edit"><svg class="w-3.5 h-3.5 inline" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>`;
     actions += `<button onclick="deleteConversion('${r.id}')" class="text-red-400 hover:text-red-300" title="Delete"><svg class="w-3.5 h-3.5 inline" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>`;
     const srcBadge = r.source_platform ? `<span class="text-[9px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">${esc(r.source_platform).toUpperCase()}</span>` : '<span class="text-gray-600">—</span>';
@@ -1180,7 +1180,7 @@ function renderConvPage(page) {
       <td class="px-3 py-2.5 text-gray-400 text-[10px]">${esc(r.broker || "—")}</td>
       <td class="px-3 py-2.5 text-gray-400">${esc(r.country || "—")}</td>
       <td class="px-3 py-2.5 text-right font-mono text-gray-300">$${Number(r.deposit_amount || 0).toFixed(2)}</td>
-      <td class="px-3 py-2.5 text-right font-mono text-green-400 font-bold">$${Number(r.commission_amount || 0).toFixed(2)}</td>
+      <td class="px-3 py-2.5 text-right font-mono font-bold">${(() => { const rawC = Number(r.raw_commission || 0); const affC = Number(r.commission_amount || 0); if (rawC > 0 && rawC !== affC && affC > 0) return '<span class="text-green-400">$' + rawC.toFixed(2) + '</span><br><span class="text-[9px] text-amber-400/70" title="Affiliate cost">aff: $' + affC.toFixed(2) + '</span>'; return '<span class="text-green-400">$' + (rawC || affC).toFixed(2) + '</span>'; })()}</td>
       <td class="px-3 py-2.5">${srcBadge}</td>
       <td class="px-3 py-2.5 text-center">${statusBadge(st)}</td>
       <td class="px-3 py-2.5 text-right whitespace-nowrap">${actions}</td>
