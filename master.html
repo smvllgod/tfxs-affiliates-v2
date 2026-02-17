@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta name="theme-color" content="#f5f5f7">
+    <meta name="theme-color" content="#050505">
     <script src="js/brand.config.js"></script>
-    <script>((t)=>{if(t==="light"){document.documentElement.classList.add("light-theme")};var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==="light"?BRAND.colors.bgLight:BRAND.colors.bgDark})(localStorage.getItem(BRAND._lsKey("theme"))||"light")</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title id="page-title">Super Admin | Master Dashboard</title>
+    <title>Super Admin | Master Control Panel</title>
     <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -16,187 +15,418 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Inter','sans-serif'], mono: ['JetBrains Mono','monospace'] },
-                    colors: { brand: BRAND._tailwindBrand() },
-                    animation: { 'fade-in-up': 'fadeInUp 0.5s ease-out forwards' },
-                    keyframes: { fadeInUp: { '0%': { opacity:'0', transform:'translateY(10px)' }, '100%': { opacity:'1', transform:'translateY(0)' } } }
+                    colors: { brand: { 50:'#fef2f2',100:'#fee2e2',200:'#fecaca',300:'#fca5a5',400:'#f87171',500:'#ef4444',600:'#dc2626',700:'#b91c1c',800:'#991b1b',900:'#7f1d1d' } },
+                    animation: { 'fade-in': 'fadeIn 0.4s ease-out forwards', 'slide-up': 'slideUp 0.5s ease-out forwards', 'pulse-slow': 'pulse 3s infinite' },
+                    keyframes: { fadeIn: { '0%': { opacity:'0' }, '100%': { opacity:'1' } }, slideUp: { '0%': { opacity:'0', transform:'translateY(20px)' }, '100%': { opacity:'1', transform:'translateY(0)' } } }
                 }
             }
         }
     </script>
     <style>
-        body { background: var(--brand-dark, #050505); color: #d4d4d8; }
-        .master-tab { transition: all 0.3s; cursor: pointer; white-space: nowrap; }
-        .master-tab.active { color: var(--brand-500, #ef4444); background: rgba(255,255,255,0.1); box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
-        .master-tab:not(.active) { color: #71717a; }
-        .master-tab:not(.active):hover { color: #d4d4d8; }
-        .kpi-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 1rem; padding: 1.25rem; transition: all 0.3s; }
-        .kpi-card:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.12); }
-        .tenant-row { transition: background 0.15s; cursor: pointer; }
-        .tenant-row:hover { background: rgba(255,255,255,0.04); }
-        .status-active { color: #22c55e; background: rgba(34,197,94,0.12); }
-        .status-trial { color: #fbbf24; background: rgba(251,191,36,0.12); }
-        .status-suspended { color: #ef4444; background: rgba(239,68,68,0.12); }
-        .status-cancelled { color: #71717a; background: rgba(113,113,122,0.12); }
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 50; display: flex; align-items: center; justify-content: center; }
-        .modal-content { background: #111; border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem; padding: 2rem; max-width: 560px; width: 90%; max-height: 85vh; overflow-y: auto; }
-        .toast { position: fixed; top: 1rem; right: 1rem; z-index: 100; padding: 0.75rem 1.25rem; border-radius: 0.75rem; font-size: 0.8rem; font-weight: 600; animation: slideIn 0.3s ease, fadeOut 0.5s ease 3.5s forwards; }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes fadeOut { to { opacity: 0; transform: translateY(-10px); } }
+        * { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent; }
+        body { background: #050505; color: #d4d4d8; }
+
+        /* ── Layout ── */
+        .sidebar { width: 260px; background: rgba(255,255,255,0.02); border-right: 1px solid rgba(255,255,255,0.05); }
+        .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 1rem; border-radius: 0.6rem; font-size: 0.8rem; font-weight: 500; color: #71717a; transition: all 0.2s; cursor: pointer; margin: 0.15rem 0; }
+        .sidebar-link:hover { color: #d4d4d8; background: rgba(255,255,255,0.04); }
+        .sidebar-link.active { color: white; background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.2); }
+        .sidebar-link.active svg { color: #ef4444; }
+
+        /* ── Cards ── */
+        .stat-card { background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.06); border-radius: 1rem; padding: 1.5rem; position: relative; overflow: hidden; transition: all 0.3s; }
+        .stat-card:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+        .stat-card .stat-icon { width: 40px; height: 40px; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .stat-card::after { content: ''; position: absolute; top: 0; right: 0; width: 120px; height: 120px; border-radius: 50%; filter: blur(50px); opacity: 0.08; pointer-events: none; }
+
+        .data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .data-table th { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #52525b; padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .data-table td { padding: 0.85rem 1rem; font-size: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.03); vertical-align: middle; }
+        .data-table tbody tr { transition: background 0.15s; }
+        .data-table tbody tr:hover { background: rgba(255,255,255,0.03); }
+        .data-table tbody tr.clickable { cursor: pointer; }
+
+        /* ── Status badges ── */
+        .badge { padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; display: inline-flex; align-items: center; gap: 0.3rem; }
+        .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; }
+        .badge-active { color: #22c55e; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); }
+        .badge-active::before { background: #22c55e; }
+        .badge-trial { color: #fbbf24; background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.2); }
+        .badge-trial::before { background: #fbbf24; }
+        .badge-suspended { color: #ef4444; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); }
+        .badge-suspended::before { background: #ef4444; }
+        .badge-cancelled { color: #71717a; background: rgba(113,113,122,0.1); border: 1px solid rgba(113,113,122,0.2); }
+        .badge-cancelled::before { background: #71717a; }
+        .badge-pending { color: #f97316; background: rgba(249,115,22,0.1); border: 1px solid rgba(249,115,22,0.2); }
+        .badge-pending::before { background: #f97316; }
+        .badge-paid { color: #22c55e; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); }
+        .badge-paid::before { background: #22c55e; }
+
+        /* ── Modal ── */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 50; display: flex; align-items: center; justify-content: center; animation: fadeIn 0.2s; }
+        .modal-content { background: #111111; border: 1px solid rgba(255,255,255,0.08); border-radius: 1.25rem; max-width: 640px; width: 92%; max-height: 88vh; overflow-y: auto; animation: slideUp 0.3s ease-out; }
+        .modal-header { padding: 1.5rem 1.75rem 0; }
+        .modal-body { padding: 1.25rem 1.75rem; }
+        .modal-footer { padding: 0 1.75rem 1.5rem; }
+
+        /* ── Buttons ── */
+        .sa-btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 0.6rem; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; cursor: pointer; border: none; }
+        .sa-btn-primary { background: #ef4444; color: white; }
+        .sa-btn-primary:hover { background: #dc2626; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(239,68,68,0.3); }
+        .sa-btn-ghost { background: rgba(255,255,255,0.05); color: #a1a1aa; border: 1px solid rgba(255,255,255,0.08); }
+        .sa-btn-ghost:hover { background: rgba(255,255,255,0.08); color: white; }
+        .sa-btn-danger { background: rgba(239,68,68,0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+        .sa-btn-danger:hover { background: rgba(239,68,68,0.2); }
+        .sa-btn-success { background: rgba(34,197,94,0.1); color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
+        .sa-btn-success:hover { background: rgba(34,197,94,0.2); }
+
+        /* ── Forms ── */
+        .sa-input { width: 100%; padding: 0.6rem 0.85rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.6rem; color: white; font-size: 0.8rem; transition: all 0.2s; outline: none; }
+        .sa-input:focus { border-color: rgba(239,68,68,0.5); box-shadow: 0 0 0 3px rgba(239,68,68,0.1); }
+        .sa-input::placeholder { color: #52525b; }
+        .sa-label { display: block; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #71717a; margin-bottom: 0.4rem; }
+        .sa-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.75rem center; padding-right: 2rem; }
+
+        /* ── Toast ── */
+        .sa-toast { position: fixed; top: 1.25rem; right: 1.25rem; z-index: 200; padding: 0.75rem 1.25rem; border-radius: 0.75rem; font-size: 0.78rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; animation: slideInR 0.3s ease, fadeOut 0.4s ease 4s forwards; max-width: 380px; }
+        @keyframes slideInR { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; transform: translateY(-10px); pointer-events: none; } }
+
+        /* ── Color preview ── */
+        .color-swatch { width: 28px; height: 28px; border-radius: 0.4rem; border: 2px solid rgba(255,255,255,0.1); cursor: pointer; transition: transform 0.2s; }
+        .color-swatch:hover { transform: scale(1.15); }
+
+        /* ── Empty state ── */
+        .empty-state { text-align: center; padding: 3rem 1rem; }
+        .empty-state svg { width: 48px; height: 48px; margin: 0 auto 1rem; color: #3f3f46; }
+
+        /* ── Sidebar collapse on mobile ── */
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .sidebar.mobile-open { display: block; position: fixed; inset: 0; z-index: 40; width: 100%; }
+        }
+
+        /* ── Skeleton loading ── */
+        .skel { background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 0.5rem; }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
     </style>
 </head>
 <body class="font-sans min-h-screen">
-    <div class="halo-bg"></div>
 
-    <!-- ═══ Login Gate ═══ -->
-    <div id="login-gate" class="relative z-10 min-h-screen flex items-center justify-center px-4">
-        <div class="w-full max-w-sm">
+    <!-- ═══════════ LOGIN GATE ═══════════ -->
+    <div id="login-gate" class="min-h-screen flex items-center justify-center px-4">
+        <div class="w-full max-w-sm animate-fade-in">
             <div class="text-center mb-8">
-                <div class="inline-flex items-center gap-2 mb-4">
-                    <svg class="w-8 h-8 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                    <span class="text-xl font-bold text-white">SUPER ADMIN</span>
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center mx-auto mb-5 shadow-lg shadow-red-500/20">
+                    <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
                 </div>
-                <p class="text-gray-500 text-xs font-mono uppercase tracking-widest">Master SaaS Dashboard</p>
+                <h1 class="text-2xl font-bold text-white mb-1">Super Admin</h1>
+                <p class="text-gray-500 text-xs font-mono uppercase tracking-[0.2em]">Master Control Panel</p>
             </div>
-            <form id="master-login-form" class="space-y-4">
-                <input type="email" id="sa-email" required class="w-full form-input py-3 rounded-xl text-sm" placeholder="Super admin email">
-                <input type="password" id="sa-password" required class="w-full form-input py-3 rounded-xl text-sm" placeholder="Password">
-                <button type="submit" class="w-full btn-gradient py-3 rounded-xl text-xs font-bold text-white uppercase tracking-widest">Login</button>
-                <p id="sa-error" class="text-red-400 text-xs text-center hidden"></p>
+            <form id="master-login-form" class="space-y-3">
+                <div>
+                    <label class="sa-label">Email</label>
+                    <input type="email" id="sa-email" required class="sa-input" placeholder="admin@yourcompany.com">
+                </div>
+                <div>
+                    <label class="sa-label">Password</label>
+                    <input type="password" id="sa-password" required class="sa-input" placeholder="••••••••">
+                </div>
+                <button type="submit" id="login-btn" class="w-full sa-btn sa-btn-primary justify-center py-3 mt-2 text-sm">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+                    Sign In
+                </button>
+                <p id="sa-error" class="text-red-400 text-xs text-center hidden mt-2"></p>
             </form>
         </div>
     </div>
 
-    <!-- ═══ Main Dashboard (hidden until login) ═══ -->
-    <div id="master-app" class="hidden relative z-10">
-        <!-- Top Bar -->
-        <nav class="sticky top-0 z-30 backdrop-blur-xl bg-black/60 border-b border-white/5">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <svg class="w-7 h-7 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                    <span class="text-lg font-bold text-white">Super Admin</span>
-                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-400 font-bold uppercase">Master</span>
-                </div>
-                <div class="flex items-center gap-3">
-                    <span id="sa-user-label" class="text-xs text-gray-500 hidden sm:inline"></span>
-                    <button onclick="saLogout()" class="text-xs text-gray-500 hover:text-white transition px-3 py-1.5 rounded-lg hover:bg-white/5">Logout</button>
+    <!-- ═══════════ MAIN APP ═══════════ -->
+    <div id="master-app" class="hidden min-h-screen flex">
+
+        <!-- ── Sidebar ── -->
+        <aside class="sidebar fixed top-0 left-0 h-full z-20 flex flex-col" id="app-sidebar">
+            <div class="p-5 border-b border-white/5">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center shadow-lg shadow-red-500/15">
+                        <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-white leading-tight">Super Admin</p>
+                        <p class="text-[10px] text-gray-600 font-mono">MASTER PANEL</p>
+                    </div>
                 </div>
             </div>
-        </nav>
 
-        <!-- Tabs -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 mt-4">
-            <div class="flex gap-1 bg-white/[0.02] rounded-xl p-1 border border-white/5 overflow-x-auto no-scrollbar">
-                <button onclick="switchMasterTab('overview')" data-tab="overview" class="master-tab flex-shrink-0 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider active">Overview</button>
-                <button onclick="switchMasterTab('tenants')" data-tab="tenants" class="master-tab flex-shrink-0 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider">Tenants</button>
-                <button onclick="switchMasterTab('invoices')" data-tab="invoices" class="master-tab flex-shrink-0 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider">Invoices</button>
-                <button onclick="switchMasterTab('audit')" data-tab="audit" class="master-tab flex-shrink-0 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider">Audit Log</button>
-            </div>
-        </div>
-
-        <!-- Tab Panels -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
-
-            <!-- ═══ OVERVIEW TAB ═══ -->
-            <div id="panel-overview">
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
-                    <div class="kpi-card"><p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Total Tenants</p><p id="kpi-total" class="text-2xl font-bold text-white font-mono">—</p></div>
-                    <div class="kpi-card"><p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Active</p><p id="kpi-active" class="text-2xl font-bold text-green-400 font-mono">—</p></div>
-                    <div class="kpi-card"><p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Trial</p><p id="kpi-trial" class="text-2xl font-bold text-amber-400 font-mono">—</p></div>
-                    <div class="kpi-card"><p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">MRR</p><p id="kpi-mrr" class="text-2xl font-bold text-brand-500 font-mono">—</p></div>
-                    <div class="kpi-card"><p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Revenue Share</p><p id="kpi-rev-share" class="text-2xl font-bold text-emerald-400 font-mono">—</p></div>
+            <nav class="flex-1 px-3 py-4 space-y-0.5">
+                <div class="sa-label px-3 mb-2 mt-1">Main</div>
+                <div class="sidebar-link active" data-tab="overview" onclick="switchTab('overview')">
+                    <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10-1a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1h-4a1 1 0 01-1-1v-5z"/></svg>
+                    Overview
                 </div>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                    <div class="kpi-card"><p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Total Affiliates (all tenants)</p><p id="kpi-affiliates" class="text-2xl font-bold text-white font-mono">—</p></div>
-                    <div class="kpi-card"><p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Total Conversions (all tenants)</p><p id="kpi-conversions" class="text-2xl font-bold text-white font-mono">—</p></div>
+                <div class="sidebar-link" data-tab="tenants" onclick="switchTab('tenants')">
+                    <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    Tenants
                 </div>
-                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mt-6 mb-3">All Tenants</h3>
-                <div id="overview-tenant-list" class="space-y-2"></div>
-            </div>
-
-            <!-- ═══ TENANTS TAB ═══ -->
-            <div id="panel-tenants" class="hidden">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest">Tenant Management</h2>
-                    <button onclick="openCreateTenant()" class="btn btn-gradient text-[10px] px-4 py-2">+ New Tenant</button>
+                <div class="sidebar-link" data-tab="invoices" onclick="switchTab('invoices')">
+                    <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/></svg>
+                    Invoices
                 </div>
-                <div id="tenants-list" class="space-y-2"></div>
-            </div>
 
-            <!-- ═══ INVOICES TAB ═══ -->
-            <div id="panel-invoices" class="hidden">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest">Invoices</h2>
-                    <button onclick="openGenerateInvoice()" class="btn btn-gradient text-[10px] px-4 py-2">+ Generate Invoice</button>
+                <div class="sa-label px-3 mb-2 mt-5">System</div>
+                <div class="sidebar-link" data-tab="audit" onclick="switchTab('audit')">
+                    <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Audit Log
                 </div>
-                <div id="invoices-list" class="space-y-2"></div>
-            </div>
+            </nav>
 
-            <!-- ═══ AUDIT TAB ═══ -->
-            <div id="panel-audit" class="hidden">
-                <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Audit Log</h2>
-                <div id="audit-list" class="space-y-1"></div>
+            <div class="p-4 border-t border-white/5">
+                <div class="flex items-center gap-2.5 mb-3">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-zinc-700 to-zinc-800 flex items-center justify-center text-xs font-bold text-white" id="sa-avatar">SA</div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-semibold text-white truncate" id="sa-user-label">Admin</p>
+                        <p class="text-[10px] text-gray-600">Super Admin</p>
+                    </div>
+                </div>
+                <button onclick="saLogout()" class="sa-btn sa-btn-ghost w-full justify-center text-[11px]">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    Sign Out
+                </button>
             </div>
-        </div>
+        </aside>
+
+        <!-- ── Main Content ── -->
+        <main class="flex-1 ml-0 lg:ml-[260px]">
+            <!-- Top Bar (mobile) -->
+            <header class="lg:hidden sticky top-0 z-30 bg-black/80 backdrop-blur-xl border-b border-white/5 px-4 py-3 flex items-center justify-between">
+                <button onclick="toggleSidebar()" class="sa-btn sa-btn-ghost p-2">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+                <span class="text-sm font-bold text-white">Super Admin</span>
+                <button onclick="saLogout()" class="text-xs text-gray-500 hover:text-white">Logout</button>
+            </header>
+
+            <div class="p-4 sm:p-6 lg:p-8 max-w-[1400px]">
+                <!-- ═══ OVERVIEW PANEL ═══ -->
+                <section id="panel-overview">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h1 class="text-xl font-bold text-white">Dashboard Overview</h1>
+                            <p class="text-xs text-gray-500 mt-0.5">Monitor all your white-label tenants</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="inline-flex items-center gap-1.5 text-[10px] text-green-400 bg-green-400/10 border border-green-400/20 px-2.5 py-1 rounded-full font-bold uppercase">
+                                <span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse-slow"></span>Live
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- KPI Grid -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+                        <div class="stat-card" style="--card-color: #ef4444;">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="stat-icon bg-red-500/10">
+                                    <svg class="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Total Tenants</p>
+                            <p id="kpi-total" class="text-2xl font-bold text-white font-mono mt-1">—</p>
+                            <div class="flex items-center gap-3 mt-2 text-[10px]">
+                                <span class="text-green-400"><span id="kpi-active-sm">0</span> active</span>
+                                <span class="text-amber-400"><span id="kpi-trial-sm">0</span> trial</span>
+                            </div>
+                            <div class="stat-card::after" style="background: #ef4444;"></div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="stat-icon bg-emerald-500/10">
+                                    <svg class="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Monthly Revenue (MRR)</p>
+                            <p id="kpi-mrr" class="text-2xl font-bold text-emerald-400 font-mono mt-1">—</p>
+                            <p class="text-[10px] text-gray-600 mt-2">Recurring subscription fees</p>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="stat-icon bg-violet-500/10">
+                                    <svg class="w-5 h-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Revenue Share</p>
+                            <p id="kpi-rev-share" class="text-2xl font-bold text-violet-400 font-mono mt-1">—</p>
+                            <p class="text-[10px] text-gray-600 mt-2">% of tenant commission revenue</p>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="stat-icon bg-sky-500/10">
+                                    <svg class="w-5 h-5 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Total Affiliates</p>
+                            <p id="kpi-affiliates" class="text-2xl font-bold text-sky-400 font-mono mt-1">—</p>
+                            <p class="text-[10px] text-gray-600 mt-2">Across all tenants</p>
+                        </div>
+                    </div>
+
+                    <!-- Tenant Table -->
+                    <div class="stat-card !p-0 overflow-hidden">
+                        <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/></svg>
+                                <h3 class="text-xs font-bold text-white uppercase tracking-wider">All Tenants</h3>
+                            </div>
+                            <button onclick="switchTab('tenants')" class="text-[10px] text-gray-500 hover:text-white transition">View All →</button>
+                        </div>
+                        <div id="overview-tenant-list" class="overflow-x-auto"></div>
+                    </div>
+                </section>
+
+                <!-- ═══ TENANTS PANEL ═══ -->
+                <section id="panel-tenants" class="hidden">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h1 class="text-xl font-bold text-white">Tenant Management</h1>
+                            <p class="text-xs text-gray-500 mt-0.5">Create, configure, and manage white-label clients</p>
+                        </div>
+                        <button onclick="openCreateTenant()" class="sa-btn sa-btn-primary">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                            New Tenant
+                        </button>
+                    </div>
+
+                    <!-- Search / Filter -->
+                    <div class="flex flex-wrap gap-3 mb-4">
+                        <div class="relative flex-1 min-w-[200px]">
+                            <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                            <input type="text" id="tenant-search" class="sa-input pl-9" placeholder="Search tenants..." oninput="filterTenants()">
+                        </div>
+                        <select id="tenant-filter-status" class="sa-input sa-select w-auto min-w-[140px]" onchange="filterTenants()">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="trial">Trial</option>
+                            <option value="suspended">Suspended</option>
+                        </select>
+                    </div>
+
+                    <div class="stat-card !p-0 overflow-hidden">
+                        <div id="tenants-list" class="overflow-x-auto"></div>
+                    </div>
+                </section>
+
+                <!-- ═══ INVOICES PANEL ═══ -->
+                <section id="panel-invoices" class="hidden">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h1 class="text-xl font-bold text-white">Invoice Management</h1>
+                            <p class="text-xs text-gray-500 mt-0.5">Track billing and payments</p>
+                        </div>
+                        <button onclick="openGenerateInvoice()" class="sa-btn sa-btn-primary">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                            Generate Invoice
+                        </button>
+                    </div>
+
+                    <div class="stat-card !p-0 overflow-hidden">
+                        <div id="invoices-list" class="overflow-x-auto"></div>
+                    </div>
+                </section>
+
+                <!-- ═══ AUDIT PANEL ═══ -->
+                <section id="panel-audit" class="hidden">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h1 class="text-xl font-bold text-white">Audit Log</h1>
+                            <p class="text-xs text-gray-500 mt-0.5">Complete activity trail for compliance and security</p>
+                        </div>
+                        <button onclick="loadAudit()" class="sa-btn sa-btn-ghost">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                            Refresh
+                        </button>
+                    </div>
+
+                    <div class="stat-card !p-0 overflow-hidden">
+                        <div id="audit-list" class="overflow-x-auto"></div>
+                    </div>
+                </section>
+            </div>
+        </main>
     </div>
 
-    <!-- ═══ Modals Container ═══ -->
+    <!-- ═══ Modal Container ═══ -->
     <div id="modal-container"></div>
 
-    <script src="js/theme.js"></script>
     <script>
     /* ═══════════════════════════════════════════════════════════════
-       SUPER ADMIN — Master Dashboard JS
+       SUPER ADMIN — Master Control Panel
+       Professional SaaS Management Dashboard
        ═══════════════════════════════════════════════════════════════ */
 
     const SA_API = (window.BRAND && BRAND.urls.api) || "https://api.theforexskyline.com";
-    const SA_TOKEN_KEY = BRAND._lsKey("sa_jwt");
+    const SA_TOKEN_KEY = (window.BRAND && typeof BRAND._lsKey === "function") ? BRAND._lsKey("sa_jwt") : "tfxs_sa_jwt";
     let saToken = localStorage.getItem(SA_TOKEN_KEY);
     let overviewData = null;
+    let allTenants = [];
 
-    // ── Helpers ─────────────────────────────────────────────────
-    function $(id) { return document.getElementById(id); }
-    function esc(s) { if(!s) return ""; const d=document.createElement("div"); d.textContent=s; return d.innerHTML; }
-    function fmtMoney(n) { return "$" + Number(n||0).toLocaleString("en",{minimumFractionDigits:2,maximumFractionDigits:2}); }
-    function fmtDate(d) { return d ? new Date(d).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"}) : "—"; }
+    /* ── Helpers ────────────────────────────────────────────────── */
+    const $ = id => document.getElementById(id);
+    const esc = s => { if (!s) return ""; const d = document.createElement("div"); d.textContent = s; return d.innerHTML; };
+    const fmtMoney = n => "$" + Number(n || 0).toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const fmtDate = d => d ? new Date(d).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "—";
+    const fmtDateTime = d => d ? new Date(d).toLocaleString("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }) : "—";
 
-    function statusBadge(s) {
-        const cls = { active: "status-active", trial: "status-trial", suspended: "status-suspended", cancelled: "status-cancelled" };
-        return `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${cls[s]||'status-cancelled'}">${esc(s)}</span>`;
+    function badge(status) {
+        const map = { active: "badge-active", trial: "badge-trial", suspended: "badge-suspended", cancelled: "badge-cancelled", pending: "badge-pending", paid: "badge-paid", overdue: "badge-danger" };
+        return `<span class="badge ${map[status] || 'badge-cancelled'}">${esc(status)}</span>`;
     }
 
-    function toast(msg, type="success") {
+    function toast(msg, type = "success") {
+        const colors = { success: "bg-green-500/90 text-white", error: "bg-red-500/90 text-white", info: "bg-sky-500/90 text-white" };
+        const icons = {
+            success: '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>',
+            error: '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>',
+            info: '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+        };
         const t = document.createElement("div");
-        t.className = `toast ${type==="error" ? "bg-red-500/90 text-white" : "bg-green-500/90 text-white"}`;
-        t.textContent = msg;
+        t.className = `sa-toast ${colors[type] || colors.info}`;
+        t.innerHTML = `${icons[type] || icons.info}<span>${esc(msg)}</span>`;
         document.body.appendChild(t);
-        setTimeout(() => t.remove(), 4500);
+        setTimeout(() => t.remove(), 5000);
     }
 
-    async function saFetch(path, opts={}) {
+    async function saFetch(path, opts = {}) {
         const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${saToken}`, ...opts.headers };
         const res = await fetch(SA_API + path, { ...opts, headers });
-        const json = await res.json().catch(()=>null);
+        const json = await res.json().catch(() => null);
         if (!res.ok) throw new Error(json?.error || `HTTP ${res.status}`);
         return json;
     }
 
-    // ── Auth ────────────────────────────────────────────────────
+    /* ── Auth ───────────────────────────────────────────────────── */
     $("master-login-form").addEventListener("submit", async (e) => {
         e.preventDefault();
-        const email = $("sa-email").value.trim();
-        const password = $("sa-password").value;
+        const btn = $("login-btn");
+        btn.disabled = true; btn.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Signing in...';
         try {
             const res = await fetch(SA_API + "/api/master/login", {
                 method: "POST", headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({ email: $("sa-email").value.trim(), password: $("sa-password").value })
             });
             const data = await res.json();
             if (!data.ok) { $("sa-error").textContent = data.error; $("sa-error").classList.remove("hidden"); return; }
             saToken = data.token;
             localStorage.setItem(SA_TOKEN_KEY, saToken);
-            $("sa-user-label").textContent = data.email || email;
+            $("sa-user-label").textContent = data.display_name || data.email;
+            const initials = (data.display_name || data.email || "SA").slice(0, 2).toUpperCase();
+            $("sa-avatar").textContent = initials;
             showApp();
         } catch (err) { $("sa-error").textContent = err.message; $("sa-error").classList.remove("hidden"); }
+        finally { btn.disabled = false; btn.innerHTML = '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg> Sign In'; }
     });
 
     function saLogout() {
@@ -212,105 +442,165 @@
         loadOverview();
     }
 
-    // ── Tab switching ───────────────────────────────────────────
-    function switchMasterTab(tab) {
-        document.querySelectorAll(".master-tab").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
-        ["overview","tenants","invoices","audit"].forEach(t => {
-            const p = $("panel-"+t);
+    function toggleSidebar() {
+        $("app-sidebar").classList.toggle("mobile-open");
+    }
+
+    /* ── Tab Switching ──────────────────────────────────────────── */
+    function switchTab(tab) {
+        document.querySelectorAll(".sidebar-link").forEach(l => l.classList.toggle("active", l.dataset.tab === tab));
+        ["overview", "tenants", "invoices", "audit"].forEach(t => {
+            const p = $("panel-" + t);
             if (p) p.classList.toggle("hidden", t !== tab);
         });
+        // Close mobile sidebar
+        $("app-sidebar").classList.remove("mobile-open");
         if (tab === "overview") loadOverview();
         if (tab === "tenants") loadTenants();
         if (tab === "invoices") loadInvoices();
         if (tab === "audit") loadAudit();
     }
 
-    // ── Overview ────────────────────────────────────────────────
+    /* ── Overview ───────────────────────────────────────────────── */
     async function loadOverview() {
         try {
             const res = await saFetch("/api/master/overview");
             overviewData = res.data;
-            $("kpi-total").textContent = overviewData.tenants_total;
-            $("kpi-active").textContent = overviewData.tenants_active;
-            $("kpi-trial").textContent = overviewData.tenants_trial;
-            $("kpi-mrr").textContent = fmtMoney(overviewData.mrr);
-            $("kpi-rev-share").textContent = fmtMoney(overviewData.revenue_share_total);
-            $("kpi-affiliates").textContent = (overviewData.total_affiliates||0).toLocaleString();
-            $("kpi-conversions").textContent = (overviewData.total_conversions||0).toLocaleString();
+            const d = overviewData;
+            animateCounter($("kpi-total"), d.tenants_total);
+            animateCounter($("kpi-mrr"), d.mrr, fmtMoney);
+            animateCounter($("kpi-rev-share"), d.revenue_share_total, fmtMoney);
+            animateCounter($("kpi-affiliates"), d.total_affiliates || 0);
+            $("kpi-active-sm").textContent = d.tenants_active;
+            $("kpi-trial-sm").textContent = d.tenants_trial;
 
-            // Render tenant cards
             const list = $("overview-tenant-list");
-            if (!overviewData.tenants.length) { list.innerHTML = '<p class="text-gray-600 text-sm">No tenants yet. Create your first client!</p>'; return; }
-            list.innerHTML = overviewData.tenants.map(t => `
-                <div class="tenant-row glass-panel p-4 rounded-xl flex items-center justify-between gap-4" onclick="viewTenant('${t.id}')">
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="font-bold text-white text-sm">${esc(t.brand_name)}</span>
-                            ${statusBadge(t.status)}
-                            <span class="text-[10px] text-gray-600 font-mono">${esc(t.slug)}</span>
-                        </div>
-                        <div class="flex gap-4 text-[10px] text-gray-500">
-                            <span>📧 ${esc(t.admin_email)}</span>
-                            <span>👥 ${t.total_affiliates||0} affiliates</span>
-                            <span>💰 ${fmtMoney(t.total_revenue)}</span>
-                        </div>
-                    </div>
-                    <div class="text-right flex-shrink-0">
-                        <p class="text-xs font-bold text-brand-500">${fmtMoney(t.monthly_fee)}/mo</p>
-                        <p class="text-[10px] text-gray-600">${t.plan} plan</p>
-                    </div>
-                </div>
-            `).join("");
+            if (!d.tenants.length) {
+                list.innerHTML = `<div class="empty-state py-12">
+                    <svg class="w-12 h-12 mx-auto mb-3 text-zinc-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/></svg>
+                    <p class="text-sm text-gray-500 mb-1">No tenants yet</p>
+                    <p class="text-xs text-gray-600">Create your first white-label client to get started</p>
+                    <button onclick="switchTab('tenants');openCreateTenant()" class="sa-btn sa-btn-primary mt-4">Create First Tenant</button>
+                </div>`;
+                return;
+            }
+            list.innerHTML = `<table class="data-table">
+                <thead><tr>
+                    <th>Brand</th><th>Status</th><th>Plan</th><th>Admin</th><th class="text-right">Fee/mo</th><th class="text-right">Rev %</th><th class="text-right">Revenue</th><th class="text-right">Affiliates</th>
+                </tr></thead>
+                <tbody>${d.tenants.map(t => `
+                    <tr class="clickable" onclick="viewTenant('${t.id}')">
+                        <td><div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-zinc-700 to-zinc-800 flex items-center justify-center text-[10px] font-bold text-white">${(t.brand_name || "?").slice(0, 2).toUpperCase()}</div>
+                            <div><p class="text-sm font-semibold text-white">${esc(t.brand_name)}</p><p class="text-[10px] text-gray-600 font-mono">${esc(t.slug)}</p></div>
+                        </div></td>
+                        <td>${badge(t.status)}</td>
+                        <td class="text-xs text-gray-400 capitalize">${esc(t.plan)}</td>
+                        <td class="text-xs text-gray-400">${esc(t.admin_email)}</td>
+                        <td class="text-right font-mono text-xs text-white">${fmtMoney(t.monthly_fee)}</td>
+                        <td class="text-right font-mono text-xs text-violet-400">${t.revenue_share_pct}%</td>
+                        <td class="text-right font-mono text-xs text-emerald-400">${fmtMoney(t.total_revenue)}</td>
+                        <td class="text-right font-mono text-xs text-sky-400">${t.total_affiliates || 0}</td>
+                    </tr>
+                `).join("")}</tbody>
+            </table>`;
         } catch (err) { toast(err.message, "error"); }
     }
 
-    // ── Tenants ─────────────────────────────────────────────────
+    function animateCounter(el, target, formatter) {
+        if (!el) return;
+        const start = parseFloat(el.textContent.replace(/[^0-9.-]/g, "")) || 0;
+        const duration = 600;
+        const startTime = performance.now();
+        function step(now) {
+            const progress = Math.min((now - startTime) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const current = start + (target - start) * eased;
+            el.textContent = formatter ? formatter(current) : Math.round(current).toLocaleString();
+            if (progress < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+    }
+
+    /* ── Tenants ────────────────────────────────────────────────── */
     async function loadTenants() {
         try {
             const res = await saFetch("/api/master/tenants");
-            const list = $("tenants-list");
-            if (!res.data.length) { list.innerHTML = '<p class="text-gray-600 text-sm">No tenants.</p>'; return; }
-            list.innerHTML = res.data.map(t => `
-                <div class="glass-panel p-4 rounded-xl">
-                    <div class="flex items-center justify-between gap-4">
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="font-bold text-white">${esc(t.brand_name)}</span>
-                                ${statusBadge(t.status)}
-                                <span class="text-[10px] text-gray-600 font-mono">${esc(t.slug)}</span>
-                            </div>
-                            <div class="flex flex-wrap gap-3 text-[10px] text-gray-500">
-                                <span>📧 ${esc(t.admin_email)}</span>
-                                <span>🌐 ${esc(t.domain||'—')}</span>
-                                <span>📅 ${fmtDate(t.created_at)}</span>
-                                <span>💰 ${fmtMoney(t.monthly_fee)}/mo + ${t.revenue_share_pct}%</span>
-                            </div>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="viewTenant('${t.id}')" class="btn btn-ghost text-[10px]">Details</button>
-                            ${t.status==='active' ?
-                                `<button onclick="changeTenantStatus('${t.id}','suspended')" class="btn btn-danger text-[10px]">Suspend</button>` :
-                                t.status==='suspended' ?
-                                `<button onclick="changeTenantStatus('${t.id}','active')" class="btn btn-gradient text-[10px]">Reactivate</button>` : ''
-                            }
-                        </div>
-                    </div>
-                </div>
-            `).join("");
+            allTenants = res.data || [];
+            renderTenants(allTenants);
         } catch (err) { toast(err.message, "error"); }
     }
 
+    function filterTenants() {
+        const search = ($("tenant-search")?.value || "").toLowerCase();
+        const status = $("tenant-filter-status")?.value || "";
+        const filtered = allTenants.filter(t => {
+            if (status && t.status !== status) return false;
+            if (search && !t.brand_name.toLowerCase().includes(search) && !t.slug.toLowerCase().includes(search) && !t.admin_email.toLowerCase().includes(search)) return false;
+            return true;
+        });
+        renderTenants(filtered);
+    }
+
+    function renderTenants(tenants) {
+        const list = $("tenants-list");
+        if (!tenants.length) {
+            list.innerHTML = `<div class="empty-state py-12">
+                <svg class="w-12 h-12 mx-auto mb-3 text-zinc-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/></svg>
+                <p class="text-sm text-gray-500">No tenants found</p>
+            </div>`;
+            return;
+        }
+        list.innerHTML = `<table class="data-table">
+            <thead><tr>
+                <th>Brand</th><th>Status</th><th>Plan</th><th>Domain</th><th>Admin</th><th class="text-right">Fee</th><th class="text-right">Rev %</th><th>Created</th><th class="text-right">Actions</th>
+            </tr></thead>
+            <tbody>${tenants.map(t => `
+                <tr>
+                    <td><div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-zinc-700 to-zinc-800 flex items-center justify-center text-[10px] font-bold text-white">${(t.brand_name || "?").slice(0, 2).toUpperCase()}</div>
+                        <div><p class="text-sm font-semibold text-white">${esc(t.brand_name)}</p><p class="text-[10px] text-gray-600 font-mono">${esc(t.slug)}</p></div>
+                    </div></td>
+                    <td>${badge(t.status)}</td>
+                    <td class="text-xs text-gray-400 capitalize">${esc(t.plan)}</td>
+                    <td class="text-xs text-gray-400 font-mono">${esc(t.domain || '—')}</td>
+                    <td class="text-xs text-gray-400">${esc(t.admin_email)}</td>
+                    <td class="text-right font-mono text-xs text-white">${fmtMoney(t.monthly_fee)}/mo</td>
+                    <td class="text-right font-mono text-xs text-violet-400">${t.revenue_share_pct}%</td>
+                    <td class="text-xs text-gray-500">${fmtDate(t.created_at)}</td>
+                    <td class="text-right">
+                        <div class="flex items-center justify-end gap-1">
+                            <button onclick="viewTenant('${t.id}')" class="sa-btn sa-btn-ghost !px-2 !py-1 text-[10px]" title="View Details">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            </button>
+                            ${t.status === 'active' || t.status === 'trial' ?
+                                `<button onclick="changeTenantStatus('${t.id}','suspended')" class="sa-btn sa-btn-danger !px-2 !py-1 text-[10px]" title="Suspend">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                                </button>` :
+                                t.status === 'suspended' ?
+                                `<button onclick="changeTenantStatus('${t.id}','active')" class="sa-btn sa-btn-success !px-2 !py-1 text-[10px]" title="Reactivate">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                </button>` : ''
+                            }
+                        </div>
+                    </td>
+                </tr>
+            `).join("")}</tbody>
+        </table>`;
+    }
+
     async function changeTenantStatus(id, status) {
-        if (!confirm(`Are you sure you want to ${status} this tenant?`)) return;
+        const action = status === "suspended" ? "suspend" : "reactivate";
+        if (!confirm(`Are you sure you want to ${action} this tenant? ${status === 'suspended' ? 'Their entire platform will be disabled.' : ''}`)) return;
         try {
             await saFetch(`/api/master/tenants/${id}/status`, { method: "POST", body: JSON.stringify({ status }) });
-            toast(`Tenant ${status}`);
+            toast(`Tenant ${action}d successfully`);
             loadTenants();
             loadOverview();
         } catch (err) { toast(err.message, "error"); }
     }
 
-    // ── View tenant detail (modal) ──────────────────────────────
+    /* ── View Tenant Detail (Modal) ─────────────────────────────── */
     async function viewTenant(id) {
         try {
             const res = await saFetch(`/api/master/tenants/${id}`);
@@ -318,42 +608,111 @@
             $("modal-container").innerHTML = `
                 <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
                     <div class="modal-content">
-                        <div class="flex items-center justify-between mb-4">
-                            <div>
-                                <h2 class="text-lg font-bold text-white">${esc(t.brand_name)}</h2>
-                                <p class="text-xs text-gray-500 font-mono">${esc(t.slug)} · ${esc(t.plan)} plan</p>
-                            </div>
-                            ${statusBadge(t.status)}
-                        </div>
-                        <div class="grid grid-cols-2 gap-3 mb-4 text-xs">
-                            <div class="glass-panel p-3 rounded-lg"><span class="text-gray-500 block text-[10px] uppercase">Admin Email</span><span class="text-white">${esc(t.admin_email)}</span></div>
-                            <div class="glass-panel p-3 rounded-lg"><span class="text-gray-500 block text-[10px] uppercase">Domain</span><span class="text-white">${esc(t.domain||'—')}</span></div>
-                            <div class="glass-panel p-3 rounded-lg"><span class="text-gray-500 block text-[10px] uppercase">Monthly Fee</span><span class="text-white font-bold">${fmtMoney(t.monthly_fee)}</span></div>
-                            <div class="glass-panel p-3 rounded-lg"><span class="text-gray-500 block text-[10px] uppercase">Revenue Share</span><span class="text-white font-bold">${t.revenue_share_pct}%</span></div>
-                            <div class="glass-panel p-3 rounded-lg"><span class="text-gray-500 block text-[10px] uppercase">Affiliates</span><span class="text-white font-bold">${t.total_affiliates||0}</span></div>
-                            <div class="glass-panel p-3 rounded-lg"><span class="text-gray-500 block text-[10px] uppercase">Conversions</span><span class="text-white font-bold">${t.total_conversions||0}</span></div>
-                            <div class="glass-panel p-3 rounded-lg col-span-2"><span class="text-gray-500 block text-[10px] uppercase">Total Revenue</span><span class="text-white font-bold text-lg">${fmtMoney(t.total_revenue)}</span></div>
-                        </div>
-                        ${t.notes ? `<p class="text-xs text-gray-400 mb-4 p-3 bg-white/[0.02] rounded-lg">📝 ${esc(t.notes)}</p>` : ''}
-                        ${t.invoices.length ? `
-                            <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Recent Invoices</h3>
-                            <div class="space-y-1 mb-4 max-h-40 overflow-y-auto">
-                                ${t.invoices.map(inv => `
-                                    <div class="flex items-center justify-between text-xs p-2 rounded-lg bg-white/[0.02]">
-                                        <span class="font-mono text-gray-400">${esc(inv.invoice_no)}</span>
-                                        <span>${fmtMoney(inv.total)}</span>
-                                        ${statusBadge(inv.status)}
+                        <div class="modal-header">
+                            <div class="flex items-start justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-zinc-700 to-zinc-800 flex items-center justify-center text-lg font-bold text-white">${(t.brand_name || "?").slice(0, 2).toUpperCase()}</div>
+                                    <div>
+                                        <h2 class="text-lg font-bold text-white">${esc(t.brand_name)}</h2>
+                                        <p class="text-xs text-gray-500 font-mono">${esc(t.slug)} · ${esc(t.plan)} plan</p>
                                     </div>
-                                `).join("")}
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    ${badge(t.status)}
+                                    <button onclick="closeModal()" class="text-gray-600 hover:text-white transition p-1">
+                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    </button>
+                                </div>
                             </div>
-                        ` : ''}
-                        <div class="flex gap-2 mt-4">
-                            ${t.status==='active' ?
-                                `<button onclick="changeTenantStatus('${t.id}','suspended');closeModal()" class="btn btn-danger flex-1">🔒 Suspend</button>` :
-                                `<button onclick="changeTenantStatus('${t.id}','active');closeModal()" class="btn btn-gradient flex-1">✅ Reactivate</button>`
-                            }
-                            <button onclick="deleteTenant('${t.id}')" class="btn btn-danger flex-1">🗑️ Delete</button>
-                            <button onclick="closeModal()" class="btn btn-ghost flex-1">Close</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="grid grid-cols-2 gap-2 mb-4">
+                                <div class="bg-white/[0.03] rounded-lg p-3">
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                        Admin Email
+                                    </p>
+                                    <p class="text-xs text-white">${esc(t.admin_email)}</p>
+                                </div>
+                                <div class="bg-white/[0.03] rounded-lg p-3">
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"/></svg>
+                                        Domain
+                                    </p>
+                                    <p class="text-xs text-white">${esc(t.domain || '—')}</p>
+                                </div>
+                                <div class="bg-white/[0.03] rounded-lg p-3">
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V7m0 1v8m0 0v1"/></svg>
+                                        Monthly Fee
+                                    </p>
+                                    <p class="text-sm font-bold text-white">${fmtMoney(t.monthly_fee)}</p>
+                                </div>
+                                <div class="bg-white/[0.03] rounded-lg p-3">
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                                        Revenue Share
+                                    </p>
+                                    <p class="text-sm font-bold text-violet-400">${t.revenue_share_pct}%</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-2 mb-4">
+                                <div class="bg-white/[0.03] rounded-lg p-3 text-center">
+                                    <p class="text-[10px] text-gray-500 uppercase mb-1">Affiliates</p>
+                                    <p class="text-lg font-bold text-sky-400 font-mono">${t.total_affiliates || 0}</p>
+                                </div>
+                                <div class="bg-white/[0.03] rounded-lg p-3 text-center">
+                                    <p class="text-[10px] text-gray-500 uppercase mb-1">Conversions</p>
+                                    <p class="text-lg font-bold text-amber-400 font-mono">${t.total_conversions || 0}</p>
+                                </div>
+                                <div class="bg-white/[0.03] rounded-lg p-3 text-center">
+                                    <p class="text-[10px] text-gray-500 uppercase mb-1">Revenue</p>
+                                    <p class="text-lg font-bold text-emerald-400 font-mono">${fmtMoney(t.total_revenue)}</p>
+                                </div>
+                            </div>
+
+                            ${t.notes ? `<div class="flex items-start gap-2 p-3 bg-white/[0.02] rounded-lg mb-4 text-xs text-gray-400">
+                                <svg class="w-4 h-4 text-gray-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
+                                ${esc(t.notes)}
+                            </div>` : ''}
+
+                            ${(t.invoices && t.invoices.length) ? `
+                                <div class="mb-2">
+                                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/></svg>
+                                        Recent Invoices
+                                    </p>
+                                    <div class="space-y-1 max-h-36 overflow-y-auto">
+                                        ${t.invoices.map(inv => `
+                                            <div class="flex items-center justify-between text-xs p-2 rounded-lg bg-white/[0.02]">
+                                                <span class="font-mono text-gray-400">${esc(inv.invoice_no)}</span>
+                                                <span class="text-white">${fmtMoney(inv.total)}</span>
+                                                ${badge(inv.status)}
+                                            </div>
+                                        `).join("")}
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="modal-footer">
+                            <div class="flex gap-2">
+                                ${t.status === 'active' || t.status === 'trial' ?
+                                    `<button onclick="changeTenantStatus('${t.id}','suspended');closeModal()" class="sa-btn sa-btn-danger flex-1">
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                                        Suspend
+                                    </button>` :
+                                    `<button onclick="changeTenantStatus('${t.id}','active');closeModal()" class="sa-btn sa-btn-success flex-1">
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        Reactivate
+                                    </button>`
+                                }
+                                <button onclick="deleteTenant('${t.id}')" class="sa-btn sa-btn-danger flex-1">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                    Delete
+                                </button>
+                                <button onclick="closeModal()" class="sa-btn sa-btn-ghost flex-1">Close</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -362,10 +721,10 @@
     }
 
     async function deleteTenant(id) {
-        if (!confirm("⚠️ This will permanently delete this tenant and all their invoices. Continue?")) return;
+        if (!confirm("This will permanently delete this tenant and all their data. This action cannot be undone. Continue?")) return;
         try {
             await saFetch(`/api/master/tenants/${id}`, { method: "DELETE" });
-            toast("Tenant deleted");
+            toast("Tenant deleted permanently");
             closeModal();
             loadTenants();
             loadOverview();
@@ -374,121 +733,245 @@
 
     function closeModal() { $("modal-container").innerHTML = ""; }
 
-    // ── Create Tenant Modal ─────────────────────────────────────
+    /* ── Create Tenant Modal ────────────────────────────────────── */
     function openCreateTenant() {
+        const planFees = { starter: 99, standard: 199, premium: 499, custom: 0 };
         $("modal-container").innerHTML = `
             <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
                 <div class="modal-content">
-                    <h2 class="text-lg font-bold text-white mb-4">🏢 New Tenant</h2>
-                    <form id="create-tenant-form" class="space-y-3">
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="text-[10px] text-gray-500 uppercase mb-1 block">Brand Name *</label>
-                                <input type="text" id="ct-brand" required class="form-input py-2 text-sm rounded-lg" placeholder="ACME">
+                    <div class="modal-header">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                                </div>
+                                <div>
+                                    <h2 class="text-base font-bold text-white">New Tenant</h2>
+                                    <p class="text-[10px] text-gray-500">Configure a new white-label client</p>
+                                </div>
                             </div>
+                            <button onclick="closeModal()" class="text-gray-600 hover:text-white transition p-1">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <form id="create-tenant-form">
+                        <div class="modal-body space-y-4">
+                            <!-- Brand Identity -->
                             <div>
-                                <label class="text-[10px] text-gray-500 uppercase mb-1 block">Slug *</label>
-                                <input type="text" id="ct-slug" required class="form-input py-2 text-sm rounded-lg" placeholder="acme-affiliates">
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+                                    Brand Identity
+                                </p>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div><label class="sa-label">Brand Name *</label><input type="text" id="ct-brand" required class="sa-input" placeholder="ACME FX"></div>
+                                    <div><label class="sa-label">Slug (URL) *</label><input type="text" id="ct-slug" required class="sa-input" placeholder="acme-fx"></div>
+                                </div>
+                            </div>
+
+                            <!-- Brand Colors -->
+                            <div>
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+                                    Brand Colors (optional)
+                                </p>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div>
+                                        <label class="sa-label">Primary Color</label>
+                                        <div class="flex items-center gap-2">
+                                            <input type="color" id="ct-color-primary" value="#ef4444" class="color-swatch" title="Pick primary color">
+                                            <input type="text" id="ct-color-primary-hex" class="sa-input text-[10px] font-mono" value="#ef4444" oninput="$('ct-color-primary').value=this.value">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="sa-label">Background</label>
+                                        <div class="flex items-center gap-2">
+                                            <input type="color" id="ct-color-bg" value="#050505" class="color-swatch" title="Pick background color">
+                                            <input type="text" id="ct-color-bg-hex" class="sa-input text-[10px] font-mono" value="#050505" oninput="$('ct-color-bg').value=this.value">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="sa-label">Accent / Neon</label>
+                                        <div class="flex items-center gap-2">
+                                            <input type="color" id="ct-color-accent" value="#22d3ee" class="color-swatch" title="Pick accent color">
+                                            <input type="text" id="ct-color-accent-hex" class="sa-input text-[10px] font-mono" value="#22d3ee" oninput="$('ct-color-accent').value=this.value">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Live Preview -->
+                                <div class="mt-3 p-3 rounded-lg border border-white/5" id="brand-preview" style="background: #050505;">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <div class="w-6 h-6 rounded-md flex items-center justify-center text-[8px] font-bold text-white" id="preview-icon" style="background: #ef4444;">AF</div>
+                                        <span class="text-xs font-bold text-white" id="preview-name">ACME FX</span>
+                                        <span class="text-[8px] px-1.5 py-0.5 rounded-full font-bold" id="preview-badge" style="background: rgba(239,68,68,0.15); color: #ef4444;">LIVE</span>
+                                    </div>
+                                    <div class="flex gap-1">
+                                        <div class="h-1 rounded-full flex-1" id="preview-bar" style="background: #ef4444;"></div>
+                                        <div class="h-1 rounded-full flex-[0.5]" style="background: rgba(255,255,255,0.1);"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Contact -->
+                            <div>
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                    Contact & Access
+                                </p>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div><label class="sa-label">Admin Email *</label><input type="email" id="ct-email" required class="sa-input" placeholder="admin@acme.com"></div>
+                                    <div><label class="sa-label">Company</label><input type="text" id="ct-company" class="sa-input" placeholder="ACME Corp Ltd"></div>
+                                    <div class="col-span-2"><label class="sa-label">Custom Domain</label><input type="text" id="ct-domain" class="sa-input" placeholder="affiliates.acmefx.com"></div>
+                                </div>
+                            </div>
+
+                            <!-- Billing -->
+                            <div>
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V7m0 1v8m0 0v1"/></svg>
+                                    Billing
+                                </p>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label class="sa-label">Plan</label>
+                                        <select id="ct-plan" class="sa-input sa-select" onchange="updateFeeFromPlan()">
+                                            <option value="starter">Starter</option>
+                                            <option value="standard" selected>Standard</option>
+                                            <option value="premium">Premium</option>
+                                            <option value="custom">Custom</option>
+                                        </select>
+                                    </div>
+                                    <div><label class="sa-label">Monthly Fee ($)</label><input type="number" id="ct-fee" class="sa-input" value="199" step="1" min="0"></div>
+                                    <div><label class="sa-label">Revenue Share %</label><input type="number" id="ct-rev-share" class="sa-input" value="5" step="0.5" min="0" max="50"></div>
+                                    <div><label class="sa-label">Trial Days</label><input type="number" id="ct-trial" class="sa-input" value="14" step="1" min="0"></div>
+                                </div>
+                            </div>
+
+                            <!-- Notes -->
+                            <div>
+                                <label class="sa-label">Internal Notes</label>
+                                <textarea id="ct-notes" class="sa-input" rows="2" placeholder="Internal notes about this client..."></textarea>
                             </div>
                         </div>
-                        <div>
-                            <label class="text-[10px] text-gray-500 uppercase mb-1 block">Admin Email *</label>
-                            <input type="email" id="ct-email" required class="form-input py-2 text-sm rounded-lg" placeholder="admin@acme.com">
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="text-[10px] text-gray-500 uppercase mb-1 block">Company</label>
-                                <input type="text" id="ct-company" class="form-input py-2 text-sm rounded-lg" placeholder="ACME Corp">
+                        <div class="modal-footer">
+                            <div class="flex gap-2">
+                                <button type="submit" class="sa-btn sa-btn-primary flex-1">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                                    Create Tenant
+                                </button>
+                                <button type="button" onclick="closeModal()" class="sa-btn sa-btn-ghost flex-1">Cancel</button>
                             </div>
-                            <div>
-                                <label class="text-[10px] text-gray-500 uppercase mb-1 block">Domain</label>
-                                <input type="text" id="ct-domain" class="form-input py-2 text-sm rounded-lg" placeholder="affiliates.acme.com">
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="text-[10px] text-gray-500 uppercase mb-1 block">Plan</label>
-                                <select id="ct-plan" class="form-input form-select py-2 text-sm rounded-lg">
-                                    <option value="starter">Starter — $99/mo</option>
-                                    <option value="standard">Standard — $199/mo</option>
-                                    <option value="premium">Premium — $499/mo</option>
-                                    <option value="custom">Custom</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-gray-500 uppercase mb-1 block">Revenue Share %</label>
-                                <input type="number" id="ct-rev-share" class="form-input py-2 text-sm rounded-lg" value="5" step="0.5" min="0" max="50">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="text-[10px] text-gray-500 uppercase mb-1 block">Notes</label>
-                            <textarea id="ct-notes" class="form-input py-2 text-sm rounded-lg" rows="2" placeholder="Internal notes..."></textarea>
-                        </div>
-                        <div class="flex gap-2 pt-2">
-                            <button type="submit" class="btn btn-gradient flex-1">Create Tenant</button>
-                            <button type="button" onclick="closeModal()" class="btn btn-ghost flex-1">Cancel</button>
                         </div>
                     </form>
                 </div>
             </div>
         `;
+
+        // Wire up color pickers for live preview
+        ["primary","bg","accent"].forEach(k => {
+            const picker = $("ct-color-" + k);
+            const hex = $("ct-color-" + k + "-hex");
+            if (picker && hex) {
+                picker.addEventListener("input", () => { hex.value = picker.value; updateBrandPreview(); });
+                hex.addEventListener("input", () => { if (/^#[0-9a-f]{6}$/i.test(hex.value)) { picker.value = hex.value; updateBrandPreview(); } });
+            }
+        });
+        $("ct-brand")?.addEventListener("input", updateBrandPreview);
+
         $("create-tenant-form").addEventListener("submit", handleCreateTenant);
+    }
+
+    function updateBrandPreview() {
+        const name = $("ct-brand")?.value || "ACME FX";
+        const primary = $("ct-color-primary")?.value || "#ef4444";
+        const bg = $("ct-color-bg")?.value || "#050505";
+        const accent = $("ct-color-accent")?.value || "#22d3ee";
+        const initials = name.trim().slice(0, 2).toUpperCase();
+
+        const preview = $("brand-preview"); if (preview) preview.style.background = bg;
+        const icon = $("preview-icon"); if (icon) { icon.style.background = primary; icon.textContent = initials; }
+        const pname = $("preview-name"); if (pname) pname.textContent = name.toUpperCase();
+        const pbadge = $("preview-badge"); if (pbadge) { pbadge.style.background = primary + "26"; pbadge.style.color = primary; }
+        const pbar = $("preview-bar"); if (pbar) pbar.style.background = primary;
+    }
+
+    function updateFeeFromPlan() {
+        const planFees = { starter: 99, standard: 199, premium: 499, custom: 0 };
+        const plan = $("ct-plan")?.value || "standard";
+        const feeInput = $("ct-fee");
+        if (feeInput && plan !== "custom") feeInput.value = planFees[plan];
     }
 
     async function handleCreateTenant(e) {
         e.preventDefault();
         try {
+            const brandConfig = {
+                primary: $("ct-color-primary")?.value || "#ef4444",
+                background: $("ct-color-bg")?.value || "#050505",
+                accent: $("ct-color-accent")?.value || "#22d3ee"
+            };
             const body = {
                 brand_name: $("ct-brand").value.trim(),
-                slug: $("ct-slug").value.trim(),
+                brand_full: $("ct-brand").value.trim().toUpperCase() + " AFFILIATES",
+                slug: $("ct-slug").value.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-"),
                 admin_email: $("ct-email").value.trim(),
                 company: $("ct-company").value.trim(),
                 domain: $("ct-domain").value.trim(),
                 plan: $("ct-plan").value,
+                monthly_fee: parseFloat($("ct-fee").value) || 199,
                 revenue_share_pct: parseFloat($("ct-rev-share").value) || 5,
                 notes: $("ct-notes").value.trim(),
-                brand_full: $("ct-brand").value.trim().toUpperCase() + " AFFILIATES"
+                brand_config: brandConfig
             };
             await saFetch("/api/master/tenants", { method: "POST", body: JSON.stringify(body) });
-            toast("Tenant created!");
+            toast("Tenant created successfully!");
             closeModal();
             loadTenants();
             loadOverview();
         } catch (err) { toast(err.message, "error"); }
     }
 
-    // ── Invoices ────────────────────────────────────────────────
+    /* ── Invoices ───────────────────────────────────────────────── */
     async function loadInvoices() {
         try {
             const res = await saFetch("/api/master/invoices");
             const list = $("invoices-list");
-            if (!res.data.length) { list.innerHTML = '<p class="text-gray-600 text-sm">No invoices yet.</p>'; return; }
-            list.innerHTML = res.data.map(inv => `
-                <div class="glass-panel p-4 rounded-xl flex items-center justify-between gap-4">
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="font-mono text-white text-sm font-bold">${esc(inv.invoice_no)}</span>
-                            ${statusBadge(inv.status)}
-                            <span class="text-[10px] text-gray-600">${esc(inv.master_tenants?.brand_name||'')}</span>
-                        </div>
-                        <div class="flex gap-3 text-[10px] text-gray-500">
-                            <span>📅 ${fmtDate(inv.period_start)} → ${fmtDate(inv.period_end)}</span>
-                            <span>📆 Due: ${fmtDate(inv.due_date)}</span>
-                        </div>
-                    </div>
-                    <div class="text-right flex-shrink-0">
-                        <p class="font-bold text-white">${fmtMoney(inv.total)}</p>
-                        <p class="text-[10px] text-gray-600">Base: ${fmtMoney(inv.base_fee)} + Rev: ${fmtMoney(inv.revenue_share)}</p>
-                    </div>
-                    <div class="flex gap-1 flex-shrink-0">
-                        ${inv.status === 'pending' ? `<button onclick="markInvoicePaid('${inv.id}')" class="btn btn-gradient text-[10px] px-3">Mark Paid</button>` : ''}
-                    </div>
-                </div>
-            `).join("");
+            if (!res.data.length) {
+                list.innerHTML = `<div class="empty-state py-12">
+                    <svg class="w-12 h-12 mx-auto mb-3 text-zinc-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/></svg>
+                    <p class="text-sm text-gray-500 mb-1">No invoices yet</p>
+                    <p class="text-xs text-gray-600">Generate your first invoice to start billing</p>
+                </div>`;
+                return;
+            }
+            list.innerHTML = `<table class="data-table">
+                <thead><tr>
+                    <th>Invoice</th><th>Tenant</th><th>Period</th><th>Status</th><th class="text-right">Base Fee</th><th class="text-right">Rev Share</th><th class="text-right">Total</th><th>Due</th><th class="text-right">Actions</th>
+                </tr></thead>
+                <tbody>${res.data.map(inv => `
+                    <tr>
+                        <td class="font-mono text-xs text-white font-semibold">${esc(inv.invoice_no)}</td>
+                        <td class="text-xs text-gray-400">${esc(inv.master_tenants?.brand_name || '—')}</td>
+                        <td class="text-[11px] text-gray-500">${fmtDate(inv.period_start)} → ${fmtDate(inv.period_end)}</td>
+                        <td>${badge(inv.status)}</td>
+                        <td class="text-right font-mono text-xs text-gray-400">${fmtMoney(inv.base_fee)}</td>
+                        <td class="text-right font-mono text-xs text-violet-400">${fmtMoney(inv.revenue_share)}</td>
+                        <td class="text-right font-mono text-sm font-bold text-white">${fmtMoney(inv.total)}</td>
+                        <td class="text-xs text-gray-500">${fmtDate(inv.due_date)}</td>
+                        <td class="text-right">
+                            ${inv.status === 'pending' ? `<button onclick="markInvoicePaid('${inv.id}')" class="sa-btn sa-btn-success !px-2 !py-1 text-[10px]">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                Mark Paid
+                            </button>` : '<span class="text-[10px] text-gray-600">—</span>'}
+                        </td>
+                    </tr>
+                `).join("")}</tbody>
+            </table>`;
         } catch (err) { toast(err.message, "error"); }
     }
 
     async function markInvoicePaid(id) {
+        if (!confirm("Mark this invoice as paid?")) return;
         try {
             await saFetch(`/api/master/invoices/${id}`, { method: "PATCH", body: JSON.stringify({ status: "paid" }) });
             toast("Invoice marked as paid");
@@ -497,33 +980,45 @@
     }
 
     function openGenerateInvoice() {
-        // Build tenant options from overview data
-        const opts = (overviewData?.tenants||[]).map(t => `<option value="${t.id}">${esc(t.brand_name)} (${esc(t.slug)})</option>`).join("");
+        const opts = (overviewData?.tenants || allTenants || []).map(t => `<option value="${t.id}">${esc(t.brand_name)} (${esc(t.slug)})</option>`).join("");
         const today = new Date().toISOString().split("T")[0];
-        const firstOfMonth = today.slice(0,8) + "01";
+        const firstOfMonth = today.slice(0, 8) + "01";
 
         $("modal-container").innerHTML = `
             <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
                 <div class="modal-content">
-                    <h2 class="text-lg font-bold text-white mb-4">📄 Generate Invoice</h2>
-                    <form id="gen-invoice-form" class="space-y-3">
-                        <div>
-                            <label class="text-[10px] text-gray-500 uppercase mb-1 block">Tenant</label>
-                            <select id="gi-tenant" required class="form-input form-select py-2 text-sm rounded-lg">${opts}</select>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="text-[10px] text-gray-500 uppercase mb-1 block">Period Start</label>
-                                <input type="date" id="gi-start" required class="form-input py-2 text-sm rounded-lg" value="${firstOfMonth}">
+                    <div class="modal-header">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/></svg>
+                                </div>
+                                <div>
+                                    <h2 class="text-base font-bold text-white">Generate Invoice</h2>
+                                    <p class="text-[10px] text-gray-500">Create a billing invoice for a tenant</p>
+                                </div>
                             </div>
-                            <div>
-                                <label class="text-[10px] text-gray-500 uppercase mb-1 block">Period End</label>
-                                <input type="date" id="gi-end" required class="form-input py-2 text-sm rounded-lg" value="${today}">
+                            <button onclick="closeModal()" class="text-gray-600 hover:text-white transition p-1">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <form id="gen-invoice-form">
+                        <div class="modal-body space-y-3">
+                            <div><label class="sa-label">Tenant</label><select id="gi-tenant" required class="sa-input sa-select">${opts}</select></div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div><label class="sa-label">Period Start</label><input type="date" id="gi-start" required class="sa-input" value="${firstOfMonth}"></div>
+                                <div><label class="sa-label">Period End</label><input type="date" id="gi-end" required class="sa-input" value="${today}"></div>
                             </div>
                         </div>
-                        <div class="flex gap-2 pt-2">
-                            <button type="submit" class="btn btn-gradient flex-1">Generate</button>
-                            <button type="button" onclick="closeModal()" class="btn btn-ghost flex-1">Cancel</button>
+                        <div class="modal-footer">
+                            <div class="flex gap-2">
+                                <button type="submit" class="sa-btn sa-btn-primary flex-1">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/></svg>
+                                    Generate
+                                </button>
+                                <button type="button" onclick="closeModal()" class="sa-btn sa-btn-ghost flex-1">Cancel</button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -537,39 +1032,64 @@
                     period_start: $("gi-start").value,
                     period_end: $("gi-end").value
                 })});
-                toast("Invoice generated!");
+                toast("Invoice generated successfully!");
                 closeModal();
                 loadInvoices();
             } catch (err) { toast(err.message, "error"); }
         });
     }
 
-    // ── Audit Log ───────────────────────────────────────────────
+    /* ── Audit Log ──────────────────────────────────────────────── */
     async function loadAudit() {
         try {
             const res = await saFetch("/api/master/audit");
             const list = $("audit-list");
-            if (!res.data.length) { list.innerHTML = '<p class="text-gray-600 text-sm">No audit entries yet.</p>'; return; }
-            list.innerHTML = res.data.map(a => {
-                const icon = a.action.includes("created") ? "🆕" : a.action.includes("suspended") ? "🔒" : a.action.includes("deleted") ? "🗑️" : a.action.includes("login") ? "🔑" : a.action.includes("invoice") ? "📄" : "📝";
-                return `
-                <div class="flex items-center gap-3 p-2 rounded-lg bg-white/[0.02] text-xs">
-                    <span class="text-lg">${icon}</span>
-                    <div class="flex-1 min-w-0">
-                        <span class="text-white font-medium">${esc(a.action)}</span>
-                        <span class="text-gray-500 ml-2">by ${esc(a.actor)}</span>
-                    </div>
-                    <span class="text-[10px] text-gray-600 flex-shrink-0">${fmtDate(a.created_at)}</span>
+            if (!res.data.length) {
+                list.innerHTML = `<div class="empty-state py-12">
+                    <svg class="w-12 h-12 mx-auto mb-3 text-zinc-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <p class="text-sm text-gray-500">No audit entries yet</p>
                 </div>`;
-            }).join("");
+                return;
+            }
+
+            const actionIcons = {
+                login: '<svg class="w-4 h-4 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>',
+                created: '<svg class="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>',
+                suspended: '<svg class="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>',
+                active: '<svg class="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+                deleted: '<svg class="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>',
+                invoice: '<svg class="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/></svg>',
+                promoted: '<svg class="w-4 h-4 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>',
+                default: '<svg class="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+            };
+
+            function getIcon(action) {
+                for (const [key, icon] of Object.entries(actionIcons)) {
+                    if (key !== 'default' && action.includes(key)) return icon;
+                }
+                return actionIcons.default;
+            }
+
+            list.innerHTML = `<table class="data-table">
+                <thead><tr><th style="width:40px"></th><th>Action</th><th>Actor</th><th>Details</th><th class="text-right">Timestamp</th></tr></thead>
+                <tbody>${res.data.map(a => {
+                    const details = a.details && Object.keys(a.details).length ? Object.entries(a.details).map(([k,v]) => `${k}: ${v}`).join(", ") : "—";
+                    return `<tr>
+                        <td class="text-center">${getIcon(a.action)}</td>
+                        <td><span class="text-xs font-mono text-white bg-white/[0.05] px-2 py-0.5 rounded">${esc(a.action)}</span></td>
+                        <td class="text-xs text-gray-400">${esc(a.actor)}</td>
+                        <td class="text-[11px] text-gray-500 max-w-[200px] truncate">${esc(details)}</td>
+                        <td class="text-right text-[11px] text-gray-600">${fmtDateTime(a.created_at)}</td>
+                    </tr>`;
+                }).join("")}</tbody>
+            </table>`;
         } catch (err) { toast(err.message, "error"); }
     }
 
-    // ── Boot ────────────────────────────────────────────────────
+    /* ── Boot ───────────────────────────────────────────────────── */
     if (saToken) {
-        // Verify token is still valid
         fetch(SA_API + "/api/master/overview", { headers: { "Authorization": `Bearer ${saToken}` } })
-            .then(r => { if (r.ok) showApp(); else saLogout(); })
+            .then(r => { if (r.ok) { showApp(); } else { saLogout(); } })
             .catch(() => saLogout());
     }
     </script>
