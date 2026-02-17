@@ -8,6 +8,50 @@
 const API_BASE = (window.BRAND && BRAND.urls.api) || "https://api.theforexskyline.com";
 const _LS = (k) => window.BRAND ? BRAND._lsKey(k) : `tfxs_${k}`;
 
+// ── Tenant blocked overlay (suspended / trial expired) ────
+function showTenantBlockedOverlay(message) {
+  if (document.getElementById("__tenant-blocked")) return;
+  const overlay = document.createElement("div");
+  overlay.id = "__tenant-blocked";
+  overlay.style.cssText = "position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.92);display:flex;align-items:center;justify-content:center;";
+  overlay.innerHTML = `<div style="text-align:center;max-width:440px;padding:40px;background:#111;border-radius:16px;border:1px solid #333;">
+    <div style="font-size:48px;margin-bottom:16px;">🚫</div>
+    <h2 style="color:#fff;font-size:22px;margin-bottom:12px;">Platform Unavailable</h2>
+    <p style="color:#999;font-size:15px;line-height:1.5;">${message}</p>
+    <p style="color:#666;font-size:13px;margin-top:16px;">Contact your platform provider for assistance.</p>
+  </div>`;
+  document.body.appendChild(overlay);
+}
+
+// ── Dynamic brand config (fetch from backend on load) ─────
+(async function loadDynamicBrand() {
+  try {
+    const r = await fetch(`${API_BASE}/api/brand`, { signal: AbortSignal.timeout(5000) });
+    if (!r.ok) return;
+    const d = await r.json();
+    if (d.ok && d.brand && window.BRAND) {
+      // Merge backend brand over static defaults (backend wins)
+      const b = d.brand;
+      if (b.name)        BRAND.name = b.name;
+      if (b.nameFull)    BRAND.nameFull = b.nameFull;
+      if (b.company)     BRAND.company = b.company;
+      if (b.year)        BRAND.year = b.year;
+      if (b.prefix)      BRAND.prefix = b.prefix;
+      if (b.tagline)     BRAND.tagline = b.tagline;
+      if (b.description) BRAND.description = b.description;
+      if (b.logoUrl)     BRAND.urls.logo = b.logoUrl;
+      // Recompute CSS vars if colors changed
+      if (b.primaryHex) {
+        BRAND.colors.primary600 = b.primaryHex;
+        BRAND.colors.primary500 = b.primaryHex;
+      }
+      if (b.gradientEnd) BRAND.colors.primary700 = b.gradientEnd;
+      if (b.bgDark)      BRAND.colors.bgDark = b.bgDark;
+      if (typeof BRAND._injectCSS === "function") BRAND._injectCSS();
+    }
+  } catch { /* static brand.config.js is the fallback */ }
+})();
+
 // ── Affiliate ID management ──────────────────────────────
 function getAffiliateId() {
   // Admin sees global data — no affiliate filter
@@ -44,6 +88,14 @@ async function apiGet(path, retries = 2) {
       clearTimeout(timeout);
 
       if (res.status === 401) { localStorage.removeItem(_LS("jwt")); localStorage.removeItem(_LS("affiliate_id")); localStorage.removeItem(_LS("is_admin")); window.location.replace("/login"); return; }
+      if (res.status === 403) {
+        try {
+          const body = await res.clone().json();
+          if (body.code === "TENANT_SUSPENDED" || body.code === "TRIAL_EXPIRED") {
+            showTenantBlockedOverlay(body.error || "Platform unavailable"); return;
+          }
+        } catch {}
+      }
       if (!res.ok) {
         const text = await res.text();
         throw new Error(`API ${res.status}: ${text}`);

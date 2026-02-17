@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="theme-color" content="#f5f5f7">
+    <script src="js/brand.config.js"></script>
+    <script>((t)=>{if(t==="light"){document.documentElement.classList.add("light-theme")};var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==="light"?BRAND.colors.bgLight:BRAND.colors.bgDark})(localStorage.getItem(BRAND._lsKey("theme"))||"light")</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title id="page-title">Super Admin | Master Dashboard</title>
+    <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/shared.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter','sans-serif'], mono: ['JetBrains Mono','monospace'] },
+                    colors: { brand: BRAND._tailwindBrand() },
+                    animation: { 'fade-in-up': 'fadeInUp 0.5s ease-out forwards' },
+                    keyframes: { fadeInUp: { '0%': { opacity:'0', transform:'translateY(10px)' }, '100%': { opacity:'1', transform:'translateY(0)' } } }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: var(--brand-dark, #050505); color: #d4d4d8; }
+        .master-tab { transition: all 0.3s; cursor: pointer; white-space: nowrap; }
+        .master-tab.active { color: var(--brand-500, #ef4444); background: rgba(255,255,255,0.1); box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+        .master-tab:not(.active) { color: #71717a; }
+        .master-tab:not(.active):hover { color: #d4d4d8; }
+        .kpi-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 1rem; padding: 1.25rem; transition: all 0.3s; }
+        .kpi-card:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.12); }
+        .tenant-row { transition: background 0.15s; cursor: pointer; }
+        .tenant-row:hover { background: rgba(255,255,255,0.04); }
+        .status-active { color: #22c55e; background: rgba(34,197,94,0.12); }
+        .status-trial { color: #fbbf24; background: rgba(251,191,36,0.12); }
+        .status-suspended { color: #ef4444; background: rgba(239,68,68,0.12); }
+        .status-cancelled { color: #71717a; background: rgba(113,113,122,0.12); }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 50; display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: #111; border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem; padding: 2rem; max-width: 560px; width: 90%; max-height: 85vh; overflow-y: auto; }
+        .toast { position: fixed; top: 1rem; right: 1rem; z-index: 100; padding: 0.75rem 1.25rem; border-radius: 0.75rem; font-size: 0.8rem; font-weight: 600; animation: slideIn 0.3s ease, fadeOut 0.5s ease 3.5s forwards; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; transform: translateY(-10px); } }
+    </style>
+</head>
+<body class="font-sans min-h-screen">
+    <div class="halo-bg"></div>
+
+    <!-- ═══ Login Gate ═══ -->
+    <div id="login-gate" class="relative z-10 min-h-screen flex items-center justify-center px-4">
+        <div class="w-full max-w-sm">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center gap-2 mb-4">
+                    <svg class="w-8 h-8 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    <span class="text-xl font-bold text-white">SUPER ADMIN</span>
+                </div>
+                <p class="text-gray-500 text-xs font-mono uppercase tracking-widest">Master SaaS Dashboard</p>
+            </div>
+            <form id="master-login-form" class="space-y-4">
+                <input type="email" id="sa-email" required class="w-full form-input py-3 rounded-xl text-sm" placeholder="Super admin email">
+                <input type="password" id="sa-password" required class="w-full form-input py-3 rounded-xl text-sm" placeholder="Password">
+                <button type="submit" class="w-full btn-gradient py-3 rounded-xl text-xs font-bold text-white uppercase tracking-widest">Login</button>
+                <p id="sa-error" class="text-red-400 text-xs text-center hidden"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- ═══ Main Dashboard (hidden until login) ═══ -->
+    <div id="master-app" class="hidden relative z-10">
+        <!-- Top Bar -->
+        <nav class="sticky top-0 z-30 backdrop-blur-xl bg-black/60 border-b border-white/5">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <svg class="w-7 h-7 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    <span class="text-lg font-bold text-white">Super Admin</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-400 font-bold uppercase">Master</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span id="sa-user-label" class="text-xs text-gray-500 hidden sm:inline"></span>
+                    <button onclick="saLogout()" class="text-xs text-gray-500 hover:text-white transition px-3 py-1.5 rounded-lg hover:bg-white/5">Logout</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Tabs -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 mt-4">
+            <div class="flex gap-1 bg-white/[0.02] rounded-xl p-1 border border-white/5 overflow-x-auto no-scrollbar">
+                <button onclick="switchMasterTab('overview')" data-tab="overview" class="master-tab flex-shrink-0 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider active">Overview</button>
+                <button onclick="switchMasterTab('tenants')" data-tab="tenants" class="master-tab flex-shrink-0 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider">Tenants</button>
+                <button onclick="switchMasterTab('invoices')" data-tab="invoices" class="master-tab flex-shrink-0 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider">Invoices</button>
+                <button onclick="switchMasterTab('audit')" data-tab="audit" class="master-tab flex-shrink-0 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider">Audit Log</button>
+            </div>
+        </div>
+
+        <!-- Tab Panels -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+            <!-- ═══ OVERVIEW TAB ═══ -->
+            <div id="panel-overview">
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
+                    <div class="kpi-card"><p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Total Tenants</p><p id="kpi-total" class="text-2xl font-bold text-white font-mono">—</p></div>
+                    <div class="kpi-card"><p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Active</p><p id="kpi-active" class="text-2xl font-bold text-green-400 font-mono">—</p></div>
+                    <div class="kpi-card"><p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Trial</p><p id="kpi-trial" class="text-2xl font-bold text-amber-400 font-mono">—</p></div>
+                    <div class="kpi-card"><p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">MRR</p><p id="kpi-mrr" class="text-2xl font-bold text-brand-500 font-mono">—</p></div>
+                    <div class="kpi-card"><p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Revenue Share</p><p id="kpi-rev-share" class="text-2xl font-bold text-emerald-400 font-mono">—</p></div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                    <div class="kpi-card"><p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Total Affiliates (all tenants)</p><p id="kpi-affiliates" class="text-2xl font-bold text-white font-mono">—</p></div>
+                    <div class="kpi-card"><p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Total Conversions (all tenants)</p><p id="kpi-conversions" class="text-2xl font-bold text-white font-mono">—</p></div>
+                </div>
+                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mt-6 mb-3">All Tenants</h3>
+                <div id="overview-tenant-list" class="space-y-2"></div>
+            </div>
+
+            <!-- ═══ TENANTS TAB ═══ -->
+            <div id="panel-tenants" class="hidden">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest">Tenant Management</h2>
+                    <button onclick="openCreateTenant()" class="btn btn-gradient text-[10px] px-4 py-2">+ New Tenant</button>
+                </div>
+                <div id="tenants-list" class="space-y-2"></div>
+            </div>
+
+            <!-- ═══ INVOICES TAB ═══ -->
+            <div id="panel-invoices" class="hidden">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest">Invoices</h2>
+                    <button onclick="openGenerateInvoice()" class="btn btn-gradient text-[10px] px-4 py-2">+ Generate Invoice</button>
+                </div>
+                <div id="invoices-list" class="space-y-2"></div>
+            </div>
+
+            <!-- ═══ AUDIT TAB ═══ -->
+            <div id="panel-audit" class="hidden">
+                <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Audit Log</h2>
+                <div id="audit-list" class="space-y-1"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Modals Container ═══ -->
+    <div id="modal-container"></div>
+
+    <script src="js/theme.js"></script>
+    <script>
+    /* ═══════════════════════════════════════════════════════════════
+       SUPER ADMIN — Master Dashboard JS
+       ═══════════════════════════════════════════════════════════════ */
+
+    const SA_API = (window.BRAND && BRAND.urls.api) || "https://api.theforexskyline.com";
+    const SA_TOKEN_KEY = BRAND._lsKey("sa_jwt");
+    let saToken = localStorage.getItem(SA_TOKEN_KEY);
+    let overviewData = null;
+
+    // ── Helpers ─────────────────────────────────────────────────
+    function $(id) { return document.getElementById(id); }
+    function esc(s) { if(!s) return ""; const d=document.createElement("div"); d.textContent=s; return d.innerHTML; }
+    function fmtMoney(n) { return "$" + Number(n||0).toLocaleString("en",{minimumFractionDigits:2,maximumFractionDigits:2}); }
+    function fmtDate(d) { return d ? new Date(d).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"}) : "—"; }
+
+    function statusBadge(s) {
+        const cls = { active: "status-active", trial: "status-trial", suspended: "status-suspended", cancelled: "status-cancelled" };
+        return `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${cls[s]||'status-cancelled'}">${esc(s)}</span>`;
+    }
+
+    function toast(msg, type="success") {
+        const t = document.createElement("div");
+        t.className = `toast ${type==="error" ? "bg-red-500/90 text-white" : "bg-green-500/90 text-white"}`;
+        t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 4500);
+    }
+
+    async function saFetch(path, opts={}) {
+        const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${saToken}`, ...opts.headers };
+        const res = await fetch(SA_API + path, { ...opts, headers });
+        const json = await res.json().catch(()=>null);
+        if (!res.ok) throw new Error(json?.error || `HTTP ${res.status}`);
+        return json;
+    }
+
+    // ── Auth ────────────────────────────────────────────────────
+    $("master-login-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = $("sa-email").value.trim();
+        const password = $("sa-password").value;
+        try {
+            const res = await fetch(SA_API + "/api/master/login", {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+            if (!data.ok) { $("sa-error").textContent = data.error; $("sa-error").classList.remove("hidden"); return; }
+            saToken = data.token;
+            localStorage.setItem(SA_TOKEN_KEY, saToken);
+            $("sa-user-label").textContent = data.email || email;
+            showApp();
+        } catch (err) { $("sa-error").textContent = err.message; $("sa-error").classList.remove("hidden"); }
+    });
+
+    function saLogout() {
+        localStorage.removeItem(SA_TOKEN_KEY);
+        saToken = null;
+        $("master-app").classList.add("hidden");
+        $("login-gate").classList.remove("hidden");
+    }
+
+    function showApp() {
+        $("login-gate").classList.add("hidden");
+        $("master-app").classList.remove("hidden");
+        loadOverview();
+    }
+
+    // ── Tab switching ───────────────────────────────────────────
+    function switchMasterTab(tab) {
+        document.querySelectorAll(".master-tab").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+        ["overview","tenants","invoices","audit"].forEach(t => {
+            const p = $("panel-"+t);
+            if (p) p.classList.toggle("hidden", t !== tab);
+        });
+        if (tab === "overview") loadOverview();
+        if (tab === "tenants") loadTenants();
+        if (tab === "invoices") loadInvoices();
+        if (tab === "audit") loadAudit();
+    }
+
+    // ── Overview ────────────────────────────────────────────────
+    async function loadOverview() {
+        try {
+            const res = await saFetch("/api/master/overview");
+            overviewData = res.data;
+            $("kpi-total").textContent = overviewData.tenants_total;
+            $("kpi-active").textContent = overviewData.tenants_active;
+            $("kpi-trial").textContent = overviewData.tenants_trial;
+            $("kpi-mrr").textContent = fmtMoney(overviewData.mrr);
+            $("kpi-rev-share").textContent = fmtMoney(overviewData.revenue_share_total);
+            $("kpi-affiliates").textContent = (overviewData.total_affiliates||0).toLocaleString();
+            $("kpi-conversions").textContent = (overviewData.total_conversions||0).toLocaleString();
+
+            // Render tenant cards
+            const list = $("overview-tenant-list");
+            if (!overviewData.tenants.length) { list.innerHTML = '<p class="text-gray-600 text-sm">No tenants yet. Create your first client!</p>'; return; }
+            list.innerHTML = overviewData.tenants.map(t => `
+                <div class="tenant-row glass-panel p-4 rounded-xl flex items-center justify-between gap-4" onclick="viewTenant('${t.id}')">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="font-bold text-white text-sm">${esc(t.brand_name)}</span>
+                            ${statusBadge(t.status)}
+                            <span class="text-[10px] text-gray-600 font-mono">${esc(t.slug)}</span>
+                        </div>
+                        <div class="flex gap-4 text-[10px] text-gray-500">
+                            <span>📧 ${esc(t.admin_email)}</span>
+                            <span>👥 ${t.total_affiliates||0} affiliates</span>
+                            <span>💰 ${fmtMoney(t.total_revenue)}</span>
+                        </div>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        <p class="text-xs font-bold text-brand-500">${fmtMoney(t.monthly_fee)}/mo</p>
+                        <p class="text-[10px] text-gray-600">${t.plan} plan</p>
+                    </div>
+                </div>
+            `).join("");
+        } catch (err) { toast(err.message, "error"); }
+    }
+
+    // ── Tenants ─────────────────────────────────────────────────
+    async function loadTenants() {
+        try {
+            const res = await saFetch("/api/master/tenants");
+            const list = $("tenants-list");
+            if (!res.data.length) { list.innerHTML = '<p class="text-gray-600 text-sm">No tenants.</p>'; return; }
+            list.innerHTML = res.data.map(t => `
+                <div class="glass-panel p-4 rounded-xl">
+                    <div class="flex items-center justify-between gap-4">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="font-bold text-white">${esc(t.brand_name)}</span>
+                                ${statusBadge(t.status)}
+                                <span class="text-[10px] text-gray-600 font-mono">${esc(t.slug)}</span>
+                            </div>
+                            <div class="flex flex-wrap gap-3 text-[10px] text-gray-500">
+                                <span>📧 ${esc(t.admin_email)}</span>
+                                <span>🌐 ${esc(t.domain||'—')}</span>
+                                <span>📅 ${fmtDate(t.created_at)}</span>
+                                <span>💰 ${fmtMoney(t.monthly_fee)}/mo + ${t.revenue_share_pct}%</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="viewTenant('${t.id}')" class="btn btn-ghost text-[10px]">Details</button>
+                            ${t.status==='active' ?
+                                `<button onclick="changeTenantStatus('${t.id}','suspended')" class="btn btn-danger text-[10px]">Suspend</button>` :
+                                t.status==='suspended' ?
+                                `<button onclick="changeTenantStatus('${t.id}','active')" class="btn btn-gradient text-[10px]">Reactivate</button>` : ''
+                            }
+                        </div>
+                    </div>
+                </div>
+            `).join("");
+        } catch (err) { toast(err.message, "error"); }
+    }
+
+    async function changeTenantStatus(id, status) {
+        if (!confirm(`Are you sure you want to ${status} this tenant?`)) return;
+        try {
+            await saFetch(`/api/master/tenants/${id}/status`, { method: "POST", body: JSON.stringify({ status }) });
+            toast(`Tenant ${status}`);
+            loadTenants();
+            loadOverview();
+        } catch (err) { toast(err.message, "error"); }
+    }
+
+    // ── View tenant detail (modal) ──────────────────────────────
+    async function viewTenant(id) {
+        try {
+            const res = await saFetch(`/api/master/tenants/${id}`);
+            const t = res.data;
+            $("modal-container").innerHTML = `
+                <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+                    <div class="modal-content">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h2 class="text-lg font-bold text-white">${esc(t.brand_name)}</h2>
+                                <p class="text-xs text-gray-500 font-mono">${esc(t.slug)} · ${esc(t.plan)} plan</p>
+                            </div>
+                            ${statusBadge(t.status)}
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mb-4 text-xs">
+                            <div class="glass-panel p-3 rounded-lg"><span class="text-gray-500 block text-[10px] uppercase">Admin Email</span><span class="text-white">${esc(t.admin_email)}</span></div>
+                            <div class="glass-panel p-3 rounded-lg"><span class="text-gray-500 block text-[10px] uppercase">Domain</span><span class="text-white">${esc(t.domain||'—')}</span></div>
+                            <div class="glass-panel p-3 rounded-lg"><span class="text-gray-500 block text-[10px] uppercase">Monthly Fee</span><span class="text-white font-bold">${fmtMoney(t.monthly_fee)}</span></div>
+                            <div class="glass-panel p-3 rounded-lg"><span class="text-gray-500 block text-[10px] uppercase">Revenue Share</span><span class="text-white font-bold">${t.revenue_share_pct}%</span></div>
+                            <div class="glass-panel p-3 rounded-lg"><span class="text-gray-500 block text-[10px] uppercase">Affiliates</span><span class="text-white font-bold">${t.total_affiliates||0}</span></div>
+                            <div class="glass-panel p-3 rounded-lg"><span class="text-gray-500 block text-[10px] uppercase">Conversions</span><span class="text-white font-bold">${t.total_conversions||0}</span></div>
+                            <div class="glass-panel p-3 rounded-lg col-span-2"><span class="text-gray-500 block text-[10px] uppercase">Total Revenue</span><span class="text-white font-bold text-lg">${fmtMoney(t.total_revenue)}</span></div>
+                        </div>
+                        ${t.notes ? `<p class="text-xs text-gray-400 mb-4 p-3 bg-white/[0.02] rounded-lg">📝 ${esc(t.notes)}</p>` : ''}
+                        ${t.invoices.length ? `
+                            <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Recent Invoices</h3>
+                            <div class="space-y-1 mb-4 max-h-40 overflow-y-auto">
+                                ${t.invoices.map(inv => `
+                                    <div class="flex items-center justify-between text-xs p-2 rounded-lg bg-white/[0.02]">
+                                        <span class="font-mono text-gray-400">${esc(inv.invoice_no)}</span>
+                                        <span>${fmtMoney(inv.total)}</span>
+                                        ${statusBadge(inv.status)}
+                                    </div>
+                                `).join("")}
+                            </div>
+                        ` : ''}
+                        <div class="flex gap-2 mt-4">
+                            ${t.status==='active' ?
+                                `<button onclick="changeTenantStatus('${t.id}','suspended');closeModal()" class="btn btn-danger flex-1">🔒 Suspend</button>` :
+                                `<button onclick="changeTenantStatus('${t.id}','active');closeModal()" class="btn btn-gradient flex-1">✅ Reactivate</button>`
+                            }
+                            <button onclick="deleteTenant('${t.id}')" class="btn btn-danger flex-1">🗑️ Delete</button>
+                            <button onclick="closeModal()" class="btn btn-ghost flex-1">Close</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } catch (err) { toast(err.message, "error"); }
+    }
+
+    async function deleteTenant(id) {
+        if (!confirm("⚠️ This will permanently delete this tenant and all their invoices. Continue?")) return;
+        try {
+            await saFetch(`/api/master/tenants/${id}`, { method: "DELETE" });
+            toast("Tenant deleted");
+            closeModal();
+            loadTenants();
+            loadOverview();
+        } catch (err) { toast(err.message, "error"); }
+    }
+
+    function closeModal() { $("modal-container").innerHTML = ""; }
+
+    // ── Create Tenant Modal ─────────────────────────────────────
+    function openCreateTenant() {
+        $("modal-container").innerHTML = `
+            <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+                <div class="modal-content">
+                    <h2 class="text-lg font-bold text-white mb-4">🏢 New Tenant</h2>
+                    <form id="create-tenant-form" class="space-y-3">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase mb-1 block">Brand Name *</label>
+                                <input type="text" id="ct-brand" required class="form-input py-2 text-sm rounded-lg" placeholder="ACME">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase mb-1 block">Slug *</label>
+                                <input type="text" id="ct-slug" required class="form-input py-2 text-sm rounded-lg" placeholder="acme-affiliates">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-gray-500 uppercase mb-1 block">Admin Email *</label>
+                            <input type="email" id="ct-email" required class="form-input py-2 text-sm rounded-lg" placeholder="admin@acme.com">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase mb-1 block">Company</label>
+                                <input type="text" id="ct-company" class="form-input py-2 text-sm rounded-lg" placeholder="ACME Corp">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase mb-1 block">Domain</label>
+                                <input type="text" id="ct-domain" class="form-input py-2 text-sm rounded-lg" placeholder="affiliates.acme.com">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase mb-1 block">Plan</label>
+                                <select id="ct-plan" class="form-input form-select py-2 text-sm rounded-lg">
+                                    <option value="starter">Starter — $99/mo</option>
+                                    <option value="standard">Standard — $199/mo</option>
+                                    <option value="premium">Premium — $499/mo</option>
+                                    <option value="custom">Custom</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase mb-1 block">Revenue Share %</label>
+                                <input type="number" id="ct-rev-share" class="form-input py-2 text-sm rounded-lg" value="5" step="0.5" min="0" max="50">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-gray-500 uppercase mb-1 block">Notes</label>
+                            <textarea id="ct-notes" class="form-input py-2 text-sm rounded-lg" rows="2" placeholder="Internal notes..."></textarea>
+                        </div>
+                        <div class="flex gap-2 pt-2">
+                            <button type="submit" class="btn btn-gradient flex-1">Create Tenant</button>
+                            <button type="button" onclick="closeModal()" class="btn btn-ghost flex-1">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
+        $("create-tenant-form").addEventListener("submit", handleCreateTenant);
+    }
+
+    async function handleCreateTenant(e) {
+        e.preventDefault();
+        try {
+            const body = {
+                brand_name: $("ct-brand").value.trim(),
+                slug: $("ct-slug").value.trim(),
+                admin_email: $("ct-email").value.trim(),
+                company: $("ct-company").value.trim(),
+                domain: $("ct-domain").value.trim(),
+                plan: $("ct-plan").value,
+                revenue_share_pct: parseFloat($("ct-rev-share").value) || 5,
+                notes: $("ct-notes").value.trim(),
+                brand_full: $("ct-brand").value.trim().toUpperCase() + " AFFILIATES"
+            };
+            await saFetch("/api/master/tenants", { method: "POST", body: JSON.stringify(body) });
+            toast("Tenant created!");
+            closeModal();
+            loadTenants();
+            loadOverview();
+        } catch (err) { toast(err.message, "error"); }
+    }
+
+    // ── Invoices ────────────────────────────────────────────────
+    async function loadInvoices() {
+        try {
+            const res = await saFetch("/api/master/invoices");
+            const list = $("invoices-list");
+            if (!res.data.length) { list.innerHTML = '<p class="text-gray-600 text-sm">No invoices yet.</p>'; return; }
+            list.innerHTML = res.data.map(inv => `
+                <div class="glass-panel p-4 rounded-xl flex items-center justify-between gap-4">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="font-mono text-white text-sm font-bold">${esc(inv.invoice_no)}</span>
+                            ${statusBadge(inv.status)}
+                            <span class="text-[10px] text-gray-600">${esc(inv.master_tenants?.brand_name||'')}</span>
+                        </div>
+                        <div class="flex gap-3 text-[10px] text-gray-500">
+                            <span>📅 ${fmtDate(inv.period_start)} → ${fmtDate(inv.period_end)}</span>
+                            <span>📆 Due: ${fmtDate(inv.due_date)}</span>
+                        </div>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        <p class="font-bold text-white">${fmtMoney(inv.total)}</p>
+                        <p class="text-[10px] text-gray-600">Base: ${fmtMoney(inv.base_fee)} + Rev: ${fmtMoney(inv.revenue_share)}</p>
+                    </div>
+                    <div class="flex gap-1 flex-shrink-0">
+                        ${inv.status === 'pending' ? `<button onclick="markInvoicePaid('${inv.id}')" class="btn btn-gradient text-[10px] px-3">Mark Paid</button>` : ''}
+                    </div>
+                </div>
+            `).join("");
+        } catch (err) { toast(err.message, "error"); }
+    }
+
+    async function markInvoicePaid(id) {
+        try {
+            await saFetch(`/api/master/invoices/${id}`, { method: "PATCH", body: JSON.stringify({ status: "paid" }) });
+            toast("Invoice marked as paid");
+            loadInvoices();
+        } catch (err) { toast(err.message, "error"); }
+    }
+
+    function openGenerateInvoice() {
+        // Build tenant options from overview data
+        const opts = (overviewData?.tenants||[]).map(t => `<option value="${t.id}">${esc(t.brand_name)} (${esc(t.slug)})</option>`).join("");
+        const today = new Date().toISOString().split("T")[0];
+        const firstOfMonth = today.slice(0,8) + "01";
+
+        $("modal-container").innerHTML = `
+            <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+                <div class="modal-content">
+                    <h2 class="text-lg font-bold text-white mb-4">📄 Generate Invoice</h2>
+                    <form id="gen-invoice-form" class="space-y-3">
+                        <div>
+                            <label class="text-[10px] text-gray-500 uppercase mb-1 block">Tenant</label>
+                            <select id="gi-tenant" required class="form-input form-select py-2 text-sm rounded-lg">${opts}</select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase mb-1 block">Period Start</label>
+                                <input type="date" id="gi-start" required class="form-input py-2 text-sm rounded-lg" value="${firstOfMonth}">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase mb-1 block">Period End</label>
+                                <input type="date" id="gi-end" required class="form-input py-2 text-sm rounded-lg" value="${today}">
+                            </div>
+                        </div>
+                        <div class="flex gap-2 pt-2">
+                            <button type="submit" class="btn btn-gradient flex-1">Generate</button>
+                            <button type="button" onclick="closeModal()" class="btn btn-ghost flex-1">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
+        $("gen-invoice-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            try {
+                await saFetch("/api/master/invoices/generate", { method: "POST", body: JSON.stringify({
+                    tenant_id: $("gi-tenant").value,
+                    period_start: $("gi-start").value,
+                    period_end: $("gi-end").value
+                })});
+                toast("Invoice generated!");
+                closeModal();
+                loadInvoices();
+            } catch (err) { toast(err.message, "error"); }
+        });
+    }
+
+    // ── Audit Log ───────────────────────────────────────────────
+    async function loadAudit() {
+        try {
+            const res = await saFetch("/api/master/audit");
+            const list = $("audit-list");
+            if (!res.data.length) { list.innerHTML = '<p class="text-gray-600 text-sm">No audit entries yet.</p>'; return; }
+            list.innerHTML = res.data.map(a => {
+                const icon = a.action.includes("created") ? "🆕" : a.action.includes("suspended") ? "🔒" : a.action.includes("deleted") ? "🗑️" : a.action.includes("login") ? "🔑" : a.action.includes("invoice") ? "📄" : "📝";
+                return `
+                <div class="flex items-center gap-3 p-2 rounded-lg bg-white/[0.02] text-xs">
+                    <span class="text-lg">${icon}</span>
+                    <div class="flex-1 min-w-0">
+                        <span class="text-white font-medium">${esc(a.action)}</span>
+                        <span class="text-gray-500 ml-2">by ${esc(a.actor)}</span>
+                    </div>
+                    <span class="text-[10px] text-gray-600 flex-shrink-0">${fmtDate(a.created_at)}</span>
+                </div>`;
+            }).join("");
+        } catch (err) { toast(err.message, "error"); }
+    }
+
+    // ── Boot ────────────────────────────────────────────────────
+    if (saToken) {
+        // Verify token is still valid
+        fetch(SA_API + "/api/master/overview", { headers: { "Authorization": `Bearer ${saToken}` } })
+            .then(r => { if (r.ok) showApp(); else saLogout(); })
+            .catch(() => saLogout());
+    }
+    </script>
+</body>
+</html>
