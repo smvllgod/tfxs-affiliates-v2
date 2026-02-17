@@ -1092,12 +1092,14 @@
             const API = window.TFXS_API;
             let totalCommission = 0, totalRegs = 0, ftDs = 0, qftDs = 0, totalDeposit = 0, totalNetDeposit = 0;
             let backendKPIs = false;
+            let _summaryData = null; // Store for balance card sync
             if (API && typeof API.fetchSummary === 'function') {
                 try {
                     const affiliateId = API.getAffiliateId ? API.getAffiliateId() : null;
                     const summaryRes = await API.fetchSummary(affiliateId, fromStr, toStr);
                     if (summaryRes && summaryRes.ok && summaryRes.data) {
                         const s = summaryRes.data;
+                        _summaryData = s; // Save for balance card
                         // Admin: commission KPI shows raw CellXpert revenue; affiliate: deal-based commission
                         const isAdminView = localStorage.getItem(BRAND._lsKey('is_admin')) === 'true';
                         totalCommission = (isAdminView && s.raw_revenue !== undefined) ? s.raw_revenue : (s.total_commission || 0);
@@ -1226,9 +1228,11 @@
                         const isSameMonth = b.same_month === true;
                         const isAdminView = localStorage.getItem(BRAND._lsKey('is_admin')) === 'true';
 
-                        // Admin: show raw_revenue as balance; Affiliate: show commission balance
+                        // Admin: use date-filtered summary revenue (same as KPI cards) for consistency
                         let myBalance;
-                        if (isAdminView && b.raw_revenue !== undefined) {
+                        if (isAdminView && _summaryData && _summaryData.raw_revenue !== undefined) {
+                            myBalance = _summaryData.raw_revenue;
+                        } else if (isAdminView && b.raw_revenue !== undefined) {
                             myBalance = b.raw_revenue;
                         } else {
                             myBalance = isSameMonth ? available : (available + currentMonth);
@@ -1236,9 +1240,10 @@
 
                         document.getElementById('balance-display').textContent = formatCurrency(myBalance);
 
-                        // Admin: override popup with business metrics
-                        if (isAdminView && b.raw_revenue !== undefined) {
-                            document.getElementById('popup-available').textContent = formatCurrency(b.raw_revenue);
+                        // Admin: override popup with business metrics (use date-filtered summary data)
+                        const _sd = (isAdminView && _summaryData) ? _summaryData : null;
+                        if (_sd && _sd.raw_revenue !== undefined) {
+                            document.getElementById('popup-available').textContent = formatCurrency(_sd.raw_revenue);
                             const availLabel = document.querySelector('#popup-available')?.closest('.flex-1')?.querySelector('.text-gray-500');
                             if (availLabel) availLabel.textContent = 'Total Revenue';
                             const availSub = document.getElementById('popup-available-sub');
@@ -1253,15 +1258,15 @@
                             const accruingSub = document.getElementById('popup-accruing-sub');
                             if (accruingSub) accruingSub.textContent = 'Owed to affiliates';
                             const accruingEl = document.getElementById('popup-accruing');
-                            if (accruingEl) { accruingEl.textContent = formatCurrency(b.affiliate_cost || 0); accruingEl.className = 'text-sm font-bold text-red-400 font-mono'; }
+                            if (accruingEl) { accruingEl.textContent = formatCurrency(_sd.affiliate_cost || 0); accruingEl.className = 'text-sm font-bold text-red-400 font-mono'; }
                             // Lifetime → Net Profit
-                            document.getElementById('popup-lifetime').textContent = formatCurrency(b.net_profit || 0);
+                            document.getElementById('popup-lifetime').textContent = formatCurrency(_sd.profit || 0);
                             const lifetimeLabel = document.querySelector('#popup-lifetime')?.closest('.flex-1')?.querySelector('.text-gray-500');
                             if (lifetimeLabel) lifetimeLabel.textContent = 'Net Profit';
                             const lifetimeEl = document.getElementById('popup-lifetime');
-                            if (lifetimeEl) lifetimeEl.className = (b.net_profit || 0) >= 0 ? 'text-sm font-bold text-emerald-400 font-mono' : 'text-sm font-bold text-red-400 font-mono';
+                            if (lifetimeEl) lifetimeEl.className = (_sd.profit || 0) >= 0 ? 'text-sm font-bold text-emerald-400 font-mono' : 'text-sm font-bold text-red-400 font-mono';
                             // Paid → Margin
-                            document.getElementById('popup-paid').textContent = (b.margin || 0).toFixed(1) + '%';
+                            document.getElementById('popup-paid').textContent = (_sd.margin || 0).toFixed(1) + '%';
                             const paidLabel2 = document.getElementById('popup-paid-label');
                             if (paidLabel2) paidLabel2.textContent = 'Margin';
                         } else {
@@ -1271,7 +1276,7 @@
                         }
 
                         // Dynamic labels based on schedule mode (affiliates only — admin uses business metrics above)
-                        if (!isAdminView || b.raw_revenue === undefined) {
+                        if (!_sd || _sd.raw_revenue === undefined) {
                             const accruingRow = document.getElementById('popup-accruing-row');
                             const accruingDivider = document.getElementById('popup-accruing-divider');
                             const accruingEl = document.getElementById('popup-accruing');
