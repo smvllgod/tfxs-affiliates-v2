@@ -1,34 +1,36 @@
 /**
- * TFXS AFFILIATES — API Layer v2
- * Connects the frontend dashboard to the TFXS backend on Render.
+ * AFFILIATES — API Layer v2
+ * Connects the frontend dashboard to the backend on Render.
  * JWT-only authentication — no static tokens.
+ * Brand config: reads from window.BRAND (loaded via brand.config.js)
  */
 
-const API_BASE = "https://api.theforexskyline.com";
+const API_BASE = (window.BRAND && BRAND.urls.api) || "https://api.theforexskyline.com";
+const _LS = (k) => window.BRAND ? BRAND._lsKey(k) : `tfxs_${k}`;
 
 // ── Affiliate ID management ──────────────────────────────
 function getAffiliateId() {
   // Admin sees global data — no affiliate filter
-  if (localStorage.getItem("is_admin") === "true") return null;
-  let id = localStorage.getItem("affiliate_id");
+  if (localStorage.getItem(_LS("is_admin")) === "true") return null;
+  let id = localStorage.getItem(_LS("affiliate_id"));
   // Return null if not set — API works without it (returns all data)
   return id || null;
 }
 
 function setAffiliateId(id) {
   if (id && id.trim()) {
-    localStorage.setItem("affiliate_id", id.trim());
+    localStorage.setItem(_LS("affiliate_id"), id.trim());
   }
 }
 
 function clearAffiliateId() {
-  localStorage.removeItem("affiliate_id");
+  localStorage.removeItem(_LS("affiliate_id"));
 }
 
 // ── Generic GET helper (with timeout + retry for Render cold starts) ──
 async function apiGet(path, retries = 2) {
   const url = `${API_BASE}${path}`;
-  const jwtToken = localStorage.getItem('tfxs_jwt');
+  const jwtToken = localStorage.getItem(_LS('jwt'));
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
@@ -41,7 +43,7 @@ async function apiGet(path, retries = 2) {
       const res = await fetch(url, { signal: controller.signal, headers });
       clearTimeout(timeout);
 
-      if (res.status === 401) { localStorage.removeItem("tfxs_jwt"); localStorage.removeItem("affiliate_id"); localStorage.removeItem("is_admin"); window.location.replace("/login"); return; }
+      if (res.status === 401) { localStorage.removeItem(_LS("jwt")); localStorage.removeItem(_LS("affiliate_id")); localStorage.removeItem(_LS("is_admin")); window.location.replace("/login"); return; }
       if (!res.ok) {
         const text = await res.text();
         throw new Error(`API ${res.status}: ${text}`);
@@ -49,7 +51,7 @@ async function apiGet(path, retries = 2) {
       return res.json();
     } catch (err) {
       if (attempt < retries && err.name !== "TypeError") {
-        console.warn(`[TFXS API] Attempt ${attempt + 1} failed, retrying in 3s...`, err.message);
+        console.warn(`[API] Attempt ${attempt + 1} failed, retrying in 3s...`, err.message);
         await new Promise(r => setTimeout(r, 3000));
         continue;
       }
@@ -61,7 +63,7 @@ async function apiGet(path, retries = 2) {
 // ── Generic PUT/POST/PATCH/DELETE helper ─────────────────
 async function apiSend(method, path, body) {
   const url = `${API_BASE}${path}`;
-  const jwtToken = localStorage.getItem('tfxs_jwt');
+  const jwtToken = localStorage.getItem(_LS('jwt'));
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15000);
@@ -77,7 +79,7 @@ async function apiSend(method, path, body) {
   });
   clearTimeout(timeout);
 
-  if (res.status === 401) { localStorage.removeItem("tfxs_jwt"); localStorage.removeItem("affiliate_id"); localStorage.removeItem("is_admin"); window.location.replace("/login"); return; }
+  if (res.status === 401) { localStorage.removeItem(_LS("jwt")); localStorage.removeItem(_LS("affiliate_id")); localStorage.removeItem(_LS("is_admin")); window.location.replace("/login"); return; }
   if (!res.ok) {
     const text = await res.text();
     throw new Error(`API ${res.status}: ${text}`);

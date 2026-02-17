@@ -2,12 +2,14 @@
 <html lang="en">
 <head>
     <meta name="theme-color" content="#f5f5f7">
-    <script>((t)=>{if(t==="light"){document.documentElement.classList.add("light-theme")};var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==="light"?"#f5f5f7":"#050505"})(localStorage.getItem("tfxs_theme")||"light")</script>
+    <script src="js/brand.config.js"></script>
+    <script>((t)=>{if(t==="light"){document.documentElement.classList.add("light-theme")};var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==="light"?BRAND.colors.bgLight:BRAND.colors.bgDark})(localStorage.getItem(BRAND._lsKey("theme"))||"light")</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>TFXS Affiliate | Elite Dashboard Pro</title>
+    <title id="page-title">TFXS Affiliate | Elite Dashboard Pro</title>
+    <script>document.getElementById('page-title').textContent=BRAND._title('index')</script>
     <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
     <link rel="manifest" href="/manifest.json">
     <meta property="og:title" content="TFXS Affiliates — Elite Dashboard">
@@ -33,17 +35,7 @@
                         mono: ['JetBrains Mono', 'monospace'],
                     },
                     colors: {
-                        brand: {
-                            50: '#fff1f2',
-                            100: '#ffe4e6',
-                            500: '#ef4444', 
-                            600: '#dc2626',
-                            900: '#7f1d1d',
-                            neon: '#ff3333',
-                            yellow: '#fbbf24',
-                            dark: '#050505',
-                            panel: '#0A0A0A'
-                        }
+                        brand: BRAND._tailwindBrand()
                     },
                     animation: {
                         'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
@@ -283,8 +275,8 @@
         <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 flex items-center justify-between gap-3 sm:gap-4 relative">
             <div class="flex items-center gap-4 sm:gap-10">
                 <a href="/" class="flex items-center gap-2 group cursor-pointer no-underline">
-                    <img src="assets/logo.svg" alt="TFXS Logo" class="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow-[0_0_15px_rgba(220,38,38,0.5)]">
-                    <span class="hidden sm:inline text-lg sm:text-xl font-bold tracking-tight text-white group-hover:text-brand-500 transition-colors">TFXS<span class="opacity-50 font-light"> AFFILIATES</span></span>
+                    <img src="assets/logo.svg" alt="Logo" class="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow-[0_0_15px_rgba(220,38,38,0.5)]">
+                    <span class="hidden sm:inline text-lg sm:text-xl font-bold tracking-tight text-white group-hover:text-brand-500 transition-colors"><script>document.write(BRAND.name)</script><span class="opacity-50 font-light"> <script>document.write(BRAND.nameFull.replace(BRAND.name,'').trim())</script></span></span>
                 </a>
 
                 <div id="nav-links" class="hidden md:flex items-center gap-1 bg-white/5 p-1 rounded-lg border border-white/5">
@@ -1107,7 +1099,7 @@
                     if (summaryRes && summaryRes.ok && summaryRes.data) {
                         const s = summaryRes.data;
                         // Admin: commission KPI shows raw CellXpert revenue; affiliate: deal-based commission
-                        const isAdminView = localStorage.getItem('is_admin') === 'true';
+                        const isAdminView = localStorage.getItem(BRAND._lsKey('is_admin')) === 'true';
                         totalCommission = (isAdminView && s.raw_revenue !== undefined) ? s.raw_revenue : (s.total_commission || 0);
                         totalRegs = s.registrations || 0;
                         ftDs = s.ftd || 0;
@@ -1117,7 +1109,7 @@
                         backendKPIs = true;
 
                         // Admin business KPIs
-                        if (localStorage.getItem('is_admin') === 'true' && s.raw_revenue !== undefined) {
+                        if (localStorage.getItem(BRAND._lsKey('is_admin')) === 'true' && s.raw_revenue !== undefined) {
                             const kpiRev = document.getElementById('kpi-revenue');
                             const kpiCost = document.getElementById('kpi-aff-cost');
                             const kpiProfit = document.getElementById('kpi-profit');
@@ -1232,7 +1224,7 @@
                         const currentMonth = b.current_month_earnings || 0;
                         const lastMonth = b.last_month_earnings || 0;
                         const isSameMonth = b.same_month === true;
-                        const isAdminView = localStorage.getItem('is_admin') === 'true';
+                        const isAdminView = localStorage.getItem(BRAND._lsKey('is_admin')) === 'true';
 
                         // Admin: show raw_revenue as balance; Affiliate: show commission balance
                         let myBalance;
@@ -1332,7 +1324,7 @@
                         // The balance card shows lifetime totals; KPIs show date-filtered values
 
                         // Next payout date (affiliates only) / Active affiliates count (admins)
-                        const isAdmin = localStorage.getItem('is_admin') === 'true';
+                        const isAdmin = localStorage.getItem(BRAND._lsKey('is_admin')) === 'true';
                         if (isAdmin) {
                             // Admin: show total affiliates count
                             const npLabel = document.getElementById('popup-last-label');
@@ -1366,10 +1358,10 @@
                 }
 
                 // === KYC PAYOUT GATE ===
-                const isAdmin = localStorage.getItem('is_admin') === 'true';
+                const isAdmin = localStorage.getItem(BRAND._lsKey('is_admin')) === 'true';
                 if (!isAdmin) {
                     try {
-                        const jwt = localStorage.getItem('tfxs_jwt');
+                        const jwt = localStorage.getItem(BRAND._lsKey('jwt'));
                         const kycRes = await fetch(`${API_BASE}/api/kyc/status`, { headers: { 'Authorization': `Bearer ${jwt}` } });
                         const kycData = await kycRes.json();
                         const kycStatus = kycData.data?.status || 'none';
@@ -1838,7 +1830,7 @@
                  });
              }
              
-             const isAdminView = localStorage.getItem('is_admin') === 'true';
+             const isAdminView = localStorage.getItem(BRAND._lsKey('is_admin')) === 'true';
              const colSpan = isAdminView ? 7 : 6;
 
              if(filtered.length === 0) {
@@ -1985,7 +1977,7 @@
                     const { fetchDeals, getAffiliateId } = window.TFXS_API || {};
                     if (!fetchDeals) return;
                     const aid = getAffiliateId ? getAffiliateId() : null;
-                    const afp = aid || localStorage.getItem('affiliate_id') || '';
+                    const afp = aid || localStorage.getItem(BRAND._lsKey('affiliate_id')) || '';
                     const res = await fetchDeals(aid);
                     if (!res || !res.ok) return;
                     const deals = res.data || [];
@@ -2084,7 +2076,7 @@
             // Fetch contact info from backend
             async function loadContactInfo() {
                 // Admin doesn't need "Contact Affiliate Manager"
-                if (localStorage.getItem('is_admin') === 'true') return;
+                if (localStorage.getItem(BRAND._lsKey('is_admin')) === 'true') return;
                 try {
                     const apiGet = window.TFXS_API?.apiGet;
                     if (!apiGet) return;
@@ -2550,7 +2542,7 @@
             // Commission per country (bar chart)
             const countryComm = {};
             const countryRegions = {};
-            const isAdmin = localStorage.getItem('is_admin') === 'true';
+            const isAdmin = localStorage.getItem(BRAND._lsKey('is_admin')) === 'true';
 
             // Prefer backend pre-aggregated country data (covers ALL records, not just 50)
             if (apiCountries && apiCountries.length > 0) {
@@ -3434,10 +3426,10 @@
         const invoiceNo = 'INV-' + reqDate.getFullYear() + String(reqDate.getMonth()+1).padStart(2,'0') + String(reqDate.getDate()).padStart(2,'0') + '-' + (payout.id ? String(payout.id).slice(-4) : Math.random().toString(36).slice(2,6).toUpperCase());
 
         // Get affiliate info from localStorage
-        const cached = JSON.parse(localStorage.getItem('tfxs_settings') || '{}');
+        const cached = JSON.parse(localStorage.getItem(BRAND._lsKey('settings')) || '{}');
         const displayName = cached.displayName || 'Affiliate';
         const email = cached.email || '';
-        const afp = localStorage.getItem('affiliate_id') || '';
+        const afp = localStorage.getItem(BRAND._lsKey('affiliate_id')) || '';
 
         // ── Header background ──
         doc.setFillColor(10, 10, 10);
@@ -3449,7 +3441,7 @@
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(22);
         doc.setTextColor(255, 255, 255);
-        doc.text('TFXS AFFILIATES', 20, 22);
+        doc.text(BRAND.nameFull, 20, 22);
 
         doc.setFontSize(9);
         doc.setTextColor(180, 180, 180);
@@ -3552,12 +3544,12 @@
         // ── Footer ──
         doc.setFontSize(7);
         doc.setTextColor(180, 180, 180);
-        doc.text('This invoice was generated automatically by TFXS Affiliates. For questions, contact support.', 105, 275, { align: 'center' });
+        doc.text('This invoice was generated automatically by ' + BRAND.nameFull + '. For questions, contact support.', 105, 275, { align: 'center' });
         doc.setFillColor(220, 38, 38);
         doc.rect(0, 290, 210, 7, 'F');
 
         // Save
-        doc.save('TFXS-Invoice-' + invoiceNo + '.pdf');
+        doc.save(BRAND._pdfName('Invoice', invoiceNo));
         if (typeof showToast === 'function') showToast('Invoice downloaded!', 'success');
       } catch (err) {
         console.error('[PDF] Invoice generation failed:', err);
@@ -3747,7 +3739,7 @@
                     }
                 }
             } catch (_) {
-                const cached = JSON.parse(localStorage.getItem('tfxs_settings') || '{}');
+                const cached = JSON.parse(localStorage.getItem(BRAND._lsKey('settings')) || '{}');
                 if (cached.walletAddress) document.getElementById('payout-wallet').value = cached.walletAddress;
                 if (cached.paymentMethod) {
                     const radio = document.querySelector(`input[name="payout_method"][value="${cached.paymentMethod}"]`);

@@ -1,15 +1,16 @@
 /* ═══════════════════════════════════════════════════════════════════
-   TFXS Admin Control Center — js/admin-settings.js  v2.0
+   Admin Control Center — js/admin-settings.js  v2.0
    Full CRUD, searchable dropdowns, server-side pagination,
    KPI timeseries charts, bulk endpoints. JWT Bearer auth.
    ═══════════════════════════════════════════════════════════════════ */
+const _LS_A = (k) => window.BRAND ? BRAND._lsKey(k) : `tfxs_${k}`;
 
 // ── Guard ─────────────────────────────────────────────
-if (localStorage.getItem("is_admin") !== "true") {
+if (localStorage.getItem(_LS_A("is_admin")) !== "true") {
   window.location.replace("/");
 }
 
-const API = window.TFXS_API?.API_BASE || "https://tfxs-affiliates-backend.onrender.com";
+const API = window.TFXS_API?.API_BASE || (window.BRAND && BRAND.urls.api) || "https://tfxs-affiliates-backend.onrender.com";
 const PER_PAGE = 25;
 
 // ══════════════════════════════════════════════════════
@@ -37,7 +38,7 @@ function fmtTime(d) {
 
 // ── Multi-Currency Support ──
 let currencyRates = {};
-let activeCurrency = localStorage.getItem("tfxs_currency") || "USD";
+let activeCurrency = localStorage.getItem(_LS_A("currency")) || "USD";
 
 async function loadCurrencyRates() {
   try {
@@ -52,7 +53,7 @@ async function loadCurrencyRates() {
 
 function setCurrency(code) {
   activeCurrency = code;
-  localStorage.setItem("tfxs_currency", code);
+  localStorage.setItem(_LS_A("currency"), code);
   // Re-render all money values
   loadStats();
   const active = document.querySelector(".admin-tab.active")?.dataset.tab;
@@ -90,7 +91,7 @@ const CRYPTO_LABELS = {
 
 // ── API helper (JWT auth) ──────────────────────────────
 async function api(path, opts = {}) {
-  const jwt = localStorage.getItem("tfxs_jwt");
+  const jwt = localStorage.getItem(_LS_A("jwt"));
   const headers = { "Content-Type": "application/json", ...opts.headers };
   if (jwt) headers["Authorization"] = `Bearer ${jwt}`;
   try {

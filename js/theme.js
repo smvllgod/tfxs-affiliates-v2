@@ -1,16 +1,17 @@
 /**
- * TFXS AFFILIATES — Theme Toggle (Dark / Light)
+ * AFFILIATES — Theme Toggle (Dark / Light)
  * Persists to localStorage. Default = light.
+ * Brand config: reads from window.BRAND (loaded via brand.config.js)
  */
 
 (function () {
   "use strict";
 
-  const THEME_KEY = "tfxs_theme";
+  const THEME_KEY = window.BRAND ? BRAND._lsKey("theme") : "tfxs_theme";
   let _theme = localStorage.getItem(THEME_KEY) || "light";
 
-  const DARK_BG  = "#050505";
-  const LIGHT_BG = "#f5f5f7";
+  const DARK_BG  = window.BRAND ? BRAND.colors.bgDark  : "#050505";
+  const LIGHT_BG = window.BRAND ? BRAND.colors.bgLight : "#f5f5f7";
 
   function setThemeColor(color) {
     let meta = document.querySelector('meta[name="theme-color"]');

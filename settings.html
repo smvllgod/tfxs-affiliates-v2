@@ -2,12 +2,14 @@
 <html lang="en">
 <head>
     <meta name="theme-color" content="#f5f5f7">
-    <script>((t)=>{if(t==="light"){document.documentElement.classList.add("light-theme")};var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==="light"?"#f5f5f7":"#050505"})(localStorage.getItem("tfxs_theme")||"light")</script>
+    <script src="js/brand.config.js"></script>
+    <script>((t)=>{if(t==="light"){document.documentElement.classList.add("light-theme")};var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==="light"?BRAND.colors.bgLight:BRAND.colors.bgDark})(localStorage.getItem(BRAND._lsKey("theme"))||"light")</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>TFXS Affiliate | Settings</title>
+    <title id="page-title">TFXS Affiliate | Settings</title>
+    <script>document.getElementById('page-title').textContent=BRAND._title('settings')</script>
     <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
     <link rel="manifest" href="/manifest.json">
     <meta property="og:title" content="TFXS Affiliates — Settings">
@@ -20,7 +22,7 @@
       // Admin redirect — if admin lands on user settings, bounce to admin panel
       (function() {
         try {
-          var t = localStorage.getItem('tfxs_jwt');
+          var t = localStorage.getItem(BRAND._lsKey('jwt'));
           if (t) { var p = JSON.parse(atob(t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))); if (p.is_admin) { window.location.replace('/admin-settings'); } }
         } catch(e) {}
       })();
@@ -34,17 +36,7 @@
                         mono: ['JetBrains Mono', 'monospace'],
                     },
                     colors: {
-                        brand: {
-                            50: '#fff1f2',
-                            100: '#ffe4e6',
-                            500: '#ef4444', 
-                            600: '#dc2626',
-                            900: '#7f1d1d',
-                            neon: '#ff3333',
-                            yellow: '#fbbf24',
-                            dark: '#050505',
-                            panel: '#0A0A0A'
-                        }
+                        brand: BRAND._tailwindBrand()
                     },
                     animation: {
                         'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
@@ -96,8 +88,8 @@
         <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 flex items-center justify-between gap-3 sm:gap-4 relative">
             <div class="flex items-center gap-4 sm:gap-10">
                 <a href="/" class="flex items-center gap-2 group cursor-pointer no-underline">
-                    <img src="assets/logo.svg" alt="TFXS Logo" class="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow-[0_0_15px_rgba(220,38,38,0.5)]">
-                    <span class="hidden sm:inline text-lg sm:text-xl font-bold tracking-tight text-white group-hover:text-brand-500 transition-colors">TFXS<span class="opacity-50 font-light"> AFFILIATES</span></span>
+                    <img src="assets/logo.svg" alt="Logo" class="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow-[0_0_15px_rgba(220,38,38,0.5)]">
+                    <span class="hidden sm:inline text-lg sm:text-xl font-bold tracking-tight text-white group-hover:text-brand-500 transition-colors"><script>document.write(BRAND.name)</script><span class="opacity-50 font-light"> <script>document.write(BRAND.nameFull.replace(BRAND.name,'').trim())</script></span></span>
                 </a>
 
                 <div id="nav-links" class="hidden md:flex items-center gap-1 bg-white/5 p-1 rounded-lg border border-white/5">
@@ -1270,7 +1262,7 @@
                  // Also save to localStorage as instant cache
                  const email = document.getElementById('settings-email').value.trim();
                  const settingsCache = { displayName, email, avatarSeed, paymentMethod, walletAddress, phone, address_street, address_city, address_state, address_zip, address_country };
-                 localStorage.setItem('tfxs_settings', JSON.stringify(settingsCache));
+                 localStorage.setItem(BRAND._lsKey('settings'), JSON.stringify(settingsCache));
 
                  // Update nav on this page
                  const navName = document.querySelector('nav .text-sm.font-bold');
@@ -1294,7 +1286,7 @@
                  // Still save to localStorage as fallback
                  const emailFallback = document.getElementById('settings-email').value.trim();
                  const settingsCache = { displayName, email: emailFallback, avatarSeed, paymentMethod, walletAddress };
-                 localStorage.setItem('tfxs_settings', JSON.stringify(settingsCache));
+                 localStorage.setItem(BRAND._lsKey('settings'), JSON.stringify(settingsCache));
 
                  if (typeof showToast === 'function') showToast("Saved locally — backend sync will retry", "info");
              }
@@ -1718,7 +1710,7 @@
             btn.textContent = 'Uploading...';
             btn.disabled = true;
             try {
-                const jwt = localStorage.getItem('tfxs_jwt');
+                const jwt = localStorage.getItem(BRAND._lsKey('jwt'));
                 const res = await fetch(`${API_BASE}/api/kyc/submit`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwt}` },
@@ -1740,7 +1732,7 @@
             const statusBox = document.getElementById('kyc-status-box');
             const uploadForm = document.getElementById('kyc-upload-form');
             try {
-                const jwt = localStorage.getItem('tfxs_jwt');
+                const jwt = localStorage.getItem(BRAND._lsKey('jwt'));
                 const res = await fetch(`${API_BASE}/api/kyc/status`, {
                     headers: { 'Authorization': `Bearer ${jwt}` }
                 });

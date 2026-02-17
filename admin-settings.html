@@ -2,12 +2,14 @@
 <html lang="en">
 <head>
     <meta name="theme-color" content="#f5f5f7">
-    <script>((t)=>{if(t==="light"){document.documentElement.classList.add("light-theme")};var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==="light"?"#f5f5f7":"#050505"})(localStorage.getItem("tfxs_theme")||"light")</script>
+    <script src="js/brand.config.js"></script>
+    <script>((t)=>{if(t==="light"){document.documentElement.classList.add("light-theme")};var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==="light"?BRAND.colors.bgLight:BRAND.colors.bgDark})(localStorage.getItem(BRAND._lsKey("theme"))||"light")</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>TFXS Affiliate | Control Center</title>
+    <title id="page-title">TFXS Affiliate | Control Center</title>
+    <script>document.getElementById('page-title').textContent=BRAND._title('admin')</script>
     <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
     <link rel="manifest" href="/manifest.json">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -21,7 +23,7 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Inter','sans-serif'], mono: ['JetBrains Mono','monospace'] },
-                    colors: { brand: { 50:'#fff1f2',100:'#ffe4e6',500:'#ef4444',600:'#dc2626',900:'#7f1d1d',neon:'#ff3333',yellow:'#fbbf24',dark:'#050505',panel:'#0A0A0A' } },
+                    colors: { brand: BRAND._tailwindBrand() },
                     animation: { 'fade-in-up': 'fadeInUp 0.5s ease-out forwards' },
                     keyframes: { fadeInUp: { '0%': { opacity:'0', transform:'translateY(10px)' }, '100%': { opacity:'1', transform:'translateY(0)' } } }
                 }
@@ -94,8 +96,8 @@
         <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 flex items-center justify-between gap-3 sm:gap-4 relative">
             <div class="flex items-center gap-4 sm:gap-10">
                 <a href="/" class="flex items-center gap-2 group cursor-pointer no-underline">
-                    <img src="assets/logo.svg" alt="TFXS Logo" class="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow-[0_0_15px_rgba(220,38,38,0.5)]">
-                    <span class="hidden sm:inline text-lg sm:text-xl font-bold tracking-tight text-white group-hover:text-brand-500 transition-colors">TFXS<span class="opacity-50 font-light"> AFFILIATES</span></span>
+                    <img src="assets/logo.svg" alt="Logo" class="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow-[0_0_15px_rgba(220,38,38,0.5)]">
+                    <span class="hidden sm:inline text-lg sm:text-xl font-bold tracking-tight text-white group-hover:text-brand-500 transition-colors"><script>document.write(BRAND.name)</script><span class="opacity-50 font-light"> <script>document.write(BRAND.nameFull.replace(BRAND.name,'').trim())</script></span></span>
                 </a>
 
                 <div id="nav-links" class="hidden md:flex items-center gap-1 bg-white/5 p-1 rounded-lg border border-white/5">
@@ -129,7 +131,7 @@
                 <a id="nav-avatar-link" href="/admin-settings" class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
                     <div class="text-right hidden sm:block">
                         <p class="text-sm font-bold text-white leading-none">Admin</p>
-                        <p class="text-[10px] text-brand-500 font-mono mt-1">TFXS-ADMIN</p>
+                        <p class="text-[10px] text-brand-500 font-mono mt-1" data-brand-admin-badge>TFXS-ADMIN</p>
                     </div>
                     <div class="w-10 h-10 rounded-full bg-gradient-to-b from-red-900 to-black border border-brand-500/30 relative overflow-hidden ring-2 ring-brand-500/30 flex items-center justify-center">
                         <svg class="w-5 h-5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
@@ -1684,7 +1686,7 @@
             <h3 id="aff-modal-title" class="text-sm font-bold text-white uppercase tracking-wider mb-5">Create Affiliate</h3>
             <input type="hidden" id="aff-edit-id">
             <div class="space-y-4">
-                <div><label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Affiliate ID <span class="text-gray-700">(auto-generated if blank)</span></label><input type="text" id="aff-form-afp" class="form-input w-full px-3 py-2.5 rounded-lg text-sm font-mono" placeholder="TFXS-XXXXXX"></div>
+                <div><label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Affiliate ID <span class="text-gray-700">(auto-generated if blank)</span></label><input type="text" id="aff-form-afp" class="form-input w-full px-3 py-2.5 rounded-lg text-sm font-mono" data-brand-placeholder="prefix" placeholder="TFXS-XXXXXX"></div>
                 <div><label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Display Name</label><input type="text" id="aff-form-name" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" placeholder="John Doe"></div>
                 <div><label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Email</label><input type="email" id="aff-form-email" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" placeholder="john@example.com"></div>
                 <div id="aff-password-row"><label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Password <span class="text-gray-700">(create only)</span></label><input type="text" id="aff-form-password" class="form-input w-full px-3 py-2.5 rounded-lg text-sm" placeholder="Min 8 characters"></div>
@@ -2181,6 +2183,15 @@
         });
         document.addEventListener('DOMContentLoaded',window.initCustomSelects);
     })();
+    </script>
+    <script>
+    // Apply BRAND prefix to dynamic placeholders/badges
+    document.addEventListener('DOMContentLoaded', () => {
+        const el = document.querySelector('[data-brand-admin-badge]');
+        if (el && typeof BRAND !== 'undefined') el.textContent = BRAND.prefix + '-ADMIN';
+        const afpInput = document.querySelector('[data-brand-placeholder="prefix"]');
+        if (afpInput && typeof BRAND !== 'undefined') afpInput.placeholder = BRAND.prefix + '-XXXXXX';
+    });
     </script>
     <script src="js/admin-settings.js"></script>
     </div>

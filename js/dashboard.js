@@ -1,5 +1,5 @@
 /**
- * TFXS AFFILIATES — Dashboard Live Data Connector
+ * AFFILIATES — Dashboard Live Data Connector
  * Loads live data from the backend and injects it into the existing dashboard DOM.
  * Falls back gracefully to static mock data (app.js) if the API is unreachable.
  *
@@ -10,10 +10,11 @@
 (function () {
   "use strict";
 
+  const _LS_D = (k) => window.BRAND ? BRAND._lsKey(k) : `tfxs_${k}`;
   // Use shared country resolver from api.js
   const { getAffiliateId, apiGet, apiSend, fetchSummary, fetchEvents, fetchReports, fetchRoiSettings, fetchBrokers, showError, hideError, resolveCountry, escapeHtml } = window.TFXS_API;
 
-  const IS_ADMIN = localStorage.getItem("is_admin") === "true";
+  const IS_ADMIN = localStorage.getItem(_LS_D("is_admin")) === "true";
   let affiliateId = null;
   let refreshTimer = null;
   let isLive = false;
