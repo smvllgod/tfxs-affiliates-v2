@@ -1385,8 +1385,8 @@
                     const payBtn = document.getElementById('request-payout-btn');
                     const kycWarn = document.getElementById('kyc-payout-warning');
                     if (payBtn) {
-                        payBtn.disabled = true;
-                        payBtn.classList.remove('btn-gradient');
+                        payBtn.disabled = false;
+                        payBtn.classList.remove('btn-gradient', 'cursor-not-allowed');
                         payBtn.classList.add('cursor-pointer');
                         payBtn.style.background = 'rgba(16,185,129,0.08)';
                         payBtn.style.border = '1px solid rgba(16,185,129,0.25)';

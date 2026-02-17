@@ -525,7 +525,17 @@
     try {
       const brokerFilter = document.getElementById("broker-filter")?.value || "";
       let url = "/admin/affiliate-performance";
-      if (brokerFilter) url += `?broker=${encodeURIComponent(brokerFilter)}`;
+      const params = [];
+      if (brokerFilter) params.push(`broker=${encodeURIComponent(brokerFilter)}`);
+      // Pass current dashboard date range so data matches the selected timeframe
+      const picker = window.dashboardDatePicker;
+      if (picker && picker.selectedDates && picker.selectedDates.length >= 1) {
+        const sd = picker.selectedDates[0];
+        const ed = picker.selectedDates[1] || picker.selectedDates[0];
+        params.push(`from=${sd.toISOString().substring(0, 10)}`);
+        params.push(`to=${ed.toISOString().substring(0, 10)}`);
+      }
+      if (params.length) url += `?${params.join('&')}`;
       const res = await apiGet(url);
       if (!res?.ok) throw new Error("Failed");
 

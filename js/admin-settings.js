@@ -1755,15 +1755,14 @@ let _adminSelfWithdrawn = 0;
 
 async function loadAdminSelfBalance() {
   try {
-    const jwt = localStorage.getItem(BRAND._lsKey("jwt"));
     const afp = localStorage.getItem(BRAND._lsKey("affiliate_id"));
     if (!afp) return;
-    // Fetch summary to get balance
-    const res = await api(`/api/summary?affiliate_id=${encodeURIComponent(afp)}`);
+    // Use payout/balance endpoint which returns available balance and total_paid
+    const res = await api(`/api/payout/balance?affiliate_id=${encodeURIComponent(afp)}`);
     if (res.ok) {
       const s = res.data || res;
-      _adminSelfBalance = parseFloat(s.available || s.balance || 0);
-      _adminSelfWithdrawn = parseFloat(s.paid || 0);
+      _adminSelfBalance = parseFloat(s.available || 0);
+      _adminSelfWithdrawn = parseFloat(s.total_paid || 0);
     }
   } catch (_) {}
   const balEl = $("admin-self-balance");
