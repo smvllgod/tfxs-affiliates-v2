@@ -10,13 +10,16 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title id="page-title">TFXS Affiliate | Settings</title>
     <script>document.getElementById('page-title').textContent=BRAND._title('settings')</script>
-    <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="manifest" href="/manifest.json">
     <meta property="og:title" content="TFXS Affiliates — Settings">
     <meta property="og:description" content="Account settings and preferences.">
     <meta property="og:image" content="assets/logo.svg">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <script>
+      var fontLink = document.createElement('link'); fontLink.rel = 'stylesheet';
+      fontLink.href = BRAND.fonts.googleImport; document.head.appendChild(fontLink);
+    </script>
     <link rel="stylesheet" href="css/shared.css">
     <script>
       // Admin redirect — if admin lands on user settings, bounce to admin panel
@@ -32,7 +35,7 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
+                        sans: [BRAND.fonts.sans.split("'")[1] || 'Inter', 'sans-serif'],
                         mono: ['JetBrains Mono', 'monospace'],
                     },
                     colors: {
@@ -58,7 +61,7 @@
         }
 
         .btn-gradient {
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            background: linear-gradient(135deg, var(--brand-500, #dc2626) 0%, var(--brand-700, #991b1b) 100%);
         }
 
         .form-input {
@@ -69,14 +72,14 @@
         }
         .form-input:focus {
             outline: none;
-            border-color: #ef4444;
-            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+            border-color: var(--brand-500, #ef4444);
+            box-shadow: 0 0 0 2px rgba(var(--brand-halo, 239,68,68), 0.2);
         }
 
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: #050505; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #dc2626; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--brand-500, #dc2626); }
     </style>
 </head>
 <body class="antialiased font-sans min-h-screen relative overflow-x-hidden selection:bg-brand-500 selection:text-white pb-20">
@@ -89,7 +92,7 @@
             <div class="flex items-center gap-4 sm:gap-10">
                 <a href="/" class="flex items-center gap-2 group cursor-pointer no-underline">
                     <img src="assets/logo.svg" alt="Logo" class="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow-[0_0_15px_rgba(220,38,38,0.5)]">
-                    <span class="hidden sm:inline text-lg sm:text-xl font-bold tracking-tight text-white group-hover:text-brand-500 transition-colors"><script>document.write(BRAND.name)</script><span class="opacity-50 font-light"> <script>document.write(BRAND.nameFull.replace(BRAND.name,'').trim())</script></span></span>
+                    <span class="hidden sm:inline text-lg sm:text-xl font-bold tracking-tight text-white group-hover:text-brand-500 transition-colors"><script>document.write(BRAND.name);</script><span class="opacity-50 font-light"> <script>document.write(BRAND.nameFull.replace(BRAND.name,'').trim());</script></span></span>
                 </a>
 
                 <div id="nav-links" class="hidden md:flex items-center gap-1 bg-white/5 p-1 rounded-lg border border-white/5">
@@ -993,10 +996,29 @@
                         if (s.address_state && stateInput) stateInput.value = s.address_state;
                         if (s.address_zip && zipInput) zipInput.value = s.address_zip;
                         if (s.address_country && countryInput) {
-                            countryInput.value = s.address_country;
+                            // Resolve code to full name (e.g. 'TG' -> 'Togo')
+                            const resolvedName = typeof window._resolveCountryName === 'function' 
+                                ? window._resolveCountryName(s.address_country) 
+                                : s.address_country;
+                            countryInput.value = resolvedName;
                             // Set flag emoji directly without opening the dropdown
                             if (typeof window._setCountryFlag === 'function') {
                                 window._setCountryFlag(s.address_country);
+                            }
+                            // Lock country field for non-admin users (set during signup)
+                            const jwt = localStorage.getItem(BRAND._lsKey('jwt'));
+                            let isAdmin = false;
+                            try { if (jwt) { const p = JSON.parse(atob(jwt.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))); isAdmin = !!p.is_admin; } } catch(_){}
+                            if (!isAdmin) {
+                                countryInput.readOnly = true;
+                                countryInput.style.opacity = '0.7';
+                                countryInput.style.cursor = 'not-allowed';
+                                countryInput.title = 'Country is set from your registration. Contact admin to change.';
+                                // Hide the dropdown on focus
+                                countryInput.addEventListener('focus', function(e) {
+                                    const dd = document.getElementById('country-dropdown');
+                                    if (dd) dd.classList.add('hidden');
+                                });
                             }
                         }
                         if (s.avatar_seed) {
@@ -1066,12 +1088,19 @@
             const flagEl = document.getElementById('country-flag');
             if (!input || !dd || !flagEl) return;
 
-            function setFlag(name) {
-                const c = COUNTRIES.find(x => x.n.toLowerCase() === (name || '').toLowerCase());
+            function setFlag(nameOrCode) {
+                const val = (nameOrCode || '').trim();
+                const c = COUNTRIES.find(x => x.n.toLowerCase() === val.toLowerCase() || x.c.toLowerCase() === val.toLowerCase());
                 flagEl.textContent = c ? c.f : '';
             }
             // Expose globally so settings loader can set flag without opening dropdown
             window._setCountryFlag = setFlag;
+            // Resolve country code to full name
+            window._resolveCountryName = function(nameOrCode) {
+                const val = (nameOrCode || '').trim();
+                const c = COUNTRIES.find(x => x.n.toLowerCase() === val.toLowerCase() || x.c.toLowerCase() === val.toLowerCase());
+                return c ? c.n : val;
+            };
 
             function render(list) {
                 if (!list.length) { dd.classList.add('hidden'); return; }
@@ -1281,7 +1310,7 @@
              } catch (err) {
                  console.error("[Settings] Save failed:", err);
                  btn.textContent = "✗ Error";
-                 btn.style.background = '#dc2626';
+                 btn.style.background = 'var(--brand-500, #dc2626)';
 
                  // Still save to localStorage as fallback
                  const emailFallback = document.getElementById('settings-email').value.trim();
@@ -1340,7 +1369,7 @@
                 track.style.background = 'rgba(239,68,68,0.4)';
                 dot.style.transform = 'translateX(0)';
                 label.textContent = 'Auto-Payout OFF';
-                label.style.color = '#dc2626';
+                label.style.color = 'var(--brand-500, #dc2626)';
             }
         }
 
