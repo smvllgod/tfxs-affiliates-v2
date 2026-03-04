@@ -71,9 +71,9 @@
         }
         .glass-hover:hover {
             background: rgba(30, 30, 30, 0.8);
-            border-color: rgba(220, 38, 38, 0.35);
+            border-color: rgba(var(--brand-halo), 0.35);
             transform: translateY(-3px) scale(1.01);
-            box-shadow: 0 12px 36px -10px rgba(220, 38, 38, 0.22), 0 0 0 1px rgba(220,38,38,0.12);
+            box-shadow: 0 12px 36px -10px rgba(var(--brand-halo), 0.22), 0 0 0 1px rgba(var(--brand-halo),0.12);
         }
 
         /* Skeleton Loader */
@@ -133,11 +133,11 @@
         }
 
         .primary-glow {
-            box-shadow: 0 0 20px rgba(220, 38, 38, 0.3);
+            box-shadow: 0 0 20px rgba(var(--brand-halo), 0.3);
         }
 
         .btn-gradient {
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            background: linear-gradient(135deg, var(--brand-600) 0%, var(--brand-700) 100%);
             position: relative;
             overflow: hidden;
         }
@@ -158,14 +158,14 @@
         }
 
         .text-glow {
-            text-shadow: 0 0 20px rgba(220, 38, 38, 0.5);
+            text-shadow: 0 0 20px rgba(var(--brand-halo), 0.5);
         }
         
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: #050505; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #dc2626; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--brand-600); }
 
         /* Custom Flatpickr Theme */
         .flatpickr-calendar {
@@ -202,32 +202,32 @@
             border-radius: 8px !important;
         }
         .flatpickr-day:hover {
-            background: rgba(239, 68, 68, 0.2) !important;
+            background: rgba(var(--brand-halo), 0.2) !important;
             border-color: transparent !important;
         }
         .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange, .flatpickr-day.selected.inRange, .flatpickr-day.startRange.inRange, .flatpickr-day.endRange.inRange, .flatpickr-day.focus, .flatpickr-day.nextMonthDay:hover, .flatpickr-day.prevMonthDay:hover {
-            background: #dc2626 !important;
-            border-color: #dc2626 !important;
+            background: var(--brand-600) !important;
+            border-color: var(--brand-600) !important;
             color: white !important;
-            box-shadow: 0 0 15px rgba(220, 38, 38, 0.4) !important;
+            box-shadow: 0 0 15px rgba(var(--brand-halo), 0.4) !important;
         }
         .flatpickr-day.inRange {
-            background: rgba(239, 68, 68, 0.1) !important;
+            background: rgba(var(--brand-halo), 0.1) !important;
             border-color: transparent !important;
-            box-shadow: -5px 0 0 rgba(239, 68, 68, 0.1), 5px 0 0 rgba(239, 68, 68, 0.1) !important;
+            box-shadow: -5px 0 0 rgba(var(--brand-halo), 0.1), 5px 0 0 rgba(var(--brand-halo), 0.1) !important;
         }
         .flatpickr-next-month, .flatpickr-prev-month {
-            fill: #ef4444 !important;
-            color: #ef4444 !important;
+            fill: var(--brand-500) !important;
+            color: var(--brand-500) !important;
         }
         .flatpickr-next-month:hover svg, .flatpickr-prev-month:hover svg {
             fill: #fff !important;
         }
         .flatpickr-current-month .numInputWrapper span.arrowUp:after {
-            border-bottom-color: #ef4444 !important;
+            border-bottom-color: var(--brand-500) !important;
         }
         .flatpickr-current-month .numInputWrapper span.arrowDown:after {
-            border-top-color: #ef4444 !important;
+            border-top-color: var(--brand-500) !important;
         }
 
         /* Custom Select Styling */
@@ -247,7 +247,7 @@
         }
         
         select:focus {
-            border-color: #ef4444 !important; 
+            border-color: var(--brand-500) !important; 
             outline: none;
         }
         
@@ -275,7 +275,7 @@
         <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 flex items-center justify-between gap-3 sm:gap-4 relative">
             <div class="flex items-center gap-4 sm:gap-10">
                 <a href="/" class="flex items-center gap-2 group cursor-pointer no-underline">
-                    <img src="assets/logo.svg" alt="Logo" class="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow-[0_0_15px_rgba(220,38,38,0.5)]">
+                    <img src="assets/logo.svg" alt="Logo" class="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow-[0_0_15px_rgba(var(--brand-halo),0.5)]">
                     <span class="hidden sm:inline text-lg sm:text-xl font-bold tracking-tight text-white group-hover:text-brand-500 transition-colors"><script>document.write(BRAND.name);</script><span class="opacity-50 font-light"> <script>document.write(BRAND.nameFull.replace(BRAND.name,'').trim());</script></span></span>
                 </a>
 
@@ -303,7 +303,7 @@
                 <!-- Notification Bell -->
                 <button class="relative p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/5 notification-bell-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-                    <span id="notif-badge" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-brand-500 text-white text-[9px] font-bold shadow-[0_0_8px_#ef4444]" style="display:none;">0</span>
+                    <span id="notif-badge" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-brand-500 text-white text-[9px] font-bold shadow-[0_0_8px_var(--brand-500)]" style="display:none;">0</span>
                 </button>
 
                 <!-- Mobile Menu Toggle -->
@@ -326,10 +326,10 @@
 
     <!-- Connecting overlay — full-page, transparent, fixed at top -->
     <div id="connecting-overlay" class="fixed inset-0 z-[9998]" style="background:rgba(5,5,5,0.85); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);">
-        <div class="flex items-center justify-center gap-3 px-6 py-3 mt-[72px]" style="background:linear-gradient(90deg, transparent, rgba(220,38,38,0.06), transparent);">
+        <div class="flex items-center justify-center gap-3 px-6 py-3 mt-[72px]" style="background:linear-gradient(90deg, transparent, rgba(var(--brand-halo),0.06), transparent);">
             <div class="relative w-5 h-5 flex-shrink-0">
                 <div class="absolute inset-0 rounded-full border-2 border-white/10"></div>
-                <div class="absolute inset-0 rounded-full border-2 border-t-red-500 animate-spin"></div>
+                <div class="absolute inset-0 rounded-full border-2 border-t-brand-500 animate-spin" style="border-top-color:var(--brand-500)"></div>
             </div>
             <p class="text-xs font-mono text-gray-400 tracking-wider" data-i18n="dash.connecting">Connecting to live data<span class="connecting-dots"></span></p>
             <p class="text-[10px] text-gray-600 ml-1" data-i18n="dash.mayTake">— may take a few seconds</p>
@@ -704,11 +704,11 @@
                 </div>
                 <div id="chart-legend" class="flex items-center gap-5 flex-shrink-0">
                     <button onclick="toggleChartSeries(0)" class="chart-legend-item flex items-center gap-1.5 cursor-pointer opacity-100 transition" data-index="0">
-                        <span class="w-2.5 h-2.5 rounded-full" style="background:#E53935"></span>
+                        <span class="w-2.5 h-2.5 rounded-full" style="background:var(--brand-600)"></span>
                         <span class="text-[11px] text-gray-400 font-medium tracking-wide" data-i18n="dash.commission">Commission</span>
                     </button>
                     <button onclick="toggleChartSeries(1)" class="chart-legend-item flex items-center gap-1.5 cursor-pointer opacity-100 transition" data-index="1">
-                        <span class="w-2.5 h-2.5 rounded-full" style="background:#FBC02D"></span>
+                        <span class="w-2.5 h-2.5 rounded-full" style="background:var(--brand-300)"></span>
                         <span class="text-[11px] text-gray-400 font-medium tracking-wide" data-i18n="dash.registrations">Registrations</span>
                     </button>
                 </div>
@@ -1533,7 +1533,7 @@
                 const isComm = ev.type === 'comm';
                 const isFtd = ev.type === 'ftd';
                 const isQcpa = ev.type === 'qcpa';
-                const dotColor = isComm ? 'bg-brand-500 shadow-[0_0_8px_#ef4444]'
+                const dotColor = isComm ? 'bg-brand-500 shadow-[0_0_8px_var(--brand-500)]'
                     : isFtd ? 'bg-green-500 shadow-[0_0_8px_#22c55e]'
                     : isQcpa ? 'bg-amber-500 shadow-[0_0_8px_#f59e0b]'
                     : 'bg-blue-500 shadow-[0_0_8px_#3b82f6]';
@@ -1738,13 +1738,13 @@
                     gridLineWidth: 0
                 },
                 yAxis: [
-                    { // Left axis — Commission
+                    { // Left axis — Commission (brand-aware)
                         title: {
                             text: 'Commission ($)',
-                            style: { color: 'rgba(229,57,53,0.7)', fontSize: '10px', fontWeight: '600', fontFamily: 'JetBrains Mono, monospace' }
+                            style: { color: (window.BRAND ? BRAND.colors.primary600 : 'rgba(229,57,53,0.7)'), fontSize: '10px', fontWeight: '600', fontFamily: 'JetBrains Mono, monospace', opacity: 0.7 }
                         },
                         labels: {
-                            style: { color: 'rgba(229,57,53,0.65)', fontSize: '10px', fontFamily: 'JetBrains Mono, monospace' },
+                            style: { color: (window.BRAND ? BRAND.colors.primary600 : 'rgba(229,57,53,0.65)'), fontSize: '10px', fontFamily: 'JetBrains Mono, monospace', opacity: 0.65 },
                             formatter: function() {
                                 if (this.value >= 1000) return '$' + (this.value / 1000).toFixed(1) + 'K';
                                 return '$' + Math.round(this.value);
@@ -1759,13 +1759,13 @@
                         tickWidth: 0,
                         opposite: false
                     },
-                    { // Right axis — Registrations
+                    { // Right axis — Registrations (brand-aware)
                         title: {
                             text: 'Registrations',
-                            style: { color: 'rgba(251,192,45,0.7)', fontSize: '10px', fontWeight: '600', fontFamily: 'JetBrains Mono, monospace' }
+                            style: { color: (window.BRAND ? BRAND.colors.primary300 : 'rgba(251,192,45,0.7)'), fontSize: '10px', fontWeight: '600', fontFamily: 'JetBrains Mono, monospace', opacity: 0.7 }
                         },
                         labels: {
-                            style: { color: 'rgba(251,192,45,0.65)', fontSize: '10px', fontFamily: 'JetBrains Mono, monospace' },
+                            style: { color: (window.BRAND ? BRAND.colors.primary300 : 'rgba(251,192,45,0.65)'), fontSize: '10px', fontFamily: 'JetBrains Mono, monospace', opacity: 0.65 },
                             formatter: function() { return Math.round(this.value); }
                         },
                         min: 0,
@@ -1820,19 +1820,27 @@
                         turboThreshold: 5000
                     }
                 },
-                series: [
+                series: (function(){
+                    const _B = window.BRAND ? BRAND.colors : {};
+                    const _commClr = _B.primary600 || '#E53935';
+                    const _regClr  = _B.primary300 || '#FBC02D';
+                    const _commH = _B.haloRgba || '229,57,53';
+                    // Build a lighter halo for registrations from primary300
+                    function hexToRgb(h){const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);return r+','+g+','+b;}
+                    const _regH = _regClr.startsWith('#') ? hexToRgb(_regClr) : '251,192,45';
+                    return [
                     {
                         name: 'Commission',
                         data: [],
                         yAxis: 0,
                         zIndex: 2,
-                        color: '#E53935',
+                        color: _commClr,
                         fillColor: {
                             linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
                             stops: [
-                                [0, 'rgba(229,57,53,0.25)'],
-                                [0.7, 'rgba(229,57,53,0.06)'],
-                                [1, 'rgba(229,57,53,0.0)']
+                                [0, 'rgba('+_commH+',0.25)'],
+                                [0.7, 'rgba('+_commH+',0.06)'],
+                                [1, 'rgba('+_commH+',0.0)']
                             ]
                         }
                     },
@@ -1841,17 +1849,17 @@
                         data: [],
                         yAxis: 1,
                         zIndex: 1,
-                        color: '#FBC02D',
+                        color: _regClr,
                         fillColor: {
                             linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
                             stops: [
-                                [0, 'rgba(251,192,45,0.25)'],
-                                [0.7, 'rgba(251,192,45,0.06)'],
-                                [1, 'rgba(251,192,45,0.0)']
+                                [0, 'rgba('+_regH+',0.25)'],
+                                [0.7, 'rgba('+_regH+',0.06)'],
+                                [1, 'rgba('+_regH+',0.0)']
                             ]
                         }
                     }
-                ]
+                ]})()]
             });
 
             // Handle chart resize for label rotation
@@ -2360,8 +2368,9 @@
                 });
             }
 
-            generateSparkline('sparkline-commission', dailyComm, '#ef4444');
-            generateSparkline('sparkline-registrations', dailyReg, '#fbbf24');
+            const _spB = window.BRAND ? BRAND.colors : {};
+            generateSparkline('sparkline-commission', dailyComm, _spB.primary500 || '#ef4444');
+            generateSparkline('sparkline-registrations', dailyReg, _spB.primary300 || '#fbbf24');
             generateSparkline('sparkline-ftd', dailyFtd, '#3b82f6');
             generateSparkline('sparkline-qftd', dailyQftd, '#22c55e');
             // ROI sparkline using real deposit data + formula
@@ -3102,22 +3111,31 @@
                 // Atmosphere / Ocean
                 context.beginPath(); 
                 path({type: "Sphere"}); 
-                context.fillStyle = isLight ? "rgba(220,38,38,0.06)" : "rgba(0,0,0,0.3)"; 
+                // Brand-aware globe colors
+                const _br = window.BRAND ? BRAND.colors : null;
+                const _b6 = _br ? _br.primary600 : '#dc2626';
+                const _b5 = _br ? _br.primary500 : '#ef4444';
+                const _b7 = _br ? _br.primary700 : '#991b1b';
+                const _halo = _br ? _br.haloRgba : '220,38,38';
+                // Darken the brand color for land in dark mode
+                const _landDark = _br ? _br.primary900 : '#5a1010';
+
+                context.fillStyle = isLight ? `rgba(${_halo},0.06)` : "rgba(0,0,0,0.3)"; 
                 context.fill();
                 
                 // Graticule
                 context.beginPath(); 
                 path(d3.geoGraticule10()); 
-                context.strokeStyle = isLight ? "rgba(220,38,38,0.08)" : "rgba(220,38,38,0.1)"; 
+                context.strokeStyle = isLight ? `rgba(${_halo},0.08)` : `rgba(${_halo},0.1)`; 
                 context.stroke();
                 
                 // Land
                 if (land) { 
                     context.beginPath(); 
                     path(land); 
-                    context.fillStyle = isLight ? "#dc2626" : "#5a1010"; 
+                    context.fillStyle = isLight ? _b6 : _landDark; 
                     context.fill(); 
-                    context.strokeStyle = isLight ? "#ef4444" : "#b91c1c"; 
+                    context.strokeStyle = isLight ? _b5 : _b7; 
                     context.lineWidth = 0.5; 
                     context.stroke(); 
                 }
@@ -3136,14 +3154,16 @@
                     path(p);
                     
                     let color, glowColor;
+                    const _c3 = _br ? _br.primary300 : '#fcd34d';
+                    const _c4 = _br ? _br.primary400 : '#f87171';
                     if(m.type === 'reg') {
-                        color = "#fcd34d"; // Brighter Yellow
-                        glowColor = "rgba(253, 224, 71, 1)";
+                        color = _c3;
+                        glowColor = _c3;
                     } else if(m.type === 'comm') {
-                        color = "#f87171"; // Brighter Red
-                        glowColor = "rgba(248, 113, 113, 1)";
+                        color = _c4;
+                        glowColor = _c4;
                     } else {
-                        color = "#60a5fa"; // Brighter Blue
+                        color = "#60a5fa"; // Deposits always blue
                         glowColor = "rgba(96, 165, 250, 1)";
                     }
                     
@@ -3163,8 +3183,8 @@
                 
                 // Gradient Overlay
                 const gradient = context.createRadialGradient(width/2, height/2, height/2.2 - 20, width/2, height/2, height/2.2 + 40);
-                gradient.addColorStop(0, "rgba(220, 38, 38, 0)"); 
-                gradient.addColorStop(0.5, "rgba(220, 38, 38, 0.1)");
+                gradient.addColorStop(0, `rgba(${_halo}, 0)`); 
+                gradient.addColorStop(0.5, `rgba(${_halo}, 0.1)`);
                 
                 context.beginPath(); 
                 path({type: "Sphere"}); 
