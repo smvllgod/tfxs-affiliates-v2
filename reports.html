@@ -55,7 +55,7 @@
         }
 
         .btn-gradient {
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            background: linear-gradient(135deg, var(--brand-600) 0%, var(--brand-700) 100%);
             position: relative;
             overflow: hidden;
         }
@@ -78,12 +78,12 @@
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: #050505; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #dc2626; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--brand-600); }
 
         /* Notification highlight animation */
         @keyframes notifHighlight {
-            0% { background: rgba(239, 68, 68, 0.35); box-shadow: inset 0 0 30px rgba(239, 68, 68, 0.15); }
-            20% { background: rgba(239, 68, 68, 0.25); }
+            0% { background: rgba(var(--brand-halo), 0.35); box-shadow: inset 0 0 30px rgba(var(--brand-halo), 0.15); }
+            20% { background: rgba(var(--brand-halo), 0.25); }
             100% { background: transparent; box-shadow: none; }
         }
         .notif-highlight {
@@ -126,38 +126,38 @@
             border-radius: 8px !important;
         }
         .flatpickr-day:hover {
-            background: rgba(239, 68, 68, 0.2) !important;
+            background: rgba(var(--brand-halo), 0.2) !important;
             border-color: transparent !important;
         }
         .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange, .flatpickr-day.selected.inRange, .flatpickr-day.startRange.inRange, .flatpickr-day.endRange.inRange, .flatpickr-day.focus, .flatpickr-day.nextMonthDay:hover, .flatpickr-day.prevMonthDay:hover {
-            background: #dc2626 !important;
-            border-color: #dc2626 !important;
+            background: var(--brand-600) !important;
+            border-color: var(--brand-600) !important;
             color: white !important;
-            box-shadow: 0 0 15px rgba(220, 38, 38, 0.4) !important;
+            box-shadow: 0 0 15px rgba(var(--brand-halo), 0.4) !important;
         }
         .flatpickr-day.inRange {
-            background: rgba(239, 68, 68, 0.1) !important;
+            background: rgba(var(--brand-halo), 0.1) !important;
             border-color: transparent !important;
-            box-shadow: -5px 0 0 rgba(239, 68, 68, 0.1), 5px 0 0 rgba(239, 68, 68, 0.1) !important;
+            box-shadow: -5px 0 0 rgba(var(--brand-halo), 0.1), 5px 0 0 rgba(var(--brand-halo), 0.1) !important;
         }
         .flatpickr-next-month, .flatpickr-prev-month {
-            fill: #ef4444 !important;
-            color: #ef4444 !important;
+            fill: var(--brand-500) !important;
+            color: var(--brand-500) !important;
         }
         .flatpickr-next-month:hover svg, .flatpickr-prev-month:hover svg {
             fill: #fff !important;
         }
         .flatpickr-current-month .numInputWrapper span.arrowUp:after {
-            border-bottom-color: #ef4444 !important;
+            border-bottom-color: var(--brand-500) !important;
         }
         .flatpickr-current-month .numInputWrapper span.arrowDown:after {
-            border-top-color: #ef4444 !important;
+            border-top-color: var(--brand-500) !important;
         }
 
         .tab-btn.active {
             background: rgba(255, 255, 255, 0.1);
             color: white;
-            border-color: #ef4444;
+            border-color: var(--brand-500);
         }
         /* ── Mobile table fixes: prevent cell overlap ── */
         @media (max-width: 768px) {
@@ -176,7 +176,7 @@
         <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 flex items-center justify-between gap-3 sm:gap-4 relative">
             <div class="flex items-center gap-4 sm:gap-10">
                 <a href="/" class="flex items-center gap-2 group cursor-pointer no-underline">
-                    <img src="assets/logo.svg" alt="Logo" class="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow-[0_0_15px_rgba(220,38,38,0.5)]">
+                    <img src="assets/logo.svg" alt="Logo" class="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow-[0_0_15px_rgba(var(--brand-halo),0.5)]">
                     <span class="hidden sm:inline text-lg sm:text-xl font-bold tracking-tight text-white group-hover:text-brand-500 transition-colors"><script>document.write(BRAND.name);</script><span class="opacity-50 font-light"> <script>document.write(BRAND.nameFull.replace(BRAND.name,'').trim());</script></span></span>
                 </a>
 
@@ -204,7 +204,7 @@
                 <!-- Notification Bell -->
                 <button class="notification-bell-btn relative p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/5">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-                    <span id="notif-badge" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-brand-500 text-white text-[9px] font-bold shadow-[0_0_8px_#ef4444]" style="display:none;">0</span>
+                    <span id="notif-badge" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-brand-500 text-white text-[9px] font-bold shadow-[0_0_8px_var(--brand-500)]" style="display:none;">0</span>
                 </button>
 
                 <!-- Mobile Menu Toggle -->
@@ -227,10 +227,10 @@
 
     <!-- Connecting overlay — full-page, fixed at top -->
     <div id="connecting-overlay" class="fixed inset-0 z-[9998]" style="background:rgba(5,5,5,0.85); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);">
-        <div class="flex items-center justify-center gap-3 px-6 py-3 mt-[72px]" style="background:linear-gradient(90deg, transparent, rgba(220,38,38,0.06), transparent);">
+        <div class="flex items-center justify-center gap-3 px-6 py-3 mt-[72px]" style="background:linear-gradient(90deg, transparent, rgba(var(--brand-halo),0.06), transparent);">
             <div class="relative w-5 h-5 flex-shrink-0">
                 <div class="absolute inset-0 rounded-full border-2 border-white/10"></div>
-                <div class="absolute inset-0 rounded-full border-2 border-t-red-500 animate-spin"></div>
+                <div class="absolute inset-0 rounded-full border-2 animate-spin" style="border-top-color:var(--brand-500)"></div>
             </div>
             <p class="text-xs font-mono text-gray-400 tracking-wider" data-i18n="rep.connecting">Connecting to live data<span class="connecting-dots"></span></p>
             <p class="text-[10px] text-gray-600 ml-1" data-i18n="rep.mayTake">— may take a few seconds</p>
