@@ -389,9 +389,9 @@ function renderKpiChart(ts) {
     },
     yAxis: [
       { // Left — Commission $
-        title: { text: 'Commission ($)', style: { color: isLt ? 'rgba(220,38,38,0.7)' : 'rgba(229,57,53,0.7)', fontSize: '10px', fontWeight: '600' } },
+        title: { text: 'Commission ($)', style: { color: BRAND.colors.primary500 + 'b3', fontSize: '10px', fontWeight: '600' } },
         labels: {
-          style: { color: isLt ? 'rgba(220,38,38,0.65)' : 'rgba(229,57,53,0.65)', fontSize: '10px' },
+          style: { color: BRAND.colors.primary500 + 'a6', fontSize: '10px' },
           formatter: function() { return this.value >= 1000 ? '$' + (this.value / 1000).toFixed(1) + 'K' : '$' + Math.round(this.value); }
         },
         min: 0,
@@ -443,8 +443,8 @@ function renderKpiChart(ts) {
       },
       {
         name: 'Commission $', data: commData, yAxis: 0,
-        color: '#ef4444',
-        fillColor: { linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 }, stops: [[0, 'rgba(239,68,68,0.2)'], [1, 'rgba(239,68,68,0)']] }
+        color: BRAND.colors.primary500,
+        fillColor: { linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 }, stops: [[0, 'rgba(' + BRAND.colors.haloRgba + ',0.2)'], [1, 'rgba(' + BRAND.colors.haloRgba + ',0)']] }
       }
     ]
   };
@@ -1070,7 +1070,7 @@ function addTierRow(data) {
     </div>
     <div class="grid grid-cols-2 gap-2">
       <div><label class="text-[9px] text-gray-600 block">Description</label><input type="text" class="tier-description form-input w-full px-2 py-1.5 rounded text-[11px]" value="${esc(data?.description || "")}" placeholder="Optional tier description..."></div>
-      <div><label class="text-[9px] text-gray-600 block">Color</label><input type="text" class="tier-color form-input w-full px-2 py-1.5 rounded text-[11px]" placeholder="#dc2626" value="${esc(data?.style_color || "")}"></div>
+      <div><label class="text-[9px] text-gray-600 block">Color</label><input type="text" class="tier-color form-input w-full px-2 py-1.5 rounded text-[11px]" placeholder="${BRAND.colors.primary600}" value="${esc(data?.style_color || "")}"></div>
     </div>
   `;
   list.appendChild(row);
@@ -2041,8 +2041,8 @@ function openBrokerModal() {
   resetBrokerLogoUpload();
   if ($("broker-name-input")) $("broker-name-input").value = "";
   if ($("broker-contact-input")) $("broker-contact-input").value = "";
-  if ($("broker-color-text")) $("broker-color-text").value = "#dc2626";
-  if ($("broker-color-input")) $("broker-color-input").value = "#dc2626";
+  if ($("broker-color-text")) $("broker-color-text").value = BRAND.colors.primary600;
+  if ($("broker-color-input")) $("broker-color-input").value = BRAND.colors.primary600;
   // Reset button text back to Add
   const addBtn = document.querySelector('#broker-modal .btn-gradient');
   if (addBtn) {
@@ -2156,8 +2156,8 @@ function editBrokerItem(id) {
   // Pre-fill the broker modal fields
   if ($("broker-name-input")) $("broker-name-input").value = broker.name || "";
   if ($("broker-contact-input")) $("broker-contact-input").value = broker.contact || "";
-  if ($("broker-color-text")) $("broker-color-text").value = broker.theme_color || "#dc2626";
-  if ($("broker-color-input")) $("broker-color-input").value = broker.theme_color || "#dc2626";
+  if ($("broker-color-text")) $("broker-color-text").value = broker.theme_color || BRAND.colors.primary600;
+  if ($("broker-color-input")) $("broker-color-input").value = broker.theme_color || BRAND.colors.primary600;
   // Reset logo upload
   resetBrokerLogoUpload();
   // Show existing logo preview if available
@@ -3476,7 +3476,7 @@ function renderBrokerConnections() {
 
   grid.innerHTML = brokers.map(b => {
     const bPrefixes = prefixes.filter(p => p.broker_name === b.name);
-    const color = b.theme_color || "#ef4444";
+    const color = b.theme_color || BRAND.colors.primary500;
     return `
       <div class="bg-white/[0.03] rounded-xl p-4 border border-white/5 hover:border-white/10 transition group">
         <div class="flex items-center gap-3 mb-3">
