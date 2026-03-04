@@ -10,7 +10,8 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     // 1. Instant apply from localStorage cache (no flash)
-    const cached = localStorage.getItem("tfxs_settings");
+    const _SK = (k) => window.BRAND ? BRAND._lsKey(k) : `tfxs_${k}`;
+    const cached = localStorage.getItem(_SK("settings"));
     if (cached) {
       try {
         const s = JSON.parse(cached);
@@ -32,7 +33,7 @@
             paymentMethod: s.payment_method,
             walletAddress: s.wallet_address
           };
-          localStorage.setItem("tfxs_settings", JSON.stringify(cache));
+          localStorage.setItem(_SK("settings"), JSON.stringify(cache));
           applyToNav(s.display_name, s.avatar_seed);
         }
         // Dismiss overlay for pages without their own live connector (assets, settings)

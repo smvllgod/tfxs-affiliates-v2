@@ -141,11 +141,14 @@
     window.tfxsAlert = function(msg, opts = {}) { return openDialog(msg, { ...opts, alert: true }); };
   })();
 
+  // Brand-aware localStorage key helper (BRAND loads before auth.js)
+  const _K = (k) => window.BRAND ? BRAND._lsKey(k) : `tfxs_${k}`;
+
   // Skip auth check on login page
   const path = window.location.pathname;
   if (path.endsWith("login.html") || path.endsWith("login")) return;
 
-  const token = localStorage.getItem("tfxs_jwt");
+  const token = localStorage.getItem(_K("jwt"));
 
   if (!token) {
     window.location.replace("/login");
@@ -163,22 +166,22 @@
 
     // Check expiry
     if (payload.exp && payload.exp * 1000 < Date.now()) {
-      localStorage.removeItem("tfxs_jwt");
-      localStorage.removeItem("affiliate_id");
+      localStorage.removeItem(_K("jwt"));
+      localStorage.removeItem(_K("affiliate_id"));
       window.location.replace("/login");
       return;
     }
 
     // Set affiliate ID for api.js and settings-loader.js
     if (payload.afp) {
-      localStorage.setItem("affiliate_id", payload.afp);
+      localStorage.setItem(_K("affiliate_id"), payload.afp);
     }
 
     // Admin flag
     if (payload.is_admin) {
-      localStorage.setItem("is_admin", "true");
+      localStorage.setItem(_K("is_admin"), "true");
     } else {
-      localStorage.removeItem("is_admin");
+      localStorage.removeItem(_K("is_admin"));
     }
 
     // Expose user info globally
@@ -190,18 +193,18 @@
     };
   } catch (e) {
     // JWT decode failed — force re-login
-    localStorage.removeItem("tfxs_jwt");
-    localStorage.removeItem("affiliate_id");
+    localStorage.removeItem(_K("jwt"));
+    localStorage.removeItem(_K("affiliate_id"));
     window.location.replace("/login");
     return;
   }
 
   // ── Logout function (available globally) ──
   window.tfxsLogout = function () {
-    localStorage.removeItem("tfxs_jwt");
-    localStorage.removeItem("affiliate_id");
-    localStorage.removeItem("is_admin");
-    localStorage.removeItem("tfxs_settings");
+    localStorage.removeItem(_K("jwt"));
+    localStorage.removeItem(_K("affiliate_id"));
+    localStorage.removeItem(_K("is_admin"));
+    localStorage.removeItem(_K("settings"));
     window.location.replace("/login");
   };
 
@@ -254,7 +257,8 @@
         '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>';
       logoutBtn.addEventListener("click", async (e) => {
         e.preventDefault();
-        if (await tfxsConfirm("Are you sure you want to log out of TFXS Affiliates?", { title: "Log Out", okText: "Log Out", variant: "logout" })) {
+        const bName = window.BRAND ? BRAND.nameFull : "TFXS Affiliates";
+        if (await tfxsConfirm(`Are you sure you want to log out of ${bName}?`, { title: "Log Out", okText: "Log Out", variant: "logout" })) {
           window.tfxsLogout();
         }
       });

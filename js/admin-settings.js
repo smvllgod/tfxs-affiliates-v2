@@ -527,13 +527,27 @@ function renderAffPage(page) {
     return '<span class="text-gray-700 text-[9px] uppercase">None</span>';
   };
 
+  const cFlag = (c) => c ? String.fromCodePoint(...[...c.toUpperCase()].map(l => 0x1F1E6 + l.charCodeAt(0) - 65)) : '';
+
   tbody.innerHTML = rows.map(r => {
     const st = r.status || "approved";
     const approveBtn = st === "pending" ? `<button onclick="approveAffiliate('${r.id}')" class="text-[10px] text-green-400 hover:text-green-300 transition font-bold uppercase mr-2">Approve</button><button onclick="rejectAffiliate('${r.id}')" class="text-[10px] text-red-400 hover:text-red-300 transition font-bold uppercase mr-2">Reject</button>` : "";
+    const countryFlag = r.country ? `<span title="${esc(r.country)}">${cFlag(r.country)}</span> ` : '';
+    // Application detail row for pending affiliates
+    let detailRow = '';
+    if (st === "pending" && (r.country || r.whatsapp || r.telegram || r.website || r.application_reason)) {
+      const chips = [];
+      if (r.country) chips.push(`<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white/5 text-[10px]">${cFlag(r.country)} ${esc(r.country)}</span>`);
+      if (r.whatsapp) chips.push(`<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-green-500/10 text-green-400 text-[10px]"><svg class="w-3 h-3 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.57.57a1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.25 1.02l-2.2 2.2z"/></svg> ${esc(r.whatsapp)}</span>`);
+      if (r.telegram) chips.push(`<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px]"><svg class="w-3 h-3 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg> @${esc(r.telegram).replace(/^@/,'')}</span>`);
+      if (r.website) chips.push(`<a href="${esc(r.website)}" target="_blank" class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 text-[10px] hover:underline"><svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg> ${esc(r.website)}</a>`);
+      const reasonHtml = r.application_reason ? `<div class="mt-1.5 text-[11px] text-gray-400 leading-relaxed"><span class="text-gray-600 font-semibold uppercase text-[9px]">Reason:</span> ${esc(r.application_reason)}</div>` : '';
+      detailRow = `<tr class="border-0 bg-amber-500/[0.02]"><td colspan="8" class="px-4 pb-3 pt-0"><div class="flex flex-wrap gap-1.5">${chips.join('')}</div>${reasonHtml}</td></tr>`;
+    }
     return `
     <tr class="border-t border-white/5 hover:bg-white/[0.02] transition ${st === "pending" ? "bg-amber-500/[0.03]" : ""}">
       <td class="px-4 py-3 font-mono text-brand-500 font-bold">${esc(r.afp)}</td>
-      <td class="px-4 py-3 text-white">${esc(r.display_name || "—")}</td>
+      <td class="px-4 py-3 text-white">${countryFlag}${esc(r.display_name || "—")}</td>
       <td class="px-4 py-3 text-gray-400">${esc(r.email)}</td>
       <td class="px-4 py-3">${statusBadge(st)}</td>
       <td class="px-4 py-3">${kycBadge(r.kyc_status)}</td>
@@ -544,7 +558,7 @@ function renderAffPage(page) {
         <button onclick="openAffModal(${JSON.stringify(r).replace(/"/g, '&quot;')})" class="text-[10px] text-blue-400 hover:text-blue-300 transition font-bold uppercase mr-2">Edit</button>
         ${!r.is_admin ? `<button onclick="deleteAffiliate('${r.id}')" class="text-[10px] text-red-400 hover:text-red-300 transition font-bold uppercase">Del</button>` : ''}
       </td>
-    </tr>`;
+    </tr>${detailRow}`;
   }).join("");
 
   renderPagination("aff-pagination", affTotalCount, page, PER_PAGE, p => loadAffiliates(p));

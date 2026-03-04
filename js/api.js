@@ -408,7 +408,7 @@ async function fetchBrokerPrefixes() { return apiGet("/admin/broker-prefixes"); 
 async function addBrokerPrefixAPI(prefix, broker_name) { return apiSend("POST", "/admin/broker-prefixes", { prefix, broker_name }); }
 async function deleteBrokerPrefixAPI(id) {
   const headers = {};
-  const jwt = localStorage.getItem('tfxs_jwt');
+  const jwt = localStorage.getItem(_LS('jwt'));
   if (jwt) headers['Authorization'] = `Bearer ${jwt}`;
   const res = await fetch(`${API_BASE}/admin/broker-prefixes/${id}`, { method: "DELETE", headers });
   if (!res.ok) throw new Error(`Delete failed: ${res.status}`);

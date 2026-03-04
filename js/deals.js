@@ -49,7 +49,8 @@ function copyBrokerLink(btn, link) {
   document.addEventListener("DOMContentLoaded", () => {
     affiliateId = getAffiliateId();
     // Always get the user's own AFP for link personalization (even admins have one)
-    userAfp = (window.__tfxsUser && window.__tfxsUser.afp) || localStorage.getItem("affiliate_id") || null;
+    const _DK = (k) => window.BRAND ? BRAND._lsKey(k) : `tfxs_${k}`;
+    userAfp = (window.__tfxsUser && window.__tfxsUser.afp) || localStorage.getItem(_DK("affiliate_id")) || null;
     loadDeals();
   });
 
