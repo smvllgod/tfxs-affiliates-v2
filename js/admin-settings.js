@@ -10,7 +10,7 @@ if (localStorage.getItem(_LS_A("is_admin")) !== "true") {
   window.location.replace("/");
 }
 
-const API = window.TFXS_API?.API_BASE || (window.BRAND && BRAND.urls.api) || "https://tfxs-affiliates-backend.onrender.com";
+const API = (window.PLATFORM_API || window.TFXS_API)?.API_BASE || (window.BRAND && BRAND.urls.api) || "";  // No hardcoded fallback — BRAND.urls.api is the source of truth
 const PER_PAGE = 25;
 
 // ══════════════════════════════════════════════════════
@@ -2214,7 +2214,7 @@ let _brokerPrefixes = [];
 
 async function loadBrokerPrefixes() {
   try {
-    const { fetchBrokerPrefixes } = window.TFXS_API;
+    const { fetchBrokerPrefixes } = window.PLATFORM_API || window.TFXS_API;
     const res = await fetchBrokerPrefixes();
     _brokerPrefixes = res.data || res || [];
     renderBrokerPrefixes();
@@ -2261,7 +2261,7 @@ async function addBrokerPrefix() {
   if (!prefix) return toast("Enter a prefix pattern", "warn");
   if (!broker_name) return toast("Select a broker", "warn");
   try {
-    const { addBrokerPrefixAPI } = window.TFXS_API;
+    const { addBrokerPrefixAPI } = window.PLATFORM_API || window.TFXS_API;
     await addBrokerPrefixAPI(prefix, broker_name);
     toast("Prefix rule added");
     $("prefix-input").value = "";
@@ -2273,7 +2273,7 @@ async function addBrokerPrefix() {
 async function deleteBrokerPrefix(id) {
   if (!await tfxsConfirm("This prefix mapping will be removed.", { title: "Delete Prefix Mapping", okText: "Delete", variant: "danger" })) return;
   try {
-    const { deleteBrokerPrefixAPI } = window.TFXS_API;
+    const { deleteBrokerPrefixAPI } = window.PLATFORM_API || window.TFXS_API;
     await deleteBrokerPrefixAPI(id);
     toast("Prefix rule deleted");
     await loadBrokerPrefixes();
@@ -2284,7 +2284,7 @@ async function normalizeBrokerNames() {
   const btn = $("normalize-brokers-btn");
   if (btn) { btn.disabled = true; btn.textContent = "Normalizing..."; }
   try {
-    const { normalizeBrokersAPI } = window.TFXS_API;
+    const { normalizeBrokersAPI } = window.PLATFORM_API || window.TFXS_API;
     const res = await normalizeBrokersAPI();
     toast(`Broker names normalized — ${res.updated || 0} conversion(s) updated`);
   } catch (e) { toast("Normalization failed: " + e.message, "error"); }
@@ -2855,6 +2855,38 @@ async function rejectKyc(affiliateId) {
   if (!document.getElementById("admin-spin-style")) { const s = document.createElement("style"); s.id="admin-spin-style"; s.textContent="@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}"; document.head.appendChild(s); }
   // Initial load
   try { setLoading(); await loadCurrencyRates(); await loadStats(); await loadAffiliates(); loadPendingCounts(); setConnected(); stopLoading(); } catch(e) { setDisconnected(); stopLoading(); }
+
+  // ── Plan limits awareness (Issue #10) ──
+  try {
+    const _planApi = (window.PLATFORM_API || window.TFXS_API);
+    if (_planApi && _planApi.apiGet) {
+      const planInfo = await _planApi.apiGet('/api/plan-info');
+      if (planInfo && planInfo.ok && planInfo.limits) {
+        const lim = planInfo.limits;
+        const warnings = [];
+        // Check affiliate usage vs limit
+        if (lim.maxAffiliates) {
+          const affCount = _totalAffiliates || 0;
+          const pct = Math.round((affCount / lim.maxAffiliates) * 100);
+          if (pct >= 90) warnings.push(`Affiliates: ${affCount}/${lim.maxAffiliates} (${pct}%)`);
+        }
+        // Check broker usage vs limit
+        if (lim.maxBrokers && allBrokers && allBrokers.length) {
+          const bCount = allBrokers.length;
+          const pct = Math.round((bCount / lim.maxBrokers) * 100);
+          if (pct >= 80) warnings.push(`Brokers: ${bCount}/${lim.maxBrokers} (${pct}%)`);
+        }
+        if (warnings.length > 0) {
+          const banner = document.createElement('div');
+          banner.className = 'mx-4 mt-3 px-4 py-3 rounded-xl border text-sm';
+          banner.style.cssText = 'background:rgba(251,191,36,0.08);border-color:rgba(251,191,36,0.25);color:#fbbf24;';
+          banner.innerHTML = `<span class="font-semibold">⚠ Plan Limits:</span> ${warnings.join(' · ')} — <span class="text-yellow-300/70 text-xs">Upgrade your plan for higher limits.</span>`;
+          const main = document.querySelector('main') || document.body;
+          main.insertBefore(banner, main.firstChild);
+        }
+      }
+    }
+  } catch (_planErr) { /* non-critical */ }
   // Hash-based tab routing (e.g. /admin-settings#kyc, #affiliates, #payouts)
   const hash = window.location.hash.replace("#", "");
   if (hash) {

@@ -20,9 +20,12 @@ const BRAND = {
   storageKey:  "tfxs",               // localStorage namespace (tfxs_jwt, tfxs_theme…)
 
   /* ── URLs ──────────────────────────────────────────────────── */
+  // ⚠️  IMPORTANT: When provisioning a new tenant, update urls.api and
+  //     urls.frontend to match the tenant's own backend/frontend domains.
+  //     The defaults below are for the TFXS tenant only.
   urls: {
-    api:       "https://api.theforexskyline.com",
-    frontend:  "https://affiliates.theforexskyline.com",
+    api:       "https://api.theforexskyline.com",  // Override per tenant!
+    frontend:  "https://affiliates.theforexskyline.com",  // Override per tenant!
     logo:      "assets/logo.svg",       // Relative to frontend root
     icon192:   "assets/icon-192.png",
     icon512:   "assets/icon-512.png",

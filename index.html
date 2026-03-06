@@ -12,10 +12,11 @@
     <script>document.getElementById('page-title').textContent=BRAND._title('index')</script>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="manifest" href="/manifest.json">
-    <meta property="og:title" content="TFXS Affiliates — Elite Dashboard">
-    <meta property="og:description" content="Premium affiliate management dashboard for top-tier forex CPA partners.">
+    <meta property="og:title" content="Affiliate Dashboard">
+    <meta property="og:description" content="Premium affiliate management dashboard.">
     <meta property="og:image" content="assets/logo.svg">
     <meta property="og:type" content="website">
+    <script>document.querySelector('meta[property="og:title"]').content=BRAND._ogTitle('index');document.querySelector('meta[property="og:description"]').content=BRAND.description;</script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.49.0"></script>
     <script src="https://code.highcharts.com/11/highcharts.js"></script>
@@ -1114,7 +1115,7 @@
             });
 
             // ── Fetch accurate KPIs from backend with date range ──
-            const API = window.TFXS_API;
+            const API = window.PLATFORM_API || window.TFXS_API;
             let totalCommission = 0, totalRegs = 0, ftDs = 0, qftDs = 0, totalDeposit = 0, totalNetDeposit = 0;
             let backendKPIs = false;
             let _summaryData = null; // Store for balance card sync
@@ -1165,7 +1166,7 @@
                 totalDeposit = filteredRegs.reduce((acc, reg) => acc + (reg.firstDeposit || 0), 0);
             }
 
-            const roiFormula = window._tfxsRoiFormula || "net_deposit_div_commission";
+            const roiFormula = window._platformRoiFormula || window._tfxsRoiFormula || "net_deposit_div_commission";
             const roi = window.calculateROI ? window.calculateROI(roiFormula, totalDeposit, totalCommission, totalNetDeposit) : (totalCommission > 0 ? (totalNetDeposit / totalCommission).toFixed(2) : "0.00");
 
             // Update DOM with animated counters
@@ -2075,7 +2076,7 @@
 
             async function loadBrokerLinks() {
                 try {
-                    const { fetchDeals, getAffiliateId } = window.TFXS_API || {};
+                    const { fetchDeals, getAffiliateId } = window.PLATFORM_API || window.TFXS_API || {};
                     if (!fetchDeals) return;
                     const aid = getAffiliateId ? getAffiliateId() : null;
                     const afp = aid || localStorage.getItem(BRAND._lsKey('affiliate_id')) || '';
@@ -2147,7 +2148,7 @@
             }
 
             // Wait for API to be ready then load
-            if (window.TFXS_API) {
+            if (window.PLATFORM_API || window.TFXS_API) {
                 loadBrokerLinks();
             } else {
                 document.addEventListener('DOMContentLoaded', () => setTimeout(loadBrokerLinks, 500));
@@ -2179,7 +2180,7 @@
                 // Admin doesn't need "Contact Affiliate Manager"
                 if (localStorage.getItem(BRAND._lsKey('is_admin')) === 'true') return;
                 try {
-                    const apiGet = window.TFXS_API?.apiGet;
+                    const apiGet = (window.PLATFORM_API || window.TFXS_API)?.apiGet;
                     if (!apiGet) return;
                     const res = await apiGet('/api/contact-info');
                     if (!res) return;
@@ -2205,11 +2206,11 @@
                 } catch (_) {}
             }
 
-            if (window.TFXS_API) {
+            if (window.PLATFORM_API || window.TFXS_API) {
                 loadContactInfo();
             } else {
                 // api.js loads at bottom — poll until ready
-                const _ci = setInterval(() => { if (window.TFXS_API) { clearInterval(_ci); loadContactInfo(); } }, 300);
+                const _ci = setInterval(() => { if (window.PLATFORM_API || window.TFXS_API) { clearInterval(_ci); loadContactInfo(); } }, 300);
                 setTimeout(() => clearInterval(_ci), 10000);
             }
         })();
@@ -2276,7 +2277,7 @@
             const cvs = document.getElementById('qr-canvas-el');
             if (!cvs) return;
             const a = document.createElement('a');
-            a.download = 'tfxs-broker-qr.png';
+            a.download = BRAND.prefix.toLowerCase() + '-broker-qr.png';
             a.href = cvs.toDataURL('image/png');
             a.click();
         }
@@ -2375,7 +2376,7 @@
             generateSparkline('sparkline-qftd', dailyQftd, '#22c55e');
             // ROI sparkline using real deposit data + formula
             const calcROI = window.calculateROI || ((f, d, c) => c > 0 ? (d / c).toFixed(2) : 0);
-            const roiF = window._tfxsRoiFormula || "deposit_div_commission";
+            const roiF = window._platformRoiFormula || window._tfxsRoiFormula || "deposit_div_commission";
             generateSparkline('sparkline-roi', dailyComm.map((c, i) => parseFloat(calcROI(roiF, dailyDeposit[i], c)) || 0), '#a855f7');
         }
 
@@ -2648,7 +2649,8 @@
 
             // Prefer backend pre-aggregated country data (covers ALL records, not just 50)
             if (apiCountries && apiCountries.length > 0) {
-                const rc = window.TFXS_API && window.TFXS_API.resolveCountry ? window.TFXS_API.resolveCountry : (c => ({ name: c || 'Unknown', code: '', flag: '🌐' }));
+                const _API = window.PLATFORM_API || window.TFXS_API;
+                const rc = _API && _API.resolveCountry ? _API.resolveCountry : (c => ({ name: c || 'Unknown', code: '', flag: '🌐' }));
                 apiCountries.forEach(c => {
                     const resolved = rc(c.country);
                     countryComm[resolved.name] = c.commission || 0;
@@ -3048,10 +3050,17 @@
                 });
             };
 
-            // Load Data
+            // Load Data with error handling for CDN failures
             d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json").then(function(world) {
+                if (!world || !world.objects || !world.objects.countries) {
+                    console.warn('[Globe] Invalid world data received');
+                    return;
+                }
                 land = topojson.feature(world, world.objects.countries);
                 d3.timer(render);
+            }).catch(function(err) {
+                console.warn('[Globe] Failed to load world data from CDN:', err.message || err);
+                // Globe will simply not render country shapes — canvas stays with gradient background
             });
 
             // Drag Handler
@@ -3547,7 +3556,9 @@
         // ── Header background ──
         doc.setFillColor(10, 10, 10);
         doc.rect(0, 0, 210, 45, 'F');
-        doc.setFillColor(220, 38, 38);
+        // Use brand color for accent bar
+        const _pdfBrand = BRAND.colors ? BRAND.colors.haloRgba.split(',').map(Number) : [220,38,38];
+        doc.setFillColor(_pdfBrand[0], _pdfBrand[1], _pdfBrand[2]);
         doc.rect(0, 43, 210, 2, 'F');
 
         // ── Company name ──
@@ -3633,7 +3644,7 @@
         doc.text('Total', 140, y);
         doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
-        doc.setTextColor(220, 38, 38);
+        doc.setTextColor(_pdfBrand[0], _pdfBrand[1], _pdfBrand[2]);
         doc.text('$' + amount, 185, y, { align: 'right' });
 
         // ── Payment details ──
@@ -3658,7 +3669,7 @@
         doc.setFontSize(7);
         doc.setTextColor(180, 180, 180);
         doc.text('This invoice was generated automatically by ' + BRAND.nameFull + '. For questions, contact support.', 105, 275, { align: 'center' });
-        doc.setFillColor(220, 38, 38);
+        doc.setFillColor(_pdfBrand[0], _pdfBrand[1], _pdfBrand[2]);
         doc.rect(0, 290, 210, 7, 'F');
 
         // Save
@@ -3723,7 +3734,7 @@
     }
 
     async function loadPayoutScheduleFromSettings() {
-        const API = window.TFXS_API;
+        const API = window.PLATFORM_API || window.TFXS_API;
         if (!API) return;
         try {
             const affiliateId = API.getAffiliateId();
@@ -3819,7 +3830,7 @@
         document.getElementById('payout-schedule-label').textContent = SCHEDULE_LABELS[_payoutSchedule] || _payoutSchedule;
 
         // Auto-fill wallet from saved settings
-        const API = window.TFXS_API;
+        const API = window.PLATFORM_API || window.TFXS_API;
         if (API) {
             try {
                 const affiliateId = API.getAffiliateId();
@@ -3953,7 +3964,7 @@
         btn.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...';
         btn.disabled = true;
 
-        const API = window.TFXS_API;
+        const API = window.PLATFORM_API || window.TFXS_API;
         try {
             const affiliateId = API ? API.getAffiliateId() : null;
             const res = await API.requestPayout({

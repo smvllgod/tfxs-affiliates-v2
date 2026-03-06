@@ -1464,7 +1464,7 @@
         if (!tbody) return;
         tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-12 text-center text-gray-600">Loading payouts...</td></tr>';
         try {
-            const API = window.TFXS_API;
+            const API = window.PLATFORM_API || window.TFXS_API;
             if (!API) return;
             const affiliateId = API.getAffiliateId();
             const res = await API.fetchPayoutHistory(affiliateId);
@@ -1567,7 +1567,7 @@
         doc.setFontSize(11);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(30, 30, 30);
-        const affiliateId = (typeof window.TFXS_API !== 'undefined' && window.TFXS_API.getAffiliateId) ? window.TFXS_API.getAffiliateId() : 'Affiliate';
+        const affiliateId = (window.PLATFORM_API || window.TFXS_API)?.getAffiliateId?.() || 'Affiliate';
         const settings = JSON.parse(localStorage.getItem(BRAND._lsKey('settings')) || '{}');
         const billName = settings.displayName || affiliateId;
         doc.text(billName, colLeft, y);

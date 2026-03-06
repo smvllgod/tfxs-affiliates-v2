@@ -970,7 +970,7 @@
             renderAvatarGrid('Jordan'); // default
 
             // ── Load saved settings from backend ──
-            const API = window.TFXS_API;
+            const API = window.PLATFORM_API || window.TFXS_API;
             if (API) {
                 const affiliateId = API.getAffiliateId();
                 API.fetchSettings(affiliateId).then(res => {
@@ -1248,7 +1248,7 @@
         document.getElementById('save-settings').addEventListener('click', async function() {
              const btn = this;
              const originalText = btn.textContent;
-             const API = window.TFXS_API;
+             const API = window.PLATFORM_API || window.TFXS_API;
 
              // Gather form values
              const displayName = document.getElementById('settings-name').value.trim();
@@ -1404,7 +1404,7 @@
             _autoPayoutEnabled = !_autoPayoutEnabled;
             renderAutoPayoutToggle();
             try {
-                const API = window.TFXS_API;
+                const API = window.PLATFORM_API || window.TFXS_API;
                 if (API) {
                     const affiliateId = API.getAffiliateId();
                     await API.saveSettings({ affiliate_id: affiliateId, auto_payout_enabled: _autoPayoutEnabled });
@@ -1428,7 +1428,7 @@
         // ═══════ AFFILIATE TELEGRAM FUNCTIONS ═══════
 
         async function loadAffiliateTelegramState() {
-            const API = window.TFXS_API;
+            const API = window.PLATFORM_API || window.TFXS_API;
             if (!API) return;
             try {
                 const res = await API.apiGet('/api/telegram-settings');
@@ -1470,7 +1470,7 @@
         }
 
         async function saveAffiliateTelegram() {
-            const API = window.TFXS_API;
+            const API = window.PLATFORM_API || window.TFXS_API;
             if (!API) return;
             const events = [];
             if (document.getElementById('aff-tg-evt-commission')?.checked) events.push('commission');
@@ -1496,7 +1496,7 @@
         }
 
         async function testAffiliateTelegram() {
-            const API = window.TFXS_API;
+            const API = window.PLATFORM_API || window.TFXS_API;
             if (!API) return;
             const token = document.getElementById('aff-tg-bot-token')?.value.trim();
             const chatId = document.getElementById('aff-tg-chat-id')?.value.trim();
@@ -1518,7 +1518,7 @@
         }
 
         async function discoverTelegramGroups() {
-            const API = window.TFXS_API;
+            const API = window.PLATFORM_API || window.TFXS_API;
             if (!API) return;
             const token = document.getElementById('aff-tg-bot-token')?.value.trim();
             if (!token) { if (typeof showToast === 'function') showToast('Enter a bot token first', 'error'); return; }
@@ -1587,7 +1587,7 @@
         };
 
         async function loadChannelState(channel) {
-            const API = window.TFXS_API;
+            const API = window.PLATFORM_API || window.TFXS_API;
             if (!API) return;
             try {
                 const res = await API.apiGet(`/api/channel-settings/${channel}`);
@@ -1631,7 +1631,7 @@
         }
 
         async function saveChannelSettings(channel) {
-            const API = window.TFXS_API;
+            const API = window.PLATFORM_API || window.TFXS_API;
             if (!API) return;
             const map = CHANNEL_FIELD_MAP[channel];
             if (!map) return;
@@ -1661,7 +1661,7 @@
         }
 
         async function testChannelNotification(channel) {
-            const API = window.TFXS_API;
+            const API = window.PLATFORM_API || window.TFXS_API;
             if (!API) return;
             const map = CHANNEL_FIELD_MAP[channel];
             if (!map) return;
@@ -1830,7 +1830,7 @@
         // --- Change Password Logic ---
         document.getElementById('change-password-btn').addEventListener('click', async function() {
             const btn = this;
-            const API = window.TFXS_API;
+            const API = window.PLATFORM_API || window.TFXS_API;
             if (!API || !API.changePassword) { await tfxsAlert("Password change is not available.", { variant: 'info' }); return; }
 
             const current = document.getElementById('current-password').value;

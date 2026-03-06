@@ -454,3 +454,6 @@ window.TFXS_API = {
   resolveCountry,
   codeToFlag
 };
+
+// Brand-agnostic alias — new deployments should use PLATFORM_API
+window.PLATFORM_API = window.TFXS_API;

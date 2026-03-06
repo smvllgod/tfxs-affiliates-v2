@@ -229,7 +229,7 @@
             const affiliateId = localStorage.getItem(BRAND._lsKey('affiliate_id'));
             if (!affiliateId) { grid.innerHTML = '<p class="text-gray-500 text-xs col-span-full text-center py-8">Please log in to view your tracking links.</p>'; return; }
 
-            const result = await window.TFXS_API.fetchDeals(affiliateId);
+            const result = await (window.PLATFORM_API || window.TFXS_API).fetchDeals(affiliateId);
             const deals = result && result.data ? result.data : (Array.isArray(result) ? result : []);
 
             if (!deals.length) {
