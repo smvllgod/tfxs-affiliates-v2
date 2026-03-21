@@ -503,3 +503,36 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// ── Apply BRAND logos & favicon ───────────────────────────────
+(function applyBrandLogos() {
+    if (typeof BRAND === 'undefined' || !BRAND.logos) return;
+
+    // Favicon — swap if a custom one is set
+    if (BRAND.logos.favicon) {
+        const link = document.getElementById('dynamic-favicon') ||
+                     document.querySelector("link[rel~='icon']");
+        if (link) link.href = BRAND.logos.favicon;
+    }
+
+    // Nav logo — only swap when logo_choice is "custom" and URLs are present
+    if (BRAND.logos.choice === 'custom') {
+        // Dark theme = show light logo (light-colored logo on dark background)
+        const isDark = !document.documentElement.classList.contains('light');
+        const logoUrl = isDark ? (BRAND.logos.light || BRAND.logos.dark) : (BRAND.logos.dark || BRAND.logos.light);
+        if (logoUrl) {
+            const imgs = document.querySelectorAll('#nav-logo-img');
+            imgs.forEach(img => {
+                img.src = logoUrl;
+                img.style.width = 'auto';
+                img.style.maxHeight = '40px';
+                img.style.maxWidth = '160px';
+                img.style.borderRadius = '0';
+            });
+            // Hide the text name when a full-width logo is provided
+            document.querySelectorAll('#nav-logo-text').forEach(t => {
+                t.style.display = 'none';
+            });
+        }
+    }
+})();
