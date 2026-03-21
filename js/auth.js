@@ -12,6 +12,7 @@
   (function initTfxsDialogs() {
     const MODAL_ID = "tfxs-confirm-modal";
     let _resolve = null;
+    let _inputMode = false;
 
     function ensureModal() {
       if (document.getElementById(MODAL_ID)) return;
@@ -29,6 +30,10 @@
               <h3 id="tfxs-confirm-title" class="text-sm font-bold leading-tight">Confirm Action</h3>
               <p id="tfxs-confirm-msg" class="text-xs mt-1.5 leading-relaxed"></p>
             </div>
+          </div>
+          <div id="tfxs-confirm-input-wrap" class="hidden mt-3 mb-1 px-0">
+            <label id="tfxs-confirm-input-label" class="block text-[10px] font-semibold uppercase tracking-wider mb-1.5" style="color:#9ca3af;"></label>
+            <input id="tfxs-confirm-input" type="text" class="w-full px-3 py-2.5 rounded-xl text-sm outline-none transition-all duration-200" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#fff;" placeholder="">
           </div>
           <div class="flex gap-2.5 mt-5">
             <button id="tfxs-confirm-cancel" class="flex-1 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all duration-200">Cancel</button>
@@ -103,6 +108,26 @@
         cancelBtn.style.display = "";
       }
 
+      // Input field support
+      const inputWrap = document.getElementById("tfxs-confirm-input-wrap");
+      const inputEl = document.getElementById("tfxs-confirm-input");
+      const inputLabelEl = document.getElementById("tfxs-confirm-input-label");
+      if (opts.input) {
+        _inputMode = true;
+        inputWrap.classList.remove("hidden");
+        inputEl.value = opts.inputValue || "";
+        inputEl.placeholder = opts.inputPlaceholder || "";
+        inputEl.style.background = isLt ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.06)';
+        inputEl.style.border = isLt ? '1px solid rgba(0,0,0,0.12)' : '1px solid rgba(255,255,255,0.1)';
+        inputEl.style.color = isLt ? '#1d1d1f' : '#ffffff';
+        inputLabelEl.textContent = opts.inputLabel || "";
+        inputLabelEl.style.display = opts.inputLabel ? "" : "none";
+        inputLabelEl.style.color = isLt ? '#6b7280' : '#9ca3af';
+      } else {
+        _inputMode = false;
+        inputWrap.classList.add("hidden");
+      }
+
       // Show with animation
       overlay.classList.remove("hidden");
       overlay.style.display = "flex";
@@ -110,6 +135,7 @@
         box.classList.remove("scale-95", "opacity-0");
         box.classList.add("scale-100", "opacity-100");
       });
+      if (opts.input) setTimeout(() => inputEl.focus(), 200);
 
       return new Promise(resolve => { _resolve = resolve; });
     }
@@ -123,7 +149,11 @@
       setTimeout(() => {
         overlay.classList.add("hidden");
         overlay.style.display = "none";
-        if (_resolve) { _resolve(result); _resolve = null; }
+        if (_resolve) {
+          let val = result;
+          if (_inputMode && result) val = document.getElementById("tfxs-confirm-input").value;
+          _resolve(val); _resolve = null; _inputMode = false;
+        }
       }, 150);
     }
 

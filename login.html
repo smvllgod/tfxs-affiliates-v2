@@ -512,7 +512,9 @@
                 // Clean URL and switch to login after 2s
                 setTimeout(() => { window.history.replaceState({}, '', '/login'); switchTab('login'); }, 2000);
             } catch (err) {
-                showMsg(err.message, 'error');
+                const msg = (err.message || '').toLowerCase();
+                const isNetwork = msg.includes('load failed') || msg.includes('failed to fetch') || msg.includes('networkerror') || msg.includes('network');
+                showMsg(isNetwork ? 'Unable to connect to server. Please try again.' : err.message, 'error');
                 btn.querySelector('span').textContent = 'Reset Password';
                 btn.disabled = false;
                 btn.classList.remove('opacity-75');
@@ -753,7 +755,9 @@
                 setTimeout(() => { window.location.href = '/'; }, 800);
 
             } catch (err) {
-                showMsg(err.message, 'error');
+                const msg = (err.message || '').toLowerCase();
+                const isNetwork = msg.includes('load failed') || msg.includes('failed to fetch') || msg.includes('networkerror') || msg.includes('network');
+                showMsg(isNetwork ? 'Unable to connect to server. Please try again.' : err.message, 'error');
                 btn.querySelector('span').textContent = 'Login';
                 btn.disabled = false;
                 btn.classList.remove('opacity-75');
@@ -856,7 +860,9 @@
                 }
 
             } catch (err) {
-                showMsg(err.message, 'error');
+                const msg = (err.message || '').toLowerCase();
+                const isNetwork = msg.includes('load failed') || msg.includes('failed to fetch') || msg.includes('networkerror') || msg.includes('network');
+                showMsg(isNetwork ? 'Unable to connect to server. Please try again.' : err.message, 'error');
                 btn.querySelector('span').textContent = 'Submit Application';
                 btn.disabled = false;
                 btn.classList.remove('opacity-75');

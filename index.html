@@ -1255,13 +1255,14 @@
                         const isAdminView = localStorage.getItem(BRAND._lsKey('is_admin')) === 'true';
 
                         // Admin: use date-filtered summary revenue (same as KPI cards) for consistency
+                        // Affiliate: "My Balance" = current month earnings only (popup shows full breakdown)
                         let myBalance;
                         if (isAdminView && _summaryData && _summaryData.raw_revenue !== undefined) {
                             myBalance = _summaryData.raw_revenue;
                         } else if (isAdminView && b.raw_revenue !== undefined) {
                             myBalance = b.raw_revenue;
                         } else {
-                            myBalance = isSameMonth ? available : (available + currentMonth);
+                            myBalance = currentMonth;
                         }
 
                         document.getElementById('balance-display').textContent = formatCurrency(myBalance);

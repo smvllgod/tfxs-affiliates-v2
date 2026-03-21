@@ -657,6 +657,7 @@
             <div class="h-4 w-[1px] bg-white/10"></div>
             <button onclick="bulkConvAction('approve')" class="text-[10px] font-bold text-green-400 hover:text-green-300 uppercase tracking-wider">✓ Approve</button>
             <button onclick="bulkConvAction('reject')" class="text-[10px] font-bold text-red-400 hover:text-red-300 uppercase tracking-wider">✗ Reject</button>
+            <button onclick="openBulkTransferModal()" class="text-[10px] font-bold text-purple-400 hover:text-purple-300 uppercase tracking-wider flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg> Transfer</button>
             <button onclick="bulkConvAction('delete')" class="text-[10px] font-bold text-orange-400 hover:text-orange-300 uppercase tracking-wider flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg> Delete</button>
             <div class="h-4 w-[1px] bg-white/10"></div>
             <button onclick="clearConvSelection()" class="text-[10px] font-bold text-gray-500 hover:text-white uppercase tracking-wider">✕ Clear</button>
@@ -2142,6 +2143,50 @@
         </div>
     </div>
 
+    <!-- Transfer Client Modal -->
+    <div id="transfer-modal" class="modal-overlay fixed inset-0 z-[9999] hidden flex items-center justify-center">
+        <div class="glass-panel rounded-2xl p-6 w-full max-w-md mx-4">
+            <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-2 flex items-center gap-2">
+                <svg class="w-4 h-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                Transfer Client
+            </h3>
+            <p class="text-[10px] text-gray-500 mb-5">Reassign this client to a different affiliate. By default, commissions stay with the original affiliate.</p>
+            <input type="hidden" id="transfer-user-id">
+            <div class="space-y-4">
+                <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-[9px] text-gray-600 uppercase tracking-widest">User ID</span>
+                        <span id="transfer-uid-display" class="text-xs text-white font-mono font-bold"></span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-[9px] text-gray-600 uppercase tracking-widest">Current Affiliate</span>
+                        <span id="transfer-from-display" class="text-xs text-amber-400 font-mono font-bold"></span>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Transfer to Affiliate *</label>
+                    <div class="afp-search-wrap relative">
+                        <input type="text" id="transfer-afp-input" placeholder="Search affiliate code..." class="form-input w-full px-3 py-2.5 rounded-lg text-sm" autocomplete="off">
+                        <div id="transfer-afp-dropdown" class="afp-dropdown absolute top-full left-0 w-full mt-1 glass-panel rounded-lg max-h-40 overflow-y-auto hidden z-50"></div>
+                        <input type="hidden" id="transfer-afp-value">
+                    </div>
+                </div>
+                <label class="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/5 cursor-pointer hover:bg-white/[0.04] transition group">
+                    <input type="checkbox" id="transfer-include-commissions" class="cursor-pointer accent-purple-500 w-4 h-4">
+                    <div>
+                        <span class="text-[11px] text-white font-medium">Also transfer commissions</span>
+                        <p class="text-[9px] text-gray-500 mt-0.5">If checked, commission records will move to the new affiliate. The original affiliate will lose these commissions.</p>
+                    </div>
+                </label>
+                <div id="transfer-msg" class="hidden text-[10px] px-3 py-2 rounded-lg"></div>
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button onclick="submitTransfer()" class="flex-1 py-2.5 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider bg-purple-600 hover:bg-purple-500 transition">Transfer</button>
+                <button onclick="closeModal('transfer-modal')" class="flex-1 py-2.5 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-wider border border-white/10 hover:bg-white/5 transition">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Broker Management Modal -->
     <div id="broker-modal" class="modal-overlay fixed inset-0 z-[9999] hidden flex items-center justify-center">
         <div class="glass-panel rounded-2xl p-6 w-full max-w-lg mx-4 max-h-[85vh] overflow-y-auto">
@@ -2182,6 +2227,45 @@
                     <div>
                         <label class="text-[9px] text-gray-600 block mb-1">Contact <span class="text-gray-700">(optional)</span></label>
                         <input type="text" id="broker-contact-input" class="form-input w-full px-3 py-2 rounded-lg text-sm" placeholder="email or telegram">
+                    </div>
+                </div>
+                <!-- ── Data Sync Section ── -->
+                <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-3">
+                    <div class="flex items-center justify-between cursor-pointer" onclick="this.nextElementSibling.classList.toggle('hidden')">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold flex items-center gap-1.5">
+                            <svg class="w-3 h-3 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 7v10M8 7v10M4 12h4M12 5l7 7-7 7"/></svg>
+                            Data Source <span class="text-gray-700">(optional)</span>
+                        </p>
+                        <span class="text-[9px] text-gray-600">click to expand</span>
+                    </div>
+                    <div class="hidden space-y-3" id="broker-datasource-section">
+                        <div>
+                            <label class="text-[9px] text-gray-600 block mb-1">Source Type</label>
+                            <select id="broker-ds-source" class="form-input w-full px-3 py-2 rounded-lg text-sm bg-white/5 border border-white/10 text-white" onchange="document.getElementById('broker-cx-fields').classList.toggle('hidden', this.value !== 'cellxpert')">
+                                <option value="none">None — manual data entry</option>
+                                <option value="cellxpert">CellXpert — automated scraping</option>
+                                <option value="api">Broker API — direct integration</option>
+                                <option value="manual">Manual CSV import</option>
+                            </select>
+                        </div>
+                        <div id="broker-cx-fields" class="hidden space-y-2">
+                            <div>
+                                <label class="text-[9px] text-gray-600 block mb-1">CellXpert Panel URL *</label>
+                                <input type="url" id="broker-cx-url" class="form-input w-full px-3 py-2 rounded-lg text-sm font-mono" placeholder="https://go.yourbroker.com">
+                                <p class="text-[8px] text-gray-700 mt-0.5">Base URL of the CellXpert back-office (e.g. https://go.vantagemarkets.com)</p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="text-[9px] text-gray-600 block mb-1">Login Email *</label>
+                                    <input type="email" id="broker-cx-email" class="form-input w-full px-3 py-2 rounded-lg text-sm" placeholder="you@email.com">
+                                </div>
+                                <div>
+                                    <label class="text-[9px] text-gray-600 block mb-1">Password *</label>
+                                    <input type="password" id="broker-cx-password" class="form-input w-full px-3 py-2 rounded-lg text-sm" placeholder="••••••••">
+                                    <p class="text-[8px] text-gray-700 mt-0.5" id="broker-cx-pass-hint"></p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <button onclick="addBroker()" class="btn-gradient w-full py-2.5 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider">Add Broker</button>
