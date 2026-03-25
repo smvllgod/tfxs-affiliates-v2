@@ -157,7 +157,18 @@ function copyBrokerLink(btn, link) {
 
     // Replace {AFP} placeholder in broker_link with user's actual AFP code
     if (deal.broker_link && userAfp) {
-      deal.broker_link = deal.broker_link.replace(/\{AFP\}/gi, userAfp);
+      if (/\{AFP\}|\[afp\]|\{afp\}|=AFP/i.test(deal.broker_link)) {
+        deal.broker_link = deal.broker_link
+          .replace(/\{AFP\}/gi, userAfp)
+          .replace(/\[afp\]/gi, userAfp)
+          .replace(/\{afp\}/gi, userAfp)
+          .replace(/=AFP$/i, '=' + userAfp)
+          .replace(/=AFP&/i, '=' + userAfp + '&');
+      } else {
+        // No placeholder — append AFP as URL parameter
+        const sep = deal.broker_link.includes('?') ? '&' : '?';
+        deal.broker_link = deal.broker_link + sep + 'afp=' + encodeURIComponent(userAfp);
+      }
     }
 
     const glowStyle = isDynamic ? accent._style.glow : "";
