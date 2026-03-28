@@ -147,10 +147,10 @@ BRAND._injectCSS = () => {
 /* ── Export globally ───────────────────────────────────────────── */
 if (typeof window !== "undefined") {
   window.BRAND = BRAND;
-  // Auto-inject CSS vars as soon as config loads
+  // Inject CSS vars immediately (synchronously) so brand colors apply before shared.css renders
+  BRAND._injectCSS();
+  // Also re-inject on DOMContentLoaded to ensure Tailwind JIT picks up the vars
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => BRAND._injectCSS());
-  } else {
-    BRAND._injectCSS();
   }
 }
