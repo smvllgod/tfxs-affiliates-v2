@@ -1919,8 +1919,8 @@
                             <div data-cs-dd class="hidden absolute left-0 right-0 mt-1 rounded-xl bg-[#1a1a1a] border border-white/10 shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
                                 <div data-cs-opts>
                                     <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300 bg-white/5 font-medium" data-value="CPA">CPA</div>
-                                    <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="RevShare">RevShare</div>
-                                    <div class="custom-select-opt px-3 py-2 text-[11px] cursor-pointer hover:bg-white/10 transition text-gray-300" data-value="Hybrid">Hybrid</div>
+                                    <div class="px-3 py-2 text-[11px] text-gray-600 flex items-center justify-between cursor-not-allowed select-none" title="Coming soon">RevShare <span class="text-[9px] px-1.5 py-0.5 rounded bg-white/5 text-gray-700 font-medium">Soon</span></div>
+                                    <div class="px-3 py-2 text-[11px] text-gray-600 flex items-center justify-between cursor-not-allowed select-none" title="Coming soon">Hybrid <span class="text-[9px] px-1.5 py-0.5 rounded bg-white/5 text-gray-700 font-medium">Soon</span></div>
                                 </div>
                             </div>
                             <input type="hidden" id="deal-type" value="CPA">
@@ -2337,20 +2337,37 @@
         <div class="glass-panel rounded-2xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between mb-5">
                 <h3 id="contract-modal-title" class="text-sm font-bold text-white uppercase tracking-wider">New Contract Template</h3>
-                <button onclick="closeModal('contract-modal')" class="text-gray-500 hover:text-white transition">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
+                <div class="flex items-center gap-2">
+                    <button onclick="openTemplatePickerModal()" class="px-3 py-1.5 rounded-lg text-[10px] font-bold text-brand-400 bg-brand-500/10 hover:bg-brand-500/20 border border-brand-500/20 transition uppercase tracking-wider flex items-center gap-1.5">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h8m-8 4h4"/></svg>
+                        Use Template
+                    </button>
+                    <button onclick="closeModal('contract-modal')" class="text-gray-500 hover:text-white transition">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
             </div>
             <input type="hidden" id="contract-modal-id">
             <div class="space-y-4">
-                <div>
-                    <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1 block">Contract Title *</label>
-                    <input type="text" id="contract-title" class="form-input w-full px-4 py-3 rounded-xl text-sm" placeholder="e.g. CPA Affiliate Agreement">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1 block">Contract Title *</label>
+                        <input type="text" id="contract-title" class="form-input w-full px-4 py-3 rounded-xl text-sm" placeholder="e.g. CPA Affiliate Agreement">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1 block">Linked Deal <span class="text-gray-700 normal-case font-normal">(optional)</span></label>
+                        <select id="contract-deal-id" class="form-input w-full px-3 py-3 rounded-xl text-sm" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:white">
+                            <option value="" style="background:#111">&mdash; None &mdash;</option>
+                        </select>
+                    </div>
                 </div>
                 <div>
-                    <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1 block">Contract Content *</label>
-                    <p class="text-[9px] text-gray-600 mb-2">Use placeholders: <span class="font-mono text-brand-400">{{AffiliateName}}</span>, <span class="font-mono text-brand-400">{{Date}}</span>, <span class="font-mono text-brand-400">{{BrokerName}}</span>, <span class="font-mono text-brand-400">{{DealName}}</span> — these are replaced when assigned.</p>
-                    <textarea id="contract-content" rows="14" class="form-input w-full px-4 py-3 rounded-xl text-sm font-mono leading-relaxed" placeholder="Enter the full contract text here...&#10;&#10;AFFILIATE AGREEMENT&#10;&#10;This agreement is entered into between {{AffiliateName}} (the Affiliate) and..."></textarea>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold block">Contract Content *</label>
+                        <span class="text-[9px] text-gray-600">Variables: <span id="contract-vars-detected" class="font-mono text-brand-400">&mdash;</span></span>
+                    </div>
+                    <p class="text-[9px] text-gray-600 mb-2">Use <span class="font-mono text-brand-400">{{AffiliateName}}</span> <span class="font-mono text-brand-400">{{Date}}</span> <span class="font-mono text-brand-400">{{BrokerName}}</span> <span class="font-mono text-brand-400">{{Commission}}</span> or any <span class="font-mono text-brand-400">{{CustomVar}}</span></p>
+                    <textarea id="contract-content" rows="13" oninput="updateContractVarsDetected()" class="form-input w-full px-4 py-3 rounded-xl text-sm font-mono leading-relaxed" placeholder="Enter full contract text, or click 'Use Template' above..."></textarea>
                 </div>
                 <div class="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/5">
                     <input type="checkbox" id="contract-lock-links" class="w-4 h-4 rounded accent-brand-500 cursor-pointer">
@@ -2387,31 +2404,54 @@
                 </div>
                 <div id="assign-affiliate-list" class="max-h-56 overflow-y-auto space-y-1.5 rounded-xl border border-white/5 p-2 bg-white/[0.01]"></div>
             </div>
-            <div class="mb-5 p-3 rounded-xl bg-white/[0.02] border border-white/5">
-                <p class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-2">Variable Values (optional)</p>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="text-[9px] text-gray-600 block mb-1">Date</label>
-                        <input type="text" id="assign-var-Date" class="form-input w-full px-3 py-2 rounded-lg text-xs" placeholder="e.g. January 1, 2025">
-                    </div>
-                    <div>
-                        <label class="text-[9px] text-gray-600 block mb-1">BrokerName</label>
-                        <input type="text" id="assign-var-BrokerName" class="form-input w-full px-3 py-2 rounded-lg text-xs" placeholder="e.g. AxiTrader">
-                    </div>
-                    <div>
-                        <label class="text-[9px] text-gray-600 block mb-1">DealName</label>
-                        <input type="text" id="assign-var-DealName" class="form-input w-full px-3 py-2 rounded-lg text-xs" placeholder="e.g. CPA $500">
-                    </div>
-                    <div>
-                        <label class="text-[9px] text-gray-600 block mb-1">Custom</label>
-                        <input type="text" id="assign-var-Custom" class="form-input w-full px-3 py-2 rounded-lg text-xs" placeholder="Any value">
-                    </div>
+            <div id="assign-vars-section" class="mb-5 hidden">
+                <div class="flex items-center justify-between mb-2">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-wider font-bold">Variable Values</p>
+                    <button onclick="previewContract()" class="text-[9px] font-bold text-brand-400 hover:text-brand-300 uppercase tracking-wider flex items-center gap-1.5 transition">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        Preview
+                    </button>
                 </div>
+                <div id="assign-vars-container" class="p-3 rounded-xl bg-white/[0.02] border border-white/5 grid grid-cols-2 gap-2"></div>
             </div>
             <div class="flex gap-3">
                 <button onclick="doAssignContract()" class="flex-1 btn-gradient py-3 rounded-xl text-xs font-bold text-white uppercase tracking-wider">Assign to Selected</button>
                 <button onclick="closeModal('assign-contract-modal')" class="px-6 py-3 rounded-xl text-xs font-bold text-gray-400 border border-white/10 hover:bg-white/5 transition uppercase tracking-wider">Cancel</button>
             </div>
+        </div>
+    </div>
+
+    <!-- ── Contract Template Picker Modal ── -->
+    <div id="template-picker-modal" class="modal-overlay fixed inset-0 z-[10000] hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('template-picker-modal')">
+        <div class="glass-panel rounded-2xl p-6 w-full max-w-lg mx-4">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider">Choose a Template</h3>
+                    <p class="text-[10px] text-gray-500 mt-1">Professional pre-written contracts &mdash; fully editable after loading.</p>
+                </div>
+                <button onclick="closeModal('template-picker-modal')" class="text-gray-500 hover:text-white transition">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="space-y-2" id="template-picker-list"></div>
+            <button onclick="closeModal('template-picker-modal')" class="mt-4 w-full py-2.5 rounded-xl text-xs font-bold text-gray-500 border border-white/10 hover:bg-white/5 transition uppercase tracking-wider">Cancel</button>
+        </div>
+    </div>
+
+    <!-- ── Contract Preview Modal ── -->
+    <div id="contract-preview-modal" class="modal-overlay fixed inset-0 z-[10001] hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('contract-preview-modal')">
+        <div class="glass-panel rounded-2xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider">Contract Preview</h3>
+                    <p class="text-[9px] text-amber-400/70 mt-1">Unfilled variables shown in <span class="font-mono text-amber-400">{{brackets}}</span></p>
+                </div>
+                <button onclick="closeModal('contract-preview-modal')" class="text-gray-500 hover:text-white transition">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div id="contract-preview-content" class="text-xs text-gray-300 leading-relaxed whitespace-pre-wrap font-mono bg-white/[0.02] border border-white/5 rounded-xl p-4 max-h-[55vh] overflow-y-auto"></div>
+            <button onclick="closeModal('contract-preview-modal')" class="mt-4 w-full py-2.5 rounded-xl text-xs font-bold text-gray-500 border border-white/10 hover:bg-white/5 transition uppercase tracking-wider">Close</button>
         </div>
     </div>
 
