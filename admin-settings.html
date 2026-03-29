@@ -323,6 +323,7 @@
             <button class="admin-tab flex-1 min-w-[120px] py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg flex items-center justify-center gap-1.5" data-tab="notifications"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg> Notifications</button>
             <button class="admin-tab flex-1 min-w-[120px] py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg flex items-center justify-center gap-1.5" data-tab="integrations"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg> Integrations</button>
             <button class="admin-tab flex-1 min-w-[120px] py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg flex items-center justify-center gap-1.5" data-tab="analytics"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg> Analytics</button>
+            <button class="admin-tab flex-1 min-w-[110px] py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg flex items-center justify-center gap-1.5 relative" data-tab="contracts"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg> Contracts <span id="contracts-tab-badge" class="hidden absolute -top-1 -right-1 bg-amber-500 text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span></button>
         </div>
 
         <!-- ═══════ AFFILIATES TAB ═══════ -->
@@ -1656,6 +1657,59 @@
             </div>
         </div>
 
+        <!-- ═══════ CONTRACTS TAB ═══════ -->
+        <div id="tab-contracts" class="tab-content hidden">
+            <!-- Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
+                <div>
+                    <h3 class="text-sm font-bold text-white mb-0.5">Legal &amp; Contracts</h3>
+                    <p class="text-xs text-gray-500">Create contract templates, assign to affiliates, and track signatures.</p>
+                </div>
+                <button onclick="openContractModal()" class="btn-gradient px-4 py-2 rounded-xl text-xs font-bold text-white flex items-center gap-2 whitespace-nowrap">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    New Contract
+                </button>
+            </div>
+
+            <!-- Sub-nav -->
+            <div class="flex gap-2 mb-6">
+                <button onclick="switchContractsSub('templates')" data-csub="templates" class="contracts-sub-btn active-csub px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-white/5 border border-white/10 text-white hover:bg-white/10 transition">Templates</button>
+                <button onclick="switchContractsSub('assignments')" data-csub="assignments" class="contracts-sub-btn px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10 transition">Assignments &amp; Signatures</button>
+            </div>
+
+            <!-- Templates panel -->
+            <div id="contracts-panel-templates">
+                <div id="contracts-loading" class="text-center py-12 text-gray-500 text-xs">Loading contracts...</div>
+                <div id="contracts-list" class="hidden space-y-3"></div>
+                <div id="contracts-empty" class="hidden text-center py-16">
+                    <div class="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-7 h-7 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
+                    <p class="text-gray-500 text-xs">No contracts yet. Create your first template.</p>
+                </div>
+            </div>
+
+            <!-- Assignments panel -->
+            <div id="contracts-panel-assignments" class="hidden">
+                <div id="assignments-loading" class="text-center py-12 text-gray-500 text-xs">Loading assignments...</div>
+                <div id="assignments-table-wrap" class="hidden overflow-x-auto rounded-2xl border border-white/5">
+                    <table class="w-full text-xs">
+                        <thead>
+                            <tr class="border-b border-white/5 text-left">
+                                <th class="px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Contract</th>
+                                <th class="px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Affiliate</th>
+                                <th class="px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Status</th>
+                                <th class="px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Signed At</th>
+                                <th class="px-4 py-3 text-[10px] text-gray-500 uppercase tracking-wider font-bold">Assigned</th>
+                            </tr>
+                        </thead>
+                        <tbody id="assignments-tbody"></tbody>
+                    </table>
+                </div>
+                <div id="assignments-empty" class="hidden text-center py-12 text-gray-500 text-xs">No assignments yet.</div>
+            </div>
+        </div>
+
     </main>
 
     <!-- ═══════════════════════════════════════════════════ -->
@@ -2274,6 +2328,105 @@
             <div id="broker-list" class="space-y-1.5 max-h-60 overflow-y-auto"></div>
             <div class="mt-5">
                 <button onclick="closeModal('broker-modal')" class="w-full py-2.5 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-wider border border-white/10 hover:bg-white/5 transition">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Contract Template Modal ── -->
+    <div id="contract-modal" class="modal-overlay fixed inset-0 z-[9999] hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('contract-modal')">
+        <div class="glass-panel rounded-2xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-5">
+                <h3 id="contract-modal-title" class="text-sm font-bold text-white uppercase tracking-wider">New Contract Template</h3>
+                <button onclick="closeModal('contract-modal')" class="text-gray-500 hover:text-white transition">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <input type="hidden" id="contract-modal-id">
+            <div class="space-y-4">
+                <div>
+                    <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1 block">Contract Title *</label>
+                    <input type="text" id="contract-title" class="form-input w-full px-4 py-3 rounded-xl text-sm" placeholder="e.g. CPA Affiliate Agreement">
+                </div>
+                <div>
+                    <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1 block">Contract Content *</label>
+                    <p class="text-[9px] text-gray-600 mb-2">Use placeholders: <span class="font-mono text-brand-400">{{AffiliateName}}</span>, <span class="font-mono text-brand-400">{{Date}}</span>, <span class="font-mono text-brand-400">{{BrokerName}}</span>, <span class="font-mono text-brand-400">{{DealName}}</span> — these are replaced when assigned.</p>
+                    <textarea id="contract-content" rows="14" class="form-input w-full px-4 py-3 rounded-xl text-sm font-mono leading-relaxed" placeholder="Enter the full contract text here...&#10;&#10;AFFILIATE AGREEMENT&#10;&#10;This agreement is entered into between {{AffiliateName}} (the Affiliate) and..."></textarea>
+                </div>
+                <div class="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                    <input type="checkbox" id="contract-lock-links" class="w-4 h-4 rounded accent-brand-500 cursor-pointer">
+                    <div>
+                        <label for="contract-lock-links" class="text-xs text-white font-semibold cursor-pointer">Lock deals &amp; links until signed</label>
+                        <p class="text-[10px] text-gray-500">Affiliates assigned this contract will not see active deals until they sign.</p>
+                    </div>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button onclick="saveContract()" class="flex-1 btn-gradient py-3 rounded-xl text-xs font-bold text-white uppercase tracking-wider">Save Contract</button>
+                    <button onclick="closeModal('contract-modal')" class="px-6 py-3 rounded-xl text-xs font-bold text-gray-400 border border-white/10 hover:bg-white/5 transition uppercase tracking-wider">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Assign Contract Modal ── -->
+    <div id="assign-contract-modal" class="modal-overlay fixed inset-0 z-[9999] hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('assign-contract-modal')">
+        <div class="glass-panel rounded-2xl p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-5">
+                <h3 class="text-sm font-bold text-white uppercase tracking-wider">Assign Contract</h3>
+                <button onclick="closeModal('assign-contract-modal')" class="text-gray-500 hover:text-white transition">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <input type="hidden" id="assign-contract-id">
+            <p id="assign-contract-name" class="text-xs text-gray-400 mb-4 px-3 py-2 rounded-lg bg-white/[0.02] border border-white/5"></p>
+            <div class="mb-4">
+                <label class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-2 block">Select Affiliates</label>
+                <div class="flex gap-2 mb-2">
+                    <button onclick="assignSelectAll(true)" class="text-[9px] font-bold text-brand-400 hover:text-brand-300 transition uppercase tracking-wider">Select All</button>
+                    <span class="text-gray-700">·</span>
+                    <button onclick="assignSelectAll(false)" class="text-[9px] font-bold text-gray-500 hover:text-gray-300 transition uppercase tracking-wider">Deselect All</button>
+                </div>
+                <div id="assign-affiliate-list" class="max-h-56 overflow-y-auto space-y-1.5 rounded-xl border border-white/5 p-2 bg-white/[0.01]"></div>
+            </div>
+            <div class="mb-5 p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                <p class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-2">Variable Values (optional)</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-[9px] text-gray-600 block mb-1">Date</label>
+                        <input type="text" id="assign-var-Date" class="form-input w-full px-3 py-2 rounded-lg text-xs" placeholder="e.g. January 1, 2025">
+                    </div>
+                    <div>
+                        <label class="text-[9px] text-gray-600 block mb-1">BrokerName</label>
+                        <input type="text" id="assign-var-BrokerName" class="form-input w-full px-3 py-2 rounded-lg text-xs" placeholder="e.g. AxiTrader">
+                    </div>
+                    <div>
+                        <label class="text-[9px] text-gray-600 block mb-1">DealName</label>
+                        <input type="text" id="assign-var-DealName" class="form-input w-full px-3 py-2 rounded-lg text-xs" placeholder="e.g. CPA $500">
+                    </div>
+                    <div>
+                        <label class="text-[9px] text-gray-600 block mb-1">Custom</label>
+                        <input type="text" id="assign-var-Custom" class="form-input w-full px-3 py-2 rounded-lg text-xs" placeholder="Any value">
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="doAssignContract()" class="flex-1 btn-gradient py-3 rounded-xl text-xs font-bold text-white uppercase tracking-wider">Assign to Selected</button>
+                <button onclick="closeModal('assign-contract-modal')" class="px-6 py-3 rounded-xl text-xs font-bold text-gray-400 border border-white/10 hover:bg-white/5 transition uppercase tracking-wider">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── View Contract Text Modal ── -->
+    <div id="view-contract-modal" class="modal-overlay fixed inset-0 z-[9999] hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('view-contract-modal')">
+        <div class="glass-panel rounded-2xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-5">
+                <h3 id="view-contract-title" class="text-sm font-bold text-white uppercase tracking-wider"></h3>
+                <button onclick="closeModal('view-contract-modal')" class="text-gray-500 hover:text-white transition">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div id="view-contract-content" class="text-xs text-gray-300 leading-relaxed whitespace-pre-wrap font-mono bg-white/[0.02] border border-white/5 rounded-xl p-4 max-h-[60vh] overflow-y-auto"></div>
+            <div class="mt-4 flex gap-3">
+                <button onclick="closeModal('view-contract-modal')" class="w-full py-3 rounded-xl text-xs font-bold text-gray-400 border border-white/10 hover:bg-white/5 transition uppercase tracking-wider">Close</button>
             </div>
         </div>
     </div>

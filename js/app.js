@@ -505,7 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ── Apply BRAND logos & favicon ───────────────────────────────
-(function applyBrandLogos() {
+function applyBrandLogos() {
     if (typeof BRAND === 'undefined' || !BRAND.logos) return;
 
     // Favicon — swap if a custom one is set
@@ -518,7 +518,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Nav logo — only swap when logo_choice is "custom" and URLs are present
     if (BRAND.logos.choice === 'custom') {
         // Dark theme = show light logo (light-colored logo on dark background)
-        const isDark = !document.documentElement.classList.contains('light');
+        // NOTE: theme.js uses class "light-theme" (not "light")
+        const isDark = !document.documentElement.classList.contains('light-theme');
         const logoUrl = isDark ? (BRAND.logos.light || BRAND.logos.dark) : (BRAND.logos.dark || BRAND.logos.light);
         if (logoUrl) {
             const imgs = document.querySelectorAll('#nav-logo-img');
@@ -535,4 +536,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
-})();
+}
+// Run immediately and re-run whenever the theme class changes (light-theme added/removed)
+applyBrandLogos();
+window.applyBrandLogos = applyBrandLogos;
+(new MutationObserver(function(muts) {
+    if (muts.some(m => m.attributeName === 'class')) applyBrandLogos();
+})).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });

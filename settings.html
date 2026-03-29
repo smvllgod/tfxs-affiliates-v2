@@ -177,6 +177,13 @@
                     Notifications
                 </span>
             </button>
+            <button id="tab-btn-contracts" onclick="switchSettingsTab('contracts')" class="px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 text-gray-500 hover:text-gray-300 hover:bg-white/5 relative">
+                <span class="flex items-center gap-2">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    Contracts
+                </span>
+                <span id="contracts-pending-badge" class="hidden absolute -top-1 -right-1 bg-amber-500 text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">!</span>
+            </button>
         </div>
 
         <!-- ═══ GENERAL SETTINGS TAB ═══ -->
@@ -875,6 +882,39 @@
         </div><!-- end glass-panel -->
         </div><!-- end tab-general-extra -->
 
+        <!-- ═══ CONTRACTS TAB ═══ -->
+        <div id="tab-contracts" class="hidden">
+        <div class="glass-panel p-8 rounded-2xl border border-white/5">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-white">Contracts &amp; Agreements</h3>
+                    <p class="text-[11px] text-gray-500">Review and sign contracts assigned to your account.</p>
+                </div>
+            </div>
+
+            <!-- Contract gate warning (shown if pending contracts lock deals) -->
+            <div id="contract-gate-warning" class="hidden mb-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-start gap-3">
+                <svg class="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <div>
+                    <p class="text-xs font-bold text-amber-400">Action Required</p>
+                    <p class="text-[11px] text-amber-300/80 mt-0.5">You must sign all pending contracts before you can access your deals and tracking links.</p>
+                </div>
+            </div>
+
+            <div id="contracts-aff-loading" class="text-center py-12 text-gray-500 text-xs">Loading contracts...</div>
+            <div id="contracts-aff-empty" class="hidden text-center py-16">
+                <div class="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-7 h-7 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                </div>
+                <p class="text-gray-500 text-xs">No contracts assigned to you yet.</p>
+            </div>
+            <div id="contracts-aff-list" class="hidden space-y-4"></div>
+        </div>
+        </div><!-- end tab-contracts -->
+
     </main>
     <script src="js/theme.js"></script>
     <script src="js/i18n.js"></script>
@@ -886,24 +926,31 @@
             const tabGeneral = document.getElementById('tab-general');
             const tabGeneralExtra = document.getElementById('tab-general-extra');
             const tabNotifications = document.getElementById('tab-notifications');
+            const tabContracts = document.getElementById('tab-contracts');
             const btnGeneral = document.getElementById('tab-btn-general');
             const btnNotifications = document.getElementById('tab-btn-notifications');
+            const btnContracts = document.getElementById('tab-btn-contracts');
 
             const activeClasses = 'bg-brand-500/20 text-brand-500 border border-brand-500/30';
             const inactiveClasses = 'text-gray-500 hover:text-gray-300 hover:bg-white/5';
 
+            // Hide all
+            [tabGeneral, tabGeneralExtra, tabNotifications].forEach(el => el && el.classList.add('hidden'));
+            if (tabContracts) tabContracts.classList.add('hidden');
+            [btnGeneral, btnNotifications].forEach(btn => btn && (btn.className = 'px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 ' + inactiveClasses));
+            if (btnContracts) btnContracts.className = 'px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 relative ' + inactiveClasses;
+
             if (tab === 'general') {
                 tabGeneral.classList.remove('hidden');
                 tabGeneralExtra.classList.remove('hidden');
-                tabNotifications.classList.add('hidden');
                 btnGeneral.className = 'px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 ' + activeClasses;
-                btnNotifications.className = 'px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 ' + inactiveClasses;
-            } else {
-                tabGeneral.classList.add('hidden');
-                tabGeneralExtra.classList.add('hidden');
+            } else if (tab === 'notifications') {
                 tabNotifications.classList.remove('hidden');
                 btnNotifications.className = 'px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 ' + activeClasses;
-                btnGeneral.className = 'px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 ' + inactiveClasses;
+            } else if (tab === 'contracts') {
+                if (tabContracts) tabContracts.classList.remove('hidden');
+                if (btnContracts) btnContracts.className = 'px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 relative ' + activeClasses;
+                loadAffiliateContracts();
             }
         }
     </script>
@@ -1893,6 +1940,162 @@
         updateServerTime();
         setInterval(updateServerTime, 1000);
     </script>
+
+    <!-- ── Affiliate Contract Engine ── -->
+    <script>
+    // View contract text modal (read before sign)
+    let _affContracts = [];
+
+    async function loadAffiliateContracts() {
+        const loading = document.getElementById('contracts-aff-loading');
+        const empty = document.getElementById('contracts-aff-empty');
+        const list = document.getElementById('contracts-aff-list');
+        const warning = document.getElementById('contract-gate-warning');
+        const badge = document.getElementById('contracts-pending-badge');
+        if (loading) loading.classList.remove('hidden');
+        if (empty) empty.classList.add('hidden');
+        if (list) { list.classList.add('hidden'); list.innerHTML = ''; }
+        if (warning) warning.classList.add('hidden');
+
+        try {
+            const API_BASE = (window.PLATFORM_API || window.TFXS_API)?.API_BASE || (window.BRAND && BRAND.urls.api) || '';
+            const jwt = localStorage.getItem((window.BRAND ? BRAND._lsKey('jwt') : 'tfxs_jwt'));
+            const res = await fetch(API_BASE + '/api/my-contracts', {
+                headers: { 'Authorization': 'Bearer ' + jwt, 'Content-Type': 'application/json' }
+            });
+            const data = await res.json();
+            if (!data.ok) throw new Error(data.error || 'Failed to load');
+            _affContracts = data.data || [];
+            if (loading) loading.classList.add('hidden');
+
+            if (!_affContracts.length) {
+                if (empty) empty.classList.remove('hidden');
+                return;
+            }
+
+            const pending = _affContracts.filter(c => c.status === 'pending');
+            const lockingPending = pending.filter(c => c.require_before_links);
+            if (lockingPending.length && warning) warning.classList.remove('hidden');
+            if (badge) { badge.textContent = pending.length > 0 ? '!' : ''; badge.classList.toggle('hidden', pending.length === 0); }
+
+            list.innerHTML = _affContracts.map(c => {
+                const isPending = c.status === 'pending';
+                const statusHtml = isPending
+                    ? `<span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-500/20 text-amber-400 uppercase">Pending Signature</span>`
+                    : `<span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-green-500/20 text-green-400 uppercase">✓ Signed</span>`;
+                const lockHtml = c.require_before_links && isPending
+                    ? `<span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-red-500/20 text-red-400 uppercase flex items-center gap-1"><svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>Locks Deals</span>`
+                    : '';
+                return `
+                <div class="rounded-2xl p-5 border ${isPending ? 'border-amber-500/20 bg-amber-500/[0.03]' : 'border-green-500/10 bg-green-500/[0.02]'}">
+                    <div class="flex items-start justify-between gap-3 flex-wrap mb-3">
+                        <div>
+                            <h4 class="text-sm font-semibold text-white">${_esc(c.title || 'Contract')}</h4>
+                            <p class="text-[10px] text-gray-500 mt-0.5">Assigned ${_fmtDate(c.assigned_at)}${c.signed_at ? ' · Signed ' + _fmtDate(c.signed_at) : ''}</p>
+                        </div>
+                        <div class="flex items-center gap-2 flex-wrap">${statusHtml}${lockHtml}</div>
+                    </div>
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <button onclick="viewAffContract('${c.id}')" class="flex items-center gap-1.5 text-[10px] font-bold text-brand-400 hover:text-brand-300 transition uppercase tracking-wider">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            Read Contract
+                        </button>
+                        ${isPending ? `<button onclick="signAffContract('${c.id}')" id="sign-btn-${c.id}" class="btn-gradient px-4 py-2 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                            Sign &amp; Accept
+                        </button>` : `<span class="text-[10px] text-green-400 flex items-center gap-1"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Completed</span>`}
+                    </div>
+                </div>`;
+            }).join('');
+            list.classList.remove('hidden');
+        } catch (e) {
+            if (loading) loading.classList.add('hidden');
+            if (empty) { empty.classList.remove('hidden'); empty.querySelector('p').textContent = 'Error loading contracts: ' + e.message; }
+        }
+    }
+
+    function _esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+    function _fmtDate(d) { if (!d) return '—'; return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }); }
+
+    async function viewAffContract(assignmentId) {
+        const API_BASE = (window.PLATFORM_API || window.TFXS_API)?.API_BASE || (window.BRAND && BRAND.urls.api) || '';
+        const jwt = localStorage.getItem((window.BRAND ? BRAND._lsKey('jwt') : 'tfxs_jwt'));
+        try {
+            const res = await fetch(API_BASE + '/api/my-contracts/' + assignmentId, {
+                headers: { 'Authorization': 'Bearer ' + jwt }
+            });
+            const data = await res.json();
+            if (!data.ok) throw new Error(data.error);
+            const c = data.data;
+            const text = c.rendered_content || c.contracts?.content || 'No content available.';
+            const title = c.contracts?.title || 'Contract';
+            // Show in a simple modal
+            let modal = document.getElementById('aff-contract-view-modal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'aff-contract-view-modal';
+                modal.className = 'fixed inset-0 z-[9999] flex items-center justify-center p-4';
+                modal.style.cssText = 'background:rgba(0,0,0,0.8);backdrop-filter:blur(4px)';
+                modal.innerHTML = `
+                    <div class="glass-panel rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 id="acvm-title" class="text-sm font-bold text-white uppercase tracking-wider"></h3>
+                            <button onclick="this.closest('#aff-contract-view-modal').remove()" class="text-gray-500 hover:text-white transition">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+                        <div id="acvm-content" class="text-xs text-gray-300 leading-relaxed whitespace-pre-wrap font-mono bg-white/[0.02] border border-white/5 rounded-xl p-4 max-h-[60vh] overflow-y-auto"></div>
+                        <button onclick="this.closest('#aff-contract-view-modal').remove()" class="w-full mt-4 py-2.5 rounded-lg text-[10px] font-bold text-gray-400 border border-white/10 hover:bg-white/5 transition uppercase tracking-wider">Close</button>
+                    </div>`;
+                document.body.appendChild(modal);
+            }
+            document.getElementById('acvm-title').textContent = title;
+            document.getElementById('acvm-content').textContent = text;
+        } catch (e) {
+            alert('Could not load contract: ' + e.message);
+        }
+    }
+
+    async function signAffContract(assignmentId) {
+        const btn = document.getElementById('sign-btn-' + assignmentId);
+        if (!confirm('By clicking OK, you confirm that you have read and agree to the terms of this contract. This action cannot be undone.')) return;
+        if (btn) { btn.disabled = true; btn.textContent = 'Signing...'; }
+        const API_BASE = (window.PLATFORM_API || window.TFXS_API)?.API_BASE || (window.BRAND && BRAND.urls.api) || '';
+        const jwt = localStorage.getItem((window.BRAND ? BRAND._lsKey('jwt') : 'tfxs_jwt'));
+        try {
+            const res = await fetch(API_BASE + '/api/contracts/' + assignmentId + '/sign', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + jwt, 'Content-Type': 'application/json' }
+            });
+            const data = await res.json();
+            if (!data.ok) throw new Error(data.error);
+            // Reload the tab
+            loadAffiliateContracts();
+        } catch (e) {
+            if (btn) { btn.disabled = false; btn.innerHTML = '<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>Sign & Accept'; }
+            alert('Signing failed: ' + e.message);
+        }
+    }
+
+    // Auto-check for pending contracts on page load and show badge
+    (async function() {
+        try {
+            const API_BASE = (window.PLATFORM_API || window.TFXS_API)?.API_BASE || (window.BRAND && BRAND.urls.api) || '';
+            const jwt = localStorage.getItem((window.BRAND ? BRAND._lsKey('jwt') : 'tfxs_jwt'));
+            if (!jwt) return;
+            const res = await fetch(API_BASE + '/api/my-contracts', {
+                headers: { 'Authorization': 'Bearer ' + jwt }
+            });
+            const data = await res.json();
+            if (data.ok) {
+                const pending = (data.data || []).filter(c => c.status === 'pending').length;
+                const badge = document.getElementById('contracts-pending-badge');
+                if (badge && pending > 0) badge.classList.remove('hidden');
+            }
+        } catch (_) {}
+    })();
+    </script>
+
     <script src="js/settings-loader.js"></script>
     <script src="js/app.js"></script>
     </div>

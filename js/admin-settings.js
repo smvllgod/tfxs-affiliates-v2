@@ -278,6 +278,7 @@ async function loadActiveTab() {
   else if (active === "notifications") await loadNotificationSettings();
   else if (active === "integrations") await loadIntegrations();
   else if (active === "analytics") await loadAnalytics();
+  else if (active === "contracts") { switchContractsSub("templates"); loadContractAssignments(); }
 }
 
 // ══════════════════════════════════════════════════════
@@ -4155,4 +4156,214 @@ function closeTutorial() {
   if (!modal) return;
   modal.classList.add("hidden");
   modal.classList.remove("flex");
+}
+// ══════════════════════════════════════════════════════════════
+// CONTRACT / SIGNATURE ENGINE — Admin JS
+// ══════════════════════════════════════════════════════════════
+
+let _contractsCache = [];
+let _contractsAffiliatesCache = [];
+
+function switchContractsSub(panel) {
+  ["templates", "assignments"].forEach(p => {
+    const el = $("contracts-panel-" + p);
+    if (el) el.classList.toggle("hidden", p !== panel);
+    const btn = document.querySelector(`[data-csub="${p}"]`);
+    if (btn) {
+      btn.classList.toggle("active-csub", p === panel);
+      btn.classList.toggle("text-white", p === panel);
+      btn.classList.toggle("text-gray-400", p !== panel);
+    }
+  });
+  if (panel === "templates") loadContracts();
+  else loadContractAssignments();
+}
+
+async function loadContracts() {
+  $("contracts-loading")?.classList.remove("hidden");
+  $("contracts-list")?.classList.add("hidden");
+  $("contracts-empty")?.classList.add("hidden");
+  try {
+    const res = await api("/admin/contracts");
+    _contractsCache = res.data || [];
+    renderContractsList(_contractsCache);
+  } catch (e) {
+    $("contracts-loading")?.classList.add("hidden");
+  }
+}
+
+function renderContractsList(list) {
+  $("contracts-loading")?.classList.add("hidden");
+  if (!list.length) {
+    $("contracts-empty")?.classList.remove("hidden");
+    return;
+  }
+  const el = $("contracts-list");
+  el.innerHTML = list.map(c => `
+    <div class="glass-panel rounded-2xl p-4 border border-white/5 flex flex-col sm:flex-row sm:items-center gap-3">
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2 mb-1 flex-wrap">
+          <span class="text-sm font-semibold text-white truncate">${esc(c.title)}</span>
+          ${c.require_before_links ? `<span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-500/20 text-amber-400 uppercase">Locks Links</span>` : ""}
+        </div>
+        <p class="text-[10px] text-gray-500 line-clamp-2">${esc((c.content || "").substring(0, 120))}${c.content?.length > 120 ? "…" : ""}</p>
+        <p class="text-[9px] text-gray-600 mt-1">${fmtDate(c.created_at)}</p>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <button onclick="viewContractText('${c.id}')" title="Preview" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+        </button>
+        <button onclick="openAssignContractModal('${c.id}','${esc(c.title)}')" title="Assign" class="p-2 rounded-lg bg-brand-500/10 hover:bg-brand-500/20 text-brand-400 hover:text-brand-300 transition">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+        </button>
+        <button onclick="openContractModal('${c.id}')" title="Edit" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+        </button>
+        <button onclick="deleteContract('${c.id}')" title="Delete" class="p-2 rounded-lg hover:bg-red-500/10 text-gray-600 hover:text-red-400 transition">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+        </button>
+      </div>
+    </div>`).join("");
+  el.classList.remove("hidden");
+}
+
+function openContractModal(id) {
+  $("contract-modal-id").value = id || "";
+  $("contract-modal-title").textContent = id ? "Edit Contract" : "New Contract Template";
+  if (id) {
+    const c = _contractsCache.find(x => x.id === id);
+    if (c) {
+      $("contract-title").value = c.title || "";
+      $("contract-content").value = c.content || "";
+      $("contract-lock-links").checked = !!c.require_before_links;
+    }
+  } else {
+    $("contract-title").value = "";
+    $("contract-content").value = "";
+    $("contract-lock-links").checked = false;
+  }
+  openModal("contract-modal");
+}
+
+async function saveContract() {
+  const id = $("contract-modal-id").value;
+  const title = $("contract-title").value.trim();
+  const content = $("contract-content").value.trim();
+  const require_before_links = $("contract-lock-links").checked;
+  if (!title) return toast("Title required", "warn");
+  if (!content) return toast("Contract content required", "warn");
+  try {
+    if (id) {
+      await api(`/admin/contracts/${id}`, { method: "PATCH", body: JSON.stringify({ title, content, require_before_links }) });
+      toast("Contract updated");
+    } else {
+      await api("/admin/contracts", { method: "POST", body: JSON.stringify({ title, content, require_before_links }) });
+      toast("Contract created");
+    }
+    closeModal("contract-modal");
+    loadContracts();
+  } catch (e) { toast(e.message, "err"); }
+}
+
+async function deleteContract(id) {
+  const confirmed = await confirm2("Delete this contract template? All assignments will also be removed.");
+  if (!confirmed) return;
+  try {
+    await api(`/admin/contracts/${id}`, { method: "DELETE" });
+    toast("Contract deleted");
+    loadContracts();
+  } catch (e) { toast(e.message, "err"); }
+}
+
+function viewContractText(id) {
+  const c = _contractsCache.find(x => x.id === id);
+  if (!c) return;
+  $("view-contract-title").textContent = c.title;
+  $("view-contract-content").textContent = c.content;
+  openModal("view-contract-modal");
+}
+
+async function openAssignContractModal(contractId, contractTitle) {
+  $("assign-contract-id").value = contractId;
+  $("assign-contract-name").textContent = contractTitle;
+  ["Date", "BrokerName", "DealName", "Custom"].forEach(k => {
+    const el = $("assign-var-" + k);
+    if (el) el.value = k === "Date" ? new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" }) : "";
+  });
+  // Load affiliates
+  const listEl = $("assign-affiliate-list");
+  listEl.innerHTML = `<p class="text-xs text-gray-500 text-center py-3">Loading affiliates...</p>`;
+  openModal("assign-contract-modal");
+  try {
+    if (!_contractsAffiliatesCache.length) {
+      const res = await api("/admin/affiliates?per_page=500");
+      _contractsAffiliatesCache = res.data || [];
+    }
+    listEl.innerHTML = _contractsAffiliatesCache.map(a => `
+      <label class="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-white/5 cursor-pointer">
+        <input type="checkbox" data-aff-id="${a.id}" class="assign-aff-check w-3.5 h-3.5 rounded accent-brand-500">
+        <span class="text-xs text-gray-300">${esc(a.display_name || a.afp)}</span>
+        <span class="text-[9px] text-gray-600 font-mono">${esc(a.afp)}</span>
+      </label>`).join("") || `<p class="text-xs text-gray-500 text-center py-3">No affiliates found</p>`;
+  } catch (e) {
+    listEl.innerHTML = `<p class="text-xs text-red-400 text-center py-3">${esc(e.message)}</p>`;
+  }
+}
+
+function assignSelectAll(select) {
+  document.querySelectorAll(".assign-aff-check").forEach(c => c.checked = select);
+}
+
+async function doAssignContract() {
+  const contractId = $("assign-contract-id").value;
+  const checked = [...document.querySelectorAll(".assign-aff-check:checked")].map(c => c.dataset.affId);
+  if (!checked.length) return toast("Select at least one affiliate", "warn");
+  const variables = {};
+  ["Date", "BrokerName", "DealName", "Custom"].forEach(k => {
+    const val = $("assign-var-" + k)?.value?.trim();
+    if (val) variables[k] = val;
+  });
+  try {
+    const res = await api(`/admin/contracts/${contractId}/assign`, {
+      method: "POST",
+      body: JSON.stringify({ affiliate_ids: checked, variables }),
+    });
+    toast(`Contract assigned to ${res.assigned} affiliate(s)`);
+    closeModal("assign-contract-modal");
+  } catch (e) { toast(e.message, "err"); }
+}
+
+async function loadContractAssignments() {
+  $("assignments-loading")?.classList.remove("hidden");
+  $("assignments-table-wrap")?.classList.add("hidden");
+  $("assignments-empty")?.classList.add("hidden");
+  try {
+    const res = await api("/admin/contract-assignments");
+    const list = res.data || [];
+    $("assignments-loading")?.classList.add("hidden");
+    if (!list.length) {
+      $("assignments-empty")?.classList.remove("hidden");
+      return;
+    }
+    const tbody = $("assignments-tbody");
+    tbody.innerHTML = list.map(a => {
+      const affName = a.affiliate_accounts?.display_name || a.affiliate_afp || a.affiliate_id;
+      const ctName = a.contracts?.title || "—";
+      const statusBg = a.status === "signed" ? "bg-green-500/20 text-green-400" : "bg-amber-500/20 text-amber-400";
+      return `<tr class="border-b border-white/5 hover:bg-white/[0.02]">
+        <td class="px-4 py-3 text-xs text-gray-300 font-medium">${esc(ctName)}</td>
+        <td class="px-4 py-3 text-xs text-gray-300">${esc(affName)}</td>
+        <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${statusBg}">${esc(a.status)}</span></td>
+        <td class="px-4 py-3 text-xs text-gray-500">${a.signed_at ? fmtTime(a.signed_at) : "—"}</td>
+        <td class="px-4 py-3 text-xs text-gray-500">${fmtDate(a.created_at)}</td>
+      </tr>`;
+    }).join("");
+    $("assignments-table-wrap")?.classList.remove("hidden");
+    // Update badge
+    const pending = list.filter(a => a.status === "pending").length;
+    const badge = $("contracts-tab-badge");
+    if (badge) { badge.textContent = pending; badge.classList.toggle("hidden", pending === 0); }
+  } catch (e) {
+    $("assignments-loading")?.classList.add("hidden");
+  }
 }

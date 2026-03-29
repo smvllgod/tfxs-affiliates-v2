@@ -11,15 +11,28 @@ const _LS = (k) => window.BRAND ? BRAND._lsKey(k) : `tfxs_${k}`;
 // ── Tenant blocked overlay (suspended / trial expired) ────
 function showTenantBlockedOverlay(message) {
   if (document.getElementById("__tenant-blocked")) return;
+  const brandColor = (window.BRAND && BRAND.colors && BRAND.colors.primary600) || "#8b5cf6";
+  const brandName  = (window.BRAND && BRAND.name) || "Platform";
   const overlay = document.createElement("div");
   overlay.id = "__tenant-blocked";
-  overlay.style.cssText = "position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.92);display:flex;align-items:center;justify-content:center;";
-  overlay.innerHTML = `<div style="text-align:center;max-width:440px;padding:40px;background:#111;border-radius:16px;border:1px solid #333;">
-    <div style="font-size:48px;margin-bottom:16px;">🚫</div>
-    <h2 style="color:#fff;font-size:22px;margin-bottom:12px;">Platform Unavailable</h2>
-    <p style="color:#999;font-size:15px;line-height:1.5;">${message}</p>
-    <p style="color:#666;font-size:13px;margin-top:16px;">Contact your platform provider for assistance.</p>
-  </div>`;
+  overlay.style.cssText = "position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;font-family:inherit;";
+  overlay.innerHTML = `
+    <div style="position:relative;text-align:center;max-width:420px;width:90%;padding:48px 40px 40px;background:linear-gradient(160deg,#141414 0%,#0e0e0e 100%);border-radius:20px;border:1px solid rgba(255,255,255,0.07);box-shadow:0 40px 80px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.04);">
+      <div style="position:absolute;inset:0;border-radius:20px;overflow:hidden;pointer-events:none;">
+        <div style="position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:220px;height:220px;background:radial-gradient(circle,${brandColor}18 0%,transparent 70%);"></div>
+      </div>
+      <div style="position:relative;display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;margin-bottom:24px;">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="${brandColor}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+      <div style="display:inline-block;padding:3px 10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:20px;color:rgba(255,255,255,0.35);font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:16px;">${brandName}</div>
+      <h2 style="color:#fff;font-size:20px;font-weight:600;letter-spacing:-0.02em;margin:0 0 10px;">Access Restricted</h2>
+      <p style="color:rgba(255,255,255,0.45);font-size:14px;line-height:1.6;margin:0 0 32px;">${message}</p>
+      <div style="height:1px;background:rgba(255,255,255,0.06);margin-bottom:24px;"></div>
+      <p style="color:rgba(255,255,255,0.2);font-size:12px;line-height:1.5;margin:0;">To restore access, please contact your platform administrator.</p>
+    </div>`;
   document.body.appendChild(overlay);
 }
 
