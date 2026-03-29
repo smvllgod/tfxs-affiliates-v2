@@ -2030,6 +2030,7 @@ function renderAuditPage(page) {
 // ══════════════════════════════════════════════════════
 
 let allBrokers = [];
+let planMaxBrokers = 0; // Set from /api/plan-info — 0 = unlimited
 
 async function loadBrokers() {
   try {
@@ -2110,6 +2111,11 @@ function resetBrokerLogoUpload() {
 }
 
 function openBrokerModal() {
+  // ── Plan limit: block add if at limit ──
+  if (planMaxBrokers > 0 && allBrokers.length >= planMaxBrokers) {
+    toast(`Broker limit reached (${allBrokers.length}/${planMaxBrokers}). Upgrade your plan to add more brokers.`, "warn");
+    return;
+  }
   editingBrokerId = null;
   resetBrokerLogoUpload();
   if ($("broker-name-input")) $("broker-name-input").value = "";
@@ -2129,6 +2135,10 @@ function openBrokerModal() {
 }
 
 async function addBroker() {
+  // ── Client-side plan limit guard ──
+  if (planMaxBrokers > 0 && allBrokers.length >= planMaxBrokers) {
+    return toast(`Broker limit reached (${allBrokers.length}/${planMaxBrokers}). Upgrade your plan to add more brokers.`, "warn");
+  }
   const name = $("broker-name-input")?.value.trim();
   if (!name) return toast("Enter a broker name", "warn");
   const logo_url = $("broker-logo-data")?.value || null;
@@ -2174,7 +2184,12 @@ function renderBrokerList() {
     container.innerHTML = '<p class="text-xs text-gray-600 text-center py-4">No brokers yet. Add one above.</p>';
     return;
   }
-  container.innerHTML = allBrokers.map(b => {
+  // Show limit notice at the top of the list
+  const atLimit = planMaxBrokers > 0 && allBrokers.length >= planMaxBrokers;
+  const limitNotice = atLimit
+    ? `<div class="mb-2 px-3 py-2 rounded-lg text-[10px] font-semibold text-amber-400" style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);">⚠ Broker limit reached (${allBrokers.length}/${planMaxBrokers}). Delete one or upgrade your plan to add more.</div>`
+    : '';
+  container.innerHTML = limitNotice + allBrokers.map(b => {
     const colorDot = b.theme_color ? `<span class="w-3 h-3 rounded-full inline-block flex-shrink-0" style="background:${esc(b.theme_color)}"></span>` : '';
     const logoImg = b.logo_url ? `<img src="${esc(b.logo_url)}" class="w-6 h-6 rounded object-contain flex-shrink-0" onerror="this.style.display='none'">` : '';
     const contactTxt = b.contact ? `<span class="text-[9px] text-gray-500 truncate max-w-[120px]">${esc(b.contact)}</span>` : '';
@@ -2969,6 +2984,7 @@ async function rejectKyc(affiliateId) {
       const planInfo = await _planApi.apiGet('/api/plan-info');
       if (planInfo && planInfo.ok && planInfo.limits) {
         const lim = planInfo.limits;
+        planMaxBrokers = lim.maxBrokers || 0; // Store globally for addBroker / renderBrokerList
         const warnings = [];
         // Check affiliate usage vs limit
         if (lim.maxAffiliates) {
